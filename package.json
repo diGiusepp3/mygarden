@@ -1,0 +1,15 @@
+{
+  "name": "gardengrid-web",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild src/main.jsx --bundle --format=esm --jsx=automatic --minify --outfile=public_html/assets/app.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.2"
+  }
+}
