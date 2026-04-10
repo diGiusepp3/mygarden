@@ -1,8 +1,8 @@
 ﻿import React, { useState, useEffect, useReducer, useCallback, useMemo, useRef, createContext, useContext } from "react";
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // THEME
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 const T = {
     // Backgrounds & Surfaces
     bg:"#F5F0E8", surface:"#FFFFFF", surfaceAlt:"#EDE8DF", surfaceSoft:"#FBF9F4",
@@ -51,9 +51,9 @@ const T = {
 };
 const SCALE = 62; 
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // I18N
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 const LANG = {
     en: {
         app_subtitle:"Kitchen Garden Planner",
@@ -339,9 +339,9 @@ const LANG = {
 const useT = (lang) => useCallback((k) => LANG[lang]?.[k] ?? LANG.en[k] ?? k, [lang]);
 const LOCALE_MAP = { en:"en-GB", nl:"nl-BE", fr:"fr-BE", de:"de-DE" };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // CONSTANTS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // Bed and field types shown in the garden editor and in the dashboard labels.
 const FIELD_TYPES   = ["open_field","raised_bed","greenhouse_bed","herb_bed","flower_bed","fruit_area","nursery"];
 const FIELD_LABEL_K = { open_field:"field_open", raised_bed:"field_raised", greenhouse_bed:"field_gh", herb_bed:"field_herb", flower_bed:"field_flower", fruit_area:"field_fruit", nursery:"field_nursery" };
@@ -481,9 +481,9 @@ const USER_AVATARS  = ["👩‍🌾","👨‍🌾","🧑‍🌾","👩‍🍳","
 const GH_TYPES      = ["greenhouse","tunnel_greenhouse"];
 const MAINTENANCE_STRUCT_TYPES = new Set(["hedge","trellis","windbreak","orchard_row"]);
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // PLANT LIBRARY (60+ species)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 const PLANT_LIB = [
     // Vegetables
     { name:"Tomato",       category:"Vegetable",   varieties:["Roma","Cherry","Beefsteak","San Marzano","Black Krim","Yellow Pear","Gardener's Delight"] },
@@ -567,9 +567,9 @@ const PLANT_LIB = [
     { name:"Phacelia",     category:"Flower",      varieties:["Common","Lacy"] },
 ];
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SEED DATA
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 const gid = () => Math.random().toString(36).slice(2, 10);
 
 const SEED = {
@@ -709,9 +709,9 @@ const SEED = {
     activeGardenId: "g1",
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // PERSISTENCE
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 const SK = "gardengrid_v4";
 const SESSION_KEY = "gardengrid_session";
 const normalizeState = (state) => state ? { ...state, slots: state.slots || [], zones: state.zones || [] } : null;
@@ -795,9 +795,9 @@ const setSession = async (uid) => {
     }
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // HELPERS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 const fmtDate = (d, lang="en") => {
     if (!d) return "—";
     try { return new Date(d+"T00:00:00").toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"short",year:"numeric"}); }
@@ -1062,9 +1062,9 @@ const polygonCentroid = (points=[]) => {
     return { x: sum.x / points.length, y: sum.y / points.length };
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // REDUCER
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function reducer(state, { type, payload }) {
     const uid = state.activeUserId;
     const inj = (p) => ({ ...p, user_id: uid });
@@ -1132,9 +1132,9 @@ function reducer(state, { type, payload }) {
     }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // UI PRIMITIVES
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function Btn({ children, variant="primary", size="md", onClick, disabled, style, icon, title }) {
     const [hov, setHov] = useState(false);
     const padding = size==="xs" ? "4px 11px" : size==="sm" ? "6px 14px" : size==="lg" ? "12px 26px" : "9px 18px";
@@ -1556,9 +1556,9 @@ const MetaBadge = ({ label, value }) => (
     </Badge>
 );
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // GARDEN EDITOR (SVG with drag/resize/edit)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function GardenEditor({ garden, fields, structures, zones, plants = [], slots = [], dispatch, lang, navigate }) {
     const [zoom, setZoom] = useState(1);
     const sc = SCALE * zoom;
@@ -2101,7 +2101,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                     {zoneDraft ? "Cancel Zone" : "Add Zone"}
                 </Btn>
                 {zoneDraft && <Btn size="sm" variant="primary" onClick={finishZoneDraft} disabled={zoneDraft.points.length < 3}>Finish Zone</Btn>}
-                <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.max(0.35, +(z-0.15).toFixed(2)))}>âˆ’</Btn>
+                <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.max(0.35, +(z-0.15).toFixed(2)))}>−</Btn>
                 <span style={{ fontSize:12, color:T.textSub, minWidth:38, textAlign:"center", fontWeight:700 }}>{Math.round(zoom*100)}%</span>
                 <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.min(2.5, +(z+0.15).toFixed(2)))}>+</Btn>
                 <Btn size="sm" variant="ghost" onClick={() => setZoom(1)}>Reset</Btn>
@@ -2177,7 +2177,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         );
                     })}
                     <rect x={pad} y={pad} width={gW} height={gH} fill="none" stroke={T.primary} strokeWidth={2.5} rx={3} style={{ pointerEvents:"none" }} />
-                    <text x={pad+gW-6} y={pad+16} textAnchor="end" fontSize={14} fill={T.primary} fontFamily="Fraunces,serif" fontWeight={800}>Nâ†‘</text>
+                    <text x={pad+gW-6} y={pad+16} textAnchor="end" fontSize={14} fill={T.primary} fontFamily="Fraunces,serif" fontWeight={800}>N↑</text>
                     <g transform={`translate(${pad},${pad+gH+16})`}>
                         <rect x={0} y={0} width={sc} height={5} fill={T.primary} opacity={0.4} rx={2} />
                         <text x={sc/2} y={17} textAnchor="middle" fontSize={9} fill={T.textSub} fontFamily="DM Sans,sans-serif">1 metre</text>
@@ -2557,9 +2557,9 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // LOGIN SCREEN
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function LoginScreen({ state, dispatch, onLogin }) {
     const [mode, setMode] = useState("login"); // "login" | "register"
     const [lang, setLang] = useState("nl");
@@ -2675,9 +2675,9 @@ function LoginScreen({ state, dispatch, onLogin }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // ACCOUNT SCREEN
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function AccountScreen({ state, dispatch, lang, onLogout }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -2772,7 +2772,7 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                         <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", background:T.surfaceAlt, borderRadius:T.rs }}>
                             <div style={{ width:38, height:38, borderRadius:99, background:pColor, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{pAvatar}</div>
                             <div>
-                                <div style={{ fontWeight:700, color:T.text, fontSize:14 }}>{pName||"â€¦"}</div>
+                                <div style={{ fontWeight:700, color:T.text, fontSize:14 }}>{pName||"…"}</div>
                                 <div style={{ fontSize:11, color:T.textMuted }}>{pEmail||"no email"}</div>
                             </div>
                         </div>
@@ -2785,10 +2785,10 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
             {tab==="password" && (
                 <Card style={{ padding:22 }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        {pwError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>âš ï¸ {pwError}</div>}
-                        <Input label={t("current_password")} value={curPw} onChange={setCurPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
-                        <Input label={t("new_password")} value={newPw} onChange={setNewPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
-                        <Input label={t("confirm_new")} value={confPw} onChange={setConfPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
+                        {pwError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>⚠️ {pwError}</div>}
+                        <Input label={t("current_password")} value={curPw} onChange={setCurPw} type="password" placeholder="••••••••" required/>
+                        <Input label={t("new_password")} value={newPw} onChange={setNewPw} type="password" placeholder="••••••••" required/>
+                        <Input label={t("confirm_new")} value={confPw} onChange={setConfPw} type="password" placeholder="••••••••" required/>
                         <div style={{ fontSize:12, color:T.textMuted, padding:"8px 12px", background:T.surfaceAlt, borderRadius:T.rs }}>
                             🔒 Wachtwoorden worden lokaal opgeslagen in je browser. MyGarden verstuurt geen gegevens naar een server.
                         </div>
@@ -2832,9 +2832,9 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SIDEBAR
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollapsed, state, dispatch, lang, onLogout }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -2901,9 +2901,9 @@ function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollapsed, sta
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: DASHBOARD
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function DashboardScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -3097,9 +3097,9 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         </PageShell>
     );
 }
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: GARDENS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function GardensScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -3190,9 +3190,9 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: GARDEN EDITOR
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function EditorScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const garden = state.gardens.find(g=>g.id===state.activeGardenId);
@@ -3294,9 +3294,9 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: BEDS & FIELDS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function FieldsScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -3556,9 +3556,9 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
         </PageShell>
     );
 }
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // QUICK ADD PLANT MODAL
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispatch, uid }) {
     const t = useT(lang);
     const [query, setQuery] = useState("");
@@ -3731,9 +3731,9 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: PLANTS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -4073,9 +4073,9 @@ const LinkedHint = (task, fields, structures) => {
 };
 const isMaintenanceTask = (task) => String(task.id || "").startsWith("maint_") || (task.linked_type === "struct" && ["pruning","repair","cleaning"].includes(task.type));
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: TASKS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function TasksScreen({ state, dispatch, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -4195,9 +4195,9 @@ function TasksScreen({ state, dispatch, lang }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: GREENHOUSES
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function GreenhouseScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -4649,9 +4649,9 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: SETTINGS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 function SettingsScreen({ state, dispatch, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -4833,12 +4833,12 @@ function SettingsScreen({ state, dispatch, lang }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // SCREEN: DEV (Ollama plant generator)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 const DEV_CATEGORIES = ["Vegetable","Leafy Green","Herb","Fruit","Legume","Root","Flower"];
 
-// â”€â”€ shared AI fetch helper â”€â”€
+// ----
 async function callAI(prompt) {
     const res = await fetch("/api/ai.php", {
         method: "POST",
@@ -4850,7 +4850,7 @@ async function callAI(prompt) {
     return data;
 }
 
-// â”€â”€ reusable error / result blocks â”€â”€
+// ----
 function DevError({ msg }) {
     if (!msg) return null;
     return (
@@ -4868,7 +4868,7 @@ function AiResult({ children, model }) {
     );
 }
 
-// â”€â”€ Tab 1: Plant Library Generator â”€â”€
+// ----
 function DevPlantGenerator() {
     const [category, setCategory] = useState("Vegetable");
     const [count, setCount]       = useState(5);
@@ -4928,7 +4928,7 @@ function DevPlantGenerator() {
     );
 }
 
-// â”€â”€ Tab 2: Tuinadviseur â”€â”€
+// ----
 function DevGardenAdvisor({ state }) {
     const uid = state.activeUserId;
     const myPlants  = forUser(state.plants, uid);
@@ -4990,7 +4990,7 @@ Antwoord in het Nederlands. Gebruik een genummerde lijst.`;
     );
 }
 
-// â”€â”€ Tab 3: Compagnons â”€â”€
+// ----
 function DevCompanions({ state }) {
     const uid = state.activeUserId;
     const myPlants = forUser(state.plants, uid);
@@ -5066,7 +5066,7 @@ Antwoord in het Nederlands. Wees praktisch en bondig.`;
     );
 }
 
-// â”€â”€ Tab 4: Zaaiplan â”€â”€
+// ----
 function DevSowCalendar() {
     const MONTHS = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
     const currentMonth = new Date().getMonth(); // 0-indexed
@@ -5126,7 +5126,7 @@ Antwoord in het Nederlands. Wees specifiek met plantnamen.`;
     );
 }
 
-// â”€â”€ Tab 5: Vrije AI â”€â”€
+// ----
 function DevFreeChat() {
     const [prompt, setPrompt] = useState("");
     const [loading, setLoading] = useState(false);
@@ -5172,7 +5172,7 @@ function DevFreeChat() {
     );
 }
 
-// â”€â”€ DevScreen root â”€â”€
+// ----
 function DevScreen({ state, dispatch, lang }) {
     const [tab, setTab] = useState("plants");
     const TABS = [
@@ -5211,9 +5211,9 @@ function DevScreen({ state, dispatch, lang }) {
     );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 // APP ROOT
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ----
 export default function GardenGridApp() {
     const [state, dispatch] = useReducer(reducer, SEED);
     const [loggedInUid, setLoggedInUid] = useState(null);
