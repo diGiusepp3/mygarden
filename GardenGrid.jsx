@@ -1248,7 +1248,7 @@ function Input({ label, value, onChange, type="text", placeholder, required, sty
     return (
         <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
             {label && <label style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>{label}{required&&<span style={{color:T.danger}}> *</span>}</label>}
-            <input type={type} value={value??""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} required={required} min={min} max={max} step={step} disabled={disabled}
+            <input type={type} value={value ?? ""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} required={required} min={min} max={max} step={step} disabled={disabled}
                    style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:disabled?T.surfaceAlt:T.surface, border:`1.5px solid ${foc?T.primary:T.border}`, borderRadius:T.rs, padding:"8px 11px", outline:"none", transition:"border 0.15s", cursor:disabled?"not-allowed":"auto", ...style }}
                    onFocus={() => setFoc(true)} onBlur={() => setFoc(false)} />
             {hint && <span style={{ fontSize:11, color:T.textMuted }}>{hint}</span>}
@@ -1260,10 +1260,10 @@ function Sel({ label, value, onChange, options, required, style }) {
     return (
         <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
             {label && <label style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>{label}{required&&<span style={{color:T.danger}}> *</span>}</label>}
-            <select value={value??""} onChange={e=>onChange(e.target.value)} required={required}
+            <select value={value ?? ""} onChange={e=>onChange(e.target.value)} required={required}
                     style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${foc?T.primary:T.border}`, borderRadius:T.rs, padding:"8px 30px 8px 11px", outline:"none", appearance:"none", backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235E5955'/%3E%3C/svg%3E")`, backgroundRepeat:"no-repeat", backgroundPosition:"right 10px center", transition:"border 0.15s", ...style }}
                     onFocus={() => setFoc(true)} onBlur={() => setFoc(false)}>
-                {options.map(o => <option key={o.value??o} value={o.value??o}>{o.label??o}</option>)}
+                {options.map(o => <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>)}
             </select>
         </div>
     );
@@ -1273,7 +1273,7 @@ function Textarea({ label, value, onChange, placeholder, rows=3, hint }) {
     return (
         <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
             {label && <label style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>{label}</label>}
-            <textarea value={value??""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows}
+            <textarea value={value ?? ""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows}
                       style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${foc?T.primary:T.border}`, borderRadius:T.rs, padding:"8px 11px", outline:"none", resize:"vertical", transition:"border 0.15s" }}
                       onFocus={() => setFoc(true)} onBlur={() => setFoc(false)} />
             {hint && <span style={{ fontSize:11, color:T.textMuted }}>{hint}</span>}
@@ -2977,7 +2977,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 title={`${plant.name}${plant.variety ? ` (${plant.variety})` : ""}`}
                 meta={`${fmtDate(plant.harvest_date, lang)} · ${bed?.name || struct?.name || t("unassigned")}`}
                 hint={plant.quantity ? `${plant.quantity} pcs` : undefined}
-                actionSlot={<Badge color={T.textSub} bg={T.surfaceAlt}>{plant.quantity || 1}Ã—</Badge>}
+                actionSlot={<Badge color={T.textSub} bg={T.surfaceAlt}>Aantal: {plant.quantity || 1}</Badge>}
             />
         );
     };
@@ -3918,7 +3918,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                                     <Badge color={sc_.color} bg={sc_.bg}>{sc_l}</Badge>
                                 </div>
                                 <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:10 }}>
-                                    <Badge color={T.textSub} bg={T.surfaceAlt}>Ã—{p.quantity}</Badge>
+                                    <Badge color={T.textSub} bg={T.surfaceAlt}>Aantal: {p.quantity}</Badge>
                                     <Badge color={T.textSub} bg={T.surfaceAlt}>{p.category}</Badge>
                                     {bed && <Badge color={T.primary} bg={T.primaryBg}>{bed.name}</Badge>}
                                     {greenhouse && <Badge color={STRUCT_STROKE[greenhouse.type]||T.info} bg={STRUCT_FILL[greenhouse.type]||T.infoBg}>{greenhouse.name}</Badge>}
@@ -4453,7 +4453,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             <div style={{ display:"flex", alignItems:"start", justifyContent:"space-between", gap:8 }}>
                                                                 <div>
                                                                     <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{slotDisplayLabel(slot, allSlots)}</div>
-                                                                    <div style={{ fontSize:11, color:T.textMuted }}>{slotTypeLabel(slot, t)}{isTray && slot.rows && slot.cols ? ` · ${slot.rows}Ã—${slot.cols}` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.spacing_cm ? ` · ${slot.spacing_cm}cm spacing` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.plant_count ? ` · ${slot.plant_count} plants` : ""}</div>
+                                                                    <div style={{ fontSize:11, color:T.textMuted }}>{slotTypeLabel(slot, t)}{isTray && slot.rows && slot.cols ? ` · ${slot.rows} x ${slot.cols}` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.spacing_cm ? ` · ${slot.spacing_cm}cm spacing` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.plant_count ? ` · ${slot.plant_count} plants` : ""}</div>
                                                                     <div style={{ fontSize:11, color:T.textSub, marginTop:2 }}>{slotPlantQty} plant{slotPlantQty!==1?"s":""}</div>
                                                                 </div>
                                                                 <div style={{ display:"flex", gap:6, flexWrap:"wrap", justifyContent:"flex-end" }}>
@@ -4485,7 +4485,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             {(slot.type==="tunnel_row"||slot.type==="bed_row") && renderSlotSeedPlan(slot)}
                                                             {slotPlants.length>0 && (
                                                                 <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:5 }}>
-                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name} Ã—{Math.max(1, +p.quantity || 1)}</Badge>)}
+                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name} · Aantal: {Math.max(1, +p.quantity || 1)}</Badge>)}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -4531,7 +4531,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             <span style={{ fontSize:16 }}>{CAT_ICONS[p.category]||"🌿"}</span>
                                                             <div>
                                                                 <div style={{ fontSize:12, fontWeight:700, color:T.text }}>{p.name}</div>
-                                                                <div style={{ fontSize:10, color:T.textMuted }}>{p.variety} · Ã—{Math.max(1, +p.quantity || 1)}{slot ? ` · ${slot.name}` : ""}{p.row_count ? ` · ${p.row_count} rows` : ""}{p.row_plant_count ? ` · ${p.row_plant_count}/row` : ""}</div>
+                                                                <div style={{ fontSize:10, color:T.textMuted }}>{p.variety} · Aantal: {Math.max(1, +p.quantity || 1)}{slot ? ` · ${slot.name}` : ""}{p.row_count ? ` · ${p.row_count} rows` : ""}{p.row_plant_count ? ` · ${p.row_plant_count}/row` : ""}</div>
                                                             </div>
                                                             <Badge color={sc_.color} bg={sc_.bg} style={{fontSize:9}}>{sc_l}</Badge>
                                                         </div>
