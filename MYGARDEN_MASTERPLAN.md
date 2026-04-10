@@ -718,6 +718,7 @@ Wat nu al duidelijk is:
 ## 30. Gamification en onboarding
 
 - [x] Voeg een tuinreis/progress kaart toe voor profiel, eerste tuin, bedden en eerste planten.
+- [x] Voeg een profielvoortgang toe voor naam, e-mail, avatar, eerste tuin en eerste planten.
 - [ ] Maak de eerste start meer als een kleine quest-lijn.
 - [ ] Laat nieuwe gebruikers direct zien wat ze nog moeten doen.
 - [ ] Laat de dashboard start meer voelen als een tuinwereld.

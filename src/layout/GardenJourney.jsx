@@ -70,6 +70,76 @@ export function buildJourneyTrack({ user, gardens = [], fields = [], plants = []
     };
 }
 
+export function buildProfileJourney({ user, gardens = [], fields = [], plants = [], tasks = [] }) {
+    const steps = [
+        {
+            key: "name",
+            icon: "✍️",
+            label: "Naam invullen",
+            done: !!user?.name,
+            helper: user?.name ? `Profiel heet ${user.name}.` : "Kies een duidelijke naam.",
+        },
+        {
+            key: "email",
+            icon: "📧",
+            label: "E-mail koppelen",
+            done: !!user?.email,
+            helper: user?.email ? `${user.email} staat gekoppeld.` : "Koppel een e-mailadres.",
+        },
+        {
+            key: "style",
+            icon: "🎨",
+            label: "Eigen stijl",
+            done: !!user?.avatar && !!user?.color,
+            helper: user?.avatar ? "Avatar en kleur zijn gekozen." : "Kies een avatar en kleur.",
+        },
+        {
+            key: "garden",
+            icon: "🌿",
+            label: "Eerste tuin",
+            done: gardens.length > 0,
+            helper: gardens.length > 0 ? `${gardens.length} tuin${gardens.length === 1 ? "" : "en"} actief.` : "Maak je eerste tuin.",
+        },
+        {
+            key: "bed",
+            icon: "🛏️",
+            label: "Eerste bed",
+            done: fields.length > 0,
+            helper: fields.length > 0 ? `${fields.length} bed${fields.length === 1 ? "" : "den"} klaar.` : "Zet een bed of vak neer.",
+        },
+        {
+            key: "plant",
+            icon: "🌱",
+            label: "Eerste plant",
+            done: plants.length > 0,
+            helper: plants.length > 0 ? `${plants.length} plant${plants.length === 1 ? "" : "en"} toegevoegd.` : "Voeg je eerste crop toe.",
+        },
+        {
+            key: "task",
+            icon: "✅",
+            label: "Eerste taak",
+            done: tasks.length > 0,
+            helper: tasks.length > 0 ? `${tasks.length} taak${tasks.length === 1 ? "" : "en"} ingepland.` : "Plan een kleine taak.",
+        },
+    ];
+
+    const completed = steps.filter(step => step.done).length;
+    const progress = Math.round((completed / steps.length) * 100);
+    const nextStep = steps.find(step => !step.done) || steps[steps.length - 1];
+
+    return {
+        steps,
+        completed,
+        progress,
+        nextStep,
+        tokens: ["👤", "🌿", "🛏️", "🌱", "✅"],
+        headline: progress >= 100 ? "Je profiel is helemaal klaar." : "Vul je profiel stap voor stap aan.",
+        reward: progress >= 100
+            ? "Nu is je tuinprofiel compleet en klaar voor groei."
+            : "Meer profielstappen maken de rest van MyGarden opener.",
+    };
+}
+
 export function JourneyPanel({
     title,
     subtitle,

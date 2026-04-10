@@ -4,7 +4,7 @@
 // THEME
 // ----
 import { PageShell, PageHeader, SectionPanel, PanelGroup, QuickAction, MetaBadge } from "./src/layout/PageChrome.jsx";
-import { JourneyPanel, buildJourneyTrack } from "./src/layout/GardenJourney.jsx";
+import { JourneyPanel, buildJourneyTrack, buildProfileJourney } from "./src/layout/GardenJourney.jsx";
 import { SCREEN_ROUTES, SCREEN_NAMES, getRouteFromHash, formatScreenHash } from "./src/routes.js";
 
 class ScreenErrorBoundary extends React.Component {
@@ -2652,19 +2652,32 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
     const myGardens = forUser(state.gardens, uid);
     const myPlants  = forUser(state.plants, uid);
     const myTasks   = forUser(state.tasks, uid);
+    const myFields  = forUser(state.fields, uid);
+    const myJourney = buildProfileJourney({ user, gardens: myGardens, fields: myFields, plants: myPlants, tasks: myTasks });
     const joined    = user.created_at ? new Date(user.created_at).toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"long",year:"numeric"}) : "—";
 
     const TABS = [["profile","👤",t("edit_profile")],["password","🔑",t("change_password")],["stats","📊",t("your_stats")]];
 
     return (
         <div style={{ padding:28, maxWidth:600, margin:"0 auto" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:28 }}>
+            <JourneyPanel
+                headerLabel="Profielstatus"
+                title={myJourney.headline}
+                subtitle="Werk je profiel af en ontgrendel de rest van de tuinwereld."
+                progress={myJourney.progress}
+                steps={myJourney.steps}
+                tokens={myJourney.tokens}
+                reward={myJourney.reward}
+                nextStep={myJourney.nextStep}
+                action={saved ? <Badge color={T.success} bg={T.successBg}>✓ {t("account_saved")}</Badge> : null}
+            />
+
+            <div style={{ display:"flex", alignItems:"center", gap:16, margin:"22px 0 28px" }}>
                 <div style={{ width:64, height:64, borderRadius:99, background:user.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, flexShrink:0, boxShadow:T.shMd }}>{user.avatar}</div>
                 <div style={{ flex:1 }}>
                     <h1 style={{ margin:0, fontSize:22, fontWeight:900, fontFamily:"Fraunces,serif", color:T.text }}>{user.name}</h1>
                     <div style={{ fontSize:13, color:T.textMuted, marginTop:2 }}>{user.email} · {t("joined")} {joined}</div>
                 </div>
-                {saved && <Badge color={T.success} bg={T.successBg}>✓ {t("account_saved")}</Badge>}
                 <Btn variant="ghost" onClick={onLogout} icon="🚪">{t("logout")}</Btn>
             </div>
 
@@ -2730,7 +2743,8 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
                         <StatCard icon="🌿" label={t("gardens")} value={myGardens.length} color={T.primary}/>
-                        <StatCard icon="🌱" label={t("plant_varieties")} value={myPlants.length} color="#388E3C"/>            <StatCard icon="✅" label={t("tasks_pending")} value={myTasks.filter(t2=>t2.status==="pending").length} color={T.warning}/>
+                        <StatCard icon="🌱" label={t("plant_varieties")} value={myPlants.length} color="#388E3C"/>
+                        <StatCard icon="✅" label={t("tasks_pending")} value={myTasks.filter(t2=>t2.status==="pending").length} color={T.warning}/>
                         <StatCard icon="🧺" label={t("ready_to_harvest")} value={myPlants.filter(p=>p.status==="harvestable").length} color={T.accent}/>
                     </div>
                     <Card style={{ padding:16 }}>
