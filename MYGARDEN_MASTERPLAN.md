@@ -19,6 +19,8 @@ Wat nu al duidelijk is:
 - De UI moet moderner.
 - De fonts moeten beter.
 - De cards en blokken moeten rustiger.
+- De UI mag meer voelen als een fijne tycoon-game, zoals Gardenscapes of Farmville.
+- De app gaat over de hele echte tuin, niet alleen de moestuin.
 - De code moet kleiner en schoner.
 - De dev panel moet beter werken.
 - Planten toevoegen moet veel makkelijker.
@@ -692,3 +694,22 @@ Wat nu al duidelijk is:
 - [ ] Of de hele app rustiger en netter voelt.
 - [ ] Of dit plan steeds bijgewerkt blijft.
 - [ ] Of we nog iets missen tijdens het werken.
+
+## 29. UI richting voor MyGarden
+
+- [ ] Maak de app meer als een rustige tycoon-game.
+- [ ] Laat de app aanvoelen als een leuke tuinwereld, niet als een zakelijke tool.
+- [ ] Gebruik speelse maar nette visuals.
+- [ ] Gebruik warme kleuren die bij buiten en groen passen.
+- [ ] Gebruik grote, duidelijke kaarten voor gebieden en taken.
+- [ ] Gebruik duidelijke progressie en status per zone.
+- [ ] Gebruik een overzicht dat voelt als een tuinmap.
+- [ ] Laat de gebruiker snel zien wat er groeit, wat aandacht vraagt en wat klaar is.
+- [ ] Maak bedden, serres, paden, objecten en zones visueel verschillend.
+- [ ] Maak de hele tuin zichtbaar in plaats van alleen de moestuin.
+- [ ] Laat siertuin, moestuin, serre, pad en objecten samen één geheel vormen.
+- [ ] Maak de app vriendelijk voor dagelijks gebruik.
+- [ ] Maak de app leuk om even in te kijken en ook nuttig om mee te werken.
+- [ ] Vermijd een saaie administratie-look.
+- [ ] Vermijd een te drukke game-look.
+- [ ] Vind de balans tussen mooi, simpel en duidelijk.
