@@ -1463,6 +1463,8 @@ const formatScreenHash = (screen, params = {}) => {
     return search ? `${base}?${search}` : base;
 };
 
+const Sidebar = React.lazy(() => import("./src/layout/Sidebar.jsx"));
+
 class ScreenErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
@@ -1555,7 +1557,6 @@ const MetaBadge = ({ label, value }) => (
         <span style={{ fontWeight:600, color:T.text }}>{value}</span> {label}
     </Badge>
 );
-
 // ----
 // GARDEN EDITOR (SVG with drag/resize/edit)
 // ----
@@ -2829,75 +2830,6 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                 </div>
             )}
         </div>
-    );
-}
-
-// ----
-// SIDEBAR
-// ----
-function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollapsed, state, dispatch, lang, onLogout }) {
-    const t = useT(lang);
-    const uid = state.activeUserId;
-    const activeUser = state.users.find(u => u.id === uid);
-    const NAV = [
-        { id:"dashboard",   icon:"🏡", key:"nav_dashboard" },
-        { id:"gardens",     icon:"🌿", key:"nav_gardens" },
-        { id:"editor",      icon:"📐", key:"nav_editor" },
-        { id:"fields",      icon:"🛏️",  key:"nav_fields" },
-        { id:"plants",      icon:"🌱", key:"nav_plants" },
-        { id:"tasks",       icon:"✅", key:"nav_tasks" },
-        { id:"greenhouses", icon:"🏡", key:"nav_greenhouses" },
-        { id:"account",     icon:"👤", key:"account" },
-        { id:"settings",    icon:"⚙️", key:"nav_settings" },
-        ...(activeUser?.is_dev ? [{ id:"dev", icon:"⚡", key:"dev" }] : []),
-    ];
-    return (
-        <nav style={{ width:collapsed?64:220, flexShrink:0, background:`linear-gradient(175deg,#1E4A08 0%,#2B5C10 60%,#3D7A1A 100%)`, display:"flex", flexDirection:"column", height:"100vh", position:"sticky", top:0, transition:"width 0.2s", overflow:"hidden", zIndex:10 }}>
-            {/* User header — click to go to Account */}
-            <div onClick={() => setScreen("account")} style={{ padding:collapsed?"14px 8px":"14px 14px 12px", borderBottom:"1px solid rgba(255,255,255,0.1)", cursor:"pointer", transition:"background 0.15s" }}
-                 onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.07)"}
-                 onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                    <div style={{ width:34, height:34, borderRadius:99, background:activeUser?.color||T.primary, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0, border:"2px solid rgba(255,255,255,0.3)" }}>{activeUser?.avatar||"🌱"}</div>
-                    {!collapsed && (
-                        <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#FFF", fontFamily:"Fraunces,serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{activeUser?.name||"Account"}</div>
-                            <div style={{ fontSize:9, color:"rgba(255,255,255,0.45)", marginTop:1 }}>MyGarden · {t("app_subtitle")}</div>
-                        </div>
-                    )}
-                    {!collapsed && <span style={{ color:"rgba(255,255,255,0.4)", fontSize:11 }}>→</span>}
-                </div>
-            </div>
-            {/* Nav */}
-            <div style={{ flex:1, padding:"8px 8px", display:"flex", flexDirection:"column", gap:2, overflowY:"auto" }}>
-                {NAV.map(item => {
-                    const active = screen===item.id;
-                    return (
-                        <button key={item.id} onClick={() => setScreen(item.id)} title={collapsed?t(item.key):undefined}
-                                style={{ display:"flex", alignItems:"center", gap:10, padding:collapsed?"10px":"9px 11px", borderRadius:T.rs, background:active?"rgba(255,255,255,0.18)":"transparent", border:"none", cursor:"pointer", color:active?"#FFF":"rgba(255,255,255,0.62)", fontSize:13, fontWeight:active?700:500, fontFamily:"inherit", transition:"all 0.15s", width:"100%", justifyContent:collapsed?"center":"flex-start" }}
-                                onMouseEnter={e=>!active&&(e.currentTarget.style.background="rgba(255,255,255,0.1)")}
-                                onMouseLeave={e=>!active&&(e.currentTarget.style.background="transparent")}>
-                            <span style={{ fontSize:18, flexShrink:0 }}>{item.icon}</span>
-                            {!collapsed && <span style={{ flex:1, textAlign:"left" }}>{t(item.key)}</span>}
-                            {!collapsed && item.id==="tasks" && pendingTasks>0 && <span style={{ background:T.accent, color:"#FFF", borderRadius:99, fontSize:10, fontWeight:800, padding:"1px 7px" }}>{pendingTasks}</span>}
-                        </button>
-                    );
-                })}
-            </div>
-            {/* Bottom: collapse + logout */}
-            <div style={{ padding:"8px 8px 12px", borderTop:"1px solid rgba(255,255,255,0.1)", display:"flex", flexDirection:"column", gap:4 }}>
-                <button onClick={onLogout} title={collapsed?t("logout"):undefined}
-                        style={{ display:"flex", alignItems:"center", gap:8, padding:collapsed?"10px":"8px 11px", width:"100%", justifyContent:collapsed?"center":"flex-start", background:"rgba(255,255,255,0.07)", border:"none", borderRadius:T.rs, cursor:"pointer", color:"rgba(255,255,255,0.55)", fontSize:12, fontFamily:"inherit", fontWeight:500, transition:"all 0.15s" }}
-                        onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.14)"}
-                        onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,0.07)"}>
-                    <span style={{ fontSize:16 }}>🚪</span>
-                    {!collapsed && <span>{t("logout")}</span>}
-                </button>
-                <button onClick={() => setCollapsed(c=>!c)} style={{ display:"flex", alignItems:"center", justifyContent:"center", width:"100%", padding:"7px", background:"rgba(255,255,255,0.06)", border:"none", borderRadius:T.rs, cursor:"pointer", color:"rgba(255,255,255,0.4)", fontSize:11, fontFamily:"inherit" }}>
-                    {collapsed?"→":"← Collapse"}
-                </button>
-            </div>
-        </nav>
     );
 }
 
@@ -5355,7 +5287,9 @@ export default function GardenGridApp() {
             <>
                 <style>{STYLES}</style>
                 <div style={{ display:"flex", minHeight:"100vh", background:"#F5F0E8" }}>
-                    <Sidebar screen={screen} setScreen={navigate} pendingTasks={pendingTasks} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} state={state} dispatch={dispatch} lang={lang} onLogout={handleLogout}/>
+                    <React.Suspense fallback={<div style={{ width: sidebarCollapsed ? 64 : 220, background:"linear-gradient(175deg,#1E4A08 0%,#2B5C10 60%,#3D7A1A 100%)" }} />}>
+                        <Sidebar screen={screen} setScreen={navigate} pendingTasks={pendingTasks} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} state={state} onLogout={handleLogout} t={t}/>
+                    </React.Suspense>
                     <main style={{ flex:1, minHeight:"100vh", overflow:"auto" }}>
                         {screen==="dashboard"   && <DashboardScreen   {...props}/>}
                         {screen==="gardens"     && <GardensScreen     {...props}/>}

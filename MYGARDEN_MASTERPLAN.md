@@ -75,6 +75,7 @@ Wat nu al duidelijk is:
 - [ ] Geef bestanden korte, duidelijke namen.
 - [ ] Zet verwante dingen bij elkaar.
 - [ ] Verplaats stukken pas als de nieuwe plek logisch voelt.
+- [x] Haal de sidebar uit `GardenGrid.jsx` en zet hem in losse layoutbestanden.
 
 ## 3. Thema en fonts
 
