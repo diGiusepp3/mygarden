@@ -19,9 +19,44 @@ export function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollaps
     ];
 
     return (
-        <nav style={{ width:collapsed ? 64 : 220, flexShrink:0, background:`linear-gradient(175deg,#1E4A08 0%,#2B5C10 60%,#3D7A1A 100%)`, display:"flex", flexDirection:"column", height:"100vh", position:"sticky", top:0, transition:"width 0.2s", overflow:"hidden", zIndex:10 }}>
+        <nav style={{
+            width:collapsed ? 78 : 268,
+            flexShrink:0,
+            position:"sticky",
+            top:0,
+            height:"100vh",
+            overflow:"hidden",
+            zIndex:10,
+            background:`radial-gradient(circle at 20% 0%, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0) 28%), linear-gradient(180deg, #173609 0%, #244F0D 35%, #2E6614 100%)`,
+            borderRight:"1px solid rgba(255,255,255,0.08)",
+            boxShadow:"12px 0 30px rgba(20,18,14,0.18)",
+            display:"flex",
+            flexDirection:"column",
+            transition:"width 0.2s ease",
+        }}>
             <SidebarHeader collapsed={collapsed} activeUser={activeUser} onOpenAccount={() => setScreen("account")} t={t} />
-            <div style={{ flex:1, padding:"8px 8px", display:"flex", flexDirection:"column", gap:2, overflowY:"auto" }}>
+            <div style={{ flex:1, padding:"12px 10px 10px", display:"flex", flexDirection:"column", gap:8, overflowY:"auto" }}>
+                {!collapsed && (
+                    <div style={{
+                        margin:"0 4px 8px",
+                        padding:"12px 12px 10px",
+                        borderRadius:18,
+                        background:"rgba(255,255,255,0.08)",
+                        border:"1px solid rgba(255,255,255,0.08)",
+                        color:"rgba(255,255,255,0.9)",
+                        boxShadow:"0 8px 18px rgba(0,0,0,0.08)",
+                    }}>
+                        <div style={{ fontSize:10, textTransform:"uppercase", letterSpacing:1, fontWeight:900, color:"rgba(255,255,255,0.7)" }}>
+                            Tuinwereld
+                        </div>
+                        <div style={{ fontSize:15, fontWeight:900, fontFamily:"Fraunces,serif", marginTop:4 }}>
+                            {pendingTasks} open taken
+                        </div>
+                        <div style={{ fontSize:11, color:"rgba(255,255,255,0.68)", lineHeight:1.5, marginTop:4 }}>
+                            Open vandaag je tuin, missies en planten in één overzicht.
+                        </div>
+                    </div>
+                )}
                 {nav.map(item => {
                     const active = screen === item.id;
                     return (
@@ -32,27 +67,39 @@ export function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollaps
                             style={{
                                 display:"flex",
                                 alignItems:"center",
-                                gap:10,
-                                padding:collapsed ? "10px" : "9px 11px",
-                                borderRadius:T.rs,
-                                background:active ? "rgba(255,255,255,0.18)" : "transparent",
-                                border:"none",
+                                gap:12,
+                                padding:collapsed ? "12px" : "11px 13px",
+                                borderRadius:18,
+                                background:active ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.04)",
+                                border:`1px solid ${active ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.06)"}`,
                                 cursor:"pointer",
-                                color:active ? "#FFF" : "rgba(255,255,255,0.62)",
+                                color:active ? "#FFF" : "rgba(255,255,255,0.72)",
                                 fontSize:13,
-                                fontWeight:active ? 700 : 500,
+                                fontWeight:active ? 800 : 600,
                                 fontFamily:"inherit",
                                 transition:"all 0.15s",
                                 width:"100%",
                                 justifyContent:collapsed ? "center" : "flex-start",
+                                boxShadow:active ? "0 10px 18px rgba(0,0,0,0.10)" : "none",
+                                backdropFilter:"blur(4px)",
                             }}
-                            onMouseEnter={e => !active && (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
-                            onMouseLeave={e => !active && (e.currentTarget.style.background = "transparent")}
+                            onMouseEnter={e => !active && (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+                            onMouseLeave={e => !active && (e.currentTarget.style.background = "rgba(255,255,255,0.04)")}
                         >
-                            <span style={{ fontSize:18, flexShrink:0 }}>{item.icon}</span>
+                            <span style={{
+                                fontSize:18,
+                                flexShrink:0,
+                                width:30,
+                                height:30,
+                                borderRadius:12,
+                                display:"inline-flex",
+                                alignItems:"center",
+                                justifyContent:"center",
+                                background:active ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.05)",
+                            }}>{item.icon}</span>
                             {!collapsed && <span style={{ flex:1, textAlign:"left" }}>{t(item.key)}</span>}
                             {!collapsed && item.id === "tasks" && pendingTasks > 0 && (
-                                <span style={{ background:T.accent, color:"#FFF", borderRadius:99, fontSize:10, fontWeight:800, padding:"1px 7px" }}>{pendingTasks}</span>
+                                <span style={{ background:T.accent, color:"#FFF", borderRadius:999, fontSize:10, fontWeight:800, padding:"2px 8px", boxShadow:"0 4px 10px rgba(0,0,0,0.12)" }}>{pendingTasks}</span>
                             )}
                         </button>
                     );

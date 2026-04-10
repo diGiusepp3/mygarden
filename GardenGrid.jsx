@@ -107,6 +107,37 @@ const LANG = {
         back:"← Back", search:"Search…", notes:"Notes", name:"Name", type:"Type",
         width:"Width", height:"Height", position:"Position", area:"Area",
         good_morning:"Good morning!", today:"Today",
+        dashboard_missions:"Garden missions",
+        dashboard_world_title:"Your garden world keeps growing.",
+        dashboard_world_subtitle:"Open the next chapter in your garden, step by step.",
+        dashboard_open_garden:"Open garden",
+        dashboard_next_step:"Next step",
+        dashboard_attention_title:"Needs attention",
+        dashboard_attention_subtitle:"focus items",
+        dashboard_no_tasks_today:"No tasks planned for today. Add a quick task or pick one from your to-do list.",
+        dashboard_no_harvest:"No crops are harvestable yet.",
+        dashboard_review_harvest:"Review harvest",
+        dashboard_no_harvest_soon:"No harvest scheduled soon",
+        dashboard_all_beds_planted:"All beds planted",
+        dashboard_keep_beds_full:"Great job keeping beds full",
+        dashboard_empty_beds:"empty beds",
+        dashboard_fill_beds:"Fill them with quick crops",
+        dashboard_greenhouse_spots:"greenhouse spots",
+        dashboard_add_greenhouse:"Add a greenhouse",
+        dashboard_check_ventilation:"Check ventilation logs",
+        dashboard_create_protected:"Create a protected structure",
+        dashboard_nothing_urgent:"Nothing urgent for now. Keep the steady rhythm.",
+        dashboard_my_gardens:"My gardens",
+        dashboard_structures:"structures",
+        dashboard_create_garden_hint:"Create a garden to unlock these insights.",
+        dashboard_seasonal_suggestions:"Seasonal suggestions",
+        dashboard_smart_tips:"Smart tips based on your garden",
+        dashboard_seo_hub:"SEO hub",
+        dashboard_seo_hub_helper:"Crawlable pages for Google and AI search.",
+        dashboard_next_prefix:"Next",
+        dashboard_last_prefix:"Last",
+        dashboard_created_prefix:"Created",
+        dashboard_no_upcoming_tasks:"No upcoming tasks",
         gardens:"Gardens", beds_fields:"Beds & Fields", plant_varieties:"Plant Varieties",
         tasks_pending:"Tasks Pending", ready_to_harvest:"Ready to Harvest",
         upcoming_tasks:"📋 Upcoming Tasks", view_all:"View all →",
@@ -198,7 +229,7 @@ const LANG = {
         no_tasks:"No tasks yet", no_gardens:"No gardens yet",
         status_planned:"Planned", status_sown:"Sown", status_planted:"Planted",
         status_growing:"Growing", status_harvestable:"Harvestable!", status_harvested:"Harvested", status_removed:"Removed",
-        task_pending:"Pending", task_in_progress:"In Progress", task_done:"Done", task_skipped:"Skipped",
+        task_pending:"Pending", task_in_progress:"In Progress", task_done:"Done", task_reopen:"Reopen", task_skipped:"Skipped",
         field_open:"Open Field", field_raised:"Raised Bed", field_gh:"Greenhouse Bed",
         field_herb:"Herb Bed", field_flower:"Flower Bed", field_fruit:"Fruit Area", field_nursery:"Nursery",
         struct_greenhouse:"Greenhouse", struct_tunnel:"Tunnel Greenhouse", struct_compost:"Compost Zone",
@@ -240,6 +271,37 @@ const LANG = {
         back:"← Terug", search:"Zoeken…", notes:"Notities", name:"Naam", type:"Type",
         width:"Breedte", height:"Hoogte", position:"Positie", area:"Oppervlak",
         good_morning:"Goedemorgen!", today:"Vandaag",
+        dashboard_missions:"Tuinmissies",
+        dashboard_world_title:"Je tuinwereld groeit verder.",
+        dashboard_world_subtitle:"Open de volgende laag van je tuin, stap voor stap.",
+        dashboard_open_garden:"Open tuin",
+        dashboard_next_step:"Volgende stap",
+        dashboard_attention_title:"Aandacht nodig",
+        dashboard_attention_subtitle:"aandachtspunten",
+        dashboard_no_tasks_today:"Geen taken gepland voor vandaag. Voeg een snelle taak toe of kies iets uit je to-do lijst.",
+        dashboard_no_harvest:"Nog geen oogstbare crops.",
+        dashboard_review_harvest:"Oogst bekijken",
+        dashboard_no_harvest_soon:"Geen oogst gepland op korte termijn",
+        dashboard_all_beds_planted:"Alle bedden beplant",
+        dashboard_keep_beds_full:"Goed bezig, je bedden blijven mooi gevuld",
+        dashboard_empty_beds:"lege bedden",
+        dashboard_fill_beds:"Vul ze met snelle gewassen",
+        dashboard_greenhouse_spots:"serreplekken",
+        dashboard_add_greenhouse:"Serre toevoegen",
+        dashboard_check_ventilation:"Ventilatielogs nakijken",
+        dashboard_create_protected:"Maak een beschermde structuur",
+        dashboard_nothing_urgent:"Voor nu niets dringend. Hou het rustige ritme aan.",
+        dashboard_my_gardens:"Mijn tuinen",
+        dashboard_structures:"structuren",
+        dashboard_create_garden_hint:"Maak een tuin aan om deze inzichten vrij te spelen.",
+        dashboard_seasonal_suggestions:"Seizoenssuggesties",
+        dashboard_smart_tips:"Slimme tips op basis van jouw tuin",
+        dashboard_seo_hub:"SEO-hub",
+        dashboard_seo_hub_helper:"Crawlbare pagina's voor Google en AI.",
+        dashboard_next_prefix:"Volgende",
+        dashboard_last_prefix:"Laatste",
+        dashboard_created_prefix:"Aangemaakt",
+        dashboard_no_upcoming_tasks:"Geen aankomende taken",
         gardens:"Tuinen", beds_fields:"Bedden & Velden", plant_varieties:"Plantensoorten",
         tasks_pending:"Openstaande Taken", ready_to_harvest:"Oogstklaar",
         upcoming_tasks:"📋 Aankomende Taken", view_all:"Alles bekijken →",
@@ -331,7 +393,7 @@ const LANG = {
         no_tasks:"Nog geen taken", no_gardens:"Nog geen tuinen",
         status_planned:"Gepland", status_sown:"Gezaaid", status_planted:"Geplant",
         status_growing:"Groeiend", status_harvestable:"Oogstbaar!", status_harvested:"Geoogst", status_removed:"Verwijderd",
-        task_pending:"Openstaand", task_in_progress:"Bezig", task_done:"Klaar", task_skipped:"Overgeslagen",
+        task_pending:"Openstaand", task_in_progress:"Bezig", task_done:"Klaar", task_reopen:"Opnieuw openen", task_skipped:"Overgeslagen",
         field_open:"Open Veld", field_raised:"Verhoogd Bed", field_gh:"Kasbed",
         field_herb:"Kruidenbed", field_flower:"Bloemenbed", field_fruit:"Fruitzone", field_nursery:"Kwekerij",
         struct_greenhouse:"Kas", struct_tunnel:"Tunnelkas", struct_compost:"Composthoop",
@@ -373,6 +435,37 @@ const LANG = {
         back:"← Retour", search:"Rechercher…", notes:"Notes", name:"Nom", type:"Type",
         width:"Largeur", height:"Hauteur", position:"Position", area:"Surface",
         good_morning:"Bonjour !", today:"Aujourd'hui",
+        dashboard_missions:"Missions du jardin",
+        dashboard_world_title:"Votre univers de jardin grandit.",
+        dashboard_world_subtitle:"Débloquez la suite du jardin, étape par étape.",
+        dashboard_open_garden:"Ouvrir le jardin",
+        dashboard_next_step:"Étape suivante",
+        dashboard_attention_title:"À surveiller",
+        dashboard_attention_subtitle:"points de focus",
+        dashboard_no_tasks_today:"Aucune tâche prévue pour aujourd'hui. Ajoutez une tâche rapide ou choisissez dans votre liste.",
+        dashboard_no_harvest:"Aucune culture n'est encore récoltable.",
+        dashboard_review_harvest:"Voir la récolte",
+        dashboard_no_harvest_soon:"Aucune récolte prévue bientôt",
+        dashboard_all_beds_planted:"Tous les parterres sont plantés",
+        dashboard_keep_beds_full:"Bravo, vos parterres restent bien remplis",
+        dashboard_empty_beds:"parterres vides",
+        dashboard_fill_beds:"Remplissez-les avec des cultures rapides",
+        dashboard_greenhouse_spots:"emplacements de serre",
+        dashboard_add_greenhouse:"Ajouter une serre",
+        dashboard_check_ventilation:"Vérifier les journaux de ventilation",
+        dashboard_create_protected:"Créer une structure protégée",
+        dashboard_nothing_urgent:"Rien d'urgent pour le moment. Gardez un rythme régulier.",
+        dashboard_my_gardens:"Mes jardins",
+        dashboard_structures:"structures",
+        dashboard_create_garden_hint:"Créez un jardin pour débloquer ces informations.",
+        dashboard_seasonal_suggestions:"Suggestions saisonnières",
+        dashboard_smart_tips:"Conseils intelligents basés sur votre jardin",
+        dashboard_seo_hub:"Centre SEO",
+        dashboard_seo_hub_helper:"Pages crawlables pour Google et la recherche IA.",
+        dashboard_next_prefix:"Suivant",
+        dashboard_last_prefix:"Dernier",
+        dashboard_created_prefix:"Créé",
+        dashboard_no_upcoming_tasks:"Aucune tâche à venir",
         gardens:"Jardins", beds_fields:"Parterres & Champs", plant_varieties:"Variétés",
         tasks_pending:"Tâches en attente", ready_to_harvest:"Prêt à récolter",
         upcoming_tasks:"📋 Tâches à venir", view_all:"Voir tout →",
@@ -464,7 +557,7 @@ const LANG = {
         no_tasks:"Aucune tâche", no_gardens:"Aucun jardin",
         status_planned:"Planifié", status_sown:"Semé", status_planted:"Planté",
         status_growing:"En croissance", status_harvestable:"À récolter !", status_harvested:"Récolté", status_removed:"Retiré",
-        task_pending:"En attente", task_in_progress:"En cours", task_done:"Terminé", task_skipped:"Ignoré",
+        task_pending:"En attente", task_in_progress:"En cours", task_done:"Terminé", task_reopen:"Rouvrir", task_skipped:"Ignoré",
         field_open:"Pleine terre", field_raised:"Carré surélevé", field_gh:"Parterre de serre",
         field_herb:"Jardin d'herbes", field_flower:"Parterre fleuri", field_fruit:"Zone fruitière", field_nursery:"Pépinière",
         struct_greenhouse:"Serre", struct_tunnel:"Tunnel serre", struct_compost:"Zone de compost",
@@ -506,6 +599,37 @@ const LANG = {
         back:"← Zurück", search:"Suchen…", notes:"Notizen", name:"Name", type:"Typ",
         width:"Breite", height:"Höhe", position:"Position", area:"Fläche",
         good_morning:"Guten Morgen!", today:"Heute",
+        dashboard_missions:"Gartenmissionen",
+        dashboard_world_title:"Deine Gartenwelt wächst weiter.",
+        dashboard_world_subtitle:"Schalte Schritt für Schritt die nächste Ebene frei.",
+        dashboard_open_garden:"Garten öffnen",
+        dashboard_next_step:"Nächster Schritt",
+        dashboard_attention_title:"Braucht Aufmerksamkeit",
+        dashboard_attention_subtitle:"Fokuspunkte",
+        dashboard_no_tasks_today:"Für heute sind keine Aufgaben geplant. Füge eine schnelle Aufgabe hinzu oder nimm etwas aus deiner Liste.",
+        dashboard_no_harvest:"Noch keine Ernte bereit.",
+        dashboard_review_harvest:"Ernte prüfen",
+        dashboard_no_harvest_soon:"Keine Ernte in Sicht",
+        dashboard_all_beds_planted:"Alle Beete bepflanzt",
+        dashboard_keep_beds_full:"Gut gemacht, deine Beete bleiben schön gefüllt",
+        dashboard_empty_beds:"leere Beete",
+        dashboard_fill_beds:"Fülle sie mit schnellen Kulturen",
+        dashboard_greenhouse_spots:"Gewächshausplätze",
+        dashboard_add_greenhouse:"Gewächshaus hinzufügen",
+        dashboard_check_ventilation:"Belüftungsprotokolle prüfen",
+        dashboard_create_protected:"Eine geschützte Struktur erstellen",
+        dashboard_nothing_urgent:"Im Moment nichts Dringendes. Bleib im ruhigen Rhythmus.",
+        dashboard_my_gardens:"Meine Gärten",
+        dashboard_structures:"Strukturen",
+        dashboard_create_garden_hint:"Erstelle einen Garten, um diese Einblicke freizuschalten.",
+        dashboard_seasonal_suggestions:"Saisonale Vorschläge",
+        dashboard_smart_tips:"Cleverer Rat basierend auf deinem Garten",
+        dashboard_seo_hub:"SEO-Hub",
+        dashboard_seo_hub_helper:"Crawlbare Seiten für Google und KI-Suche.",
+        dashboard_next_prefix:"Nächste",
+        dashboard_last_prefix:"Letzte",
+        dashboard_created_prefix:"Erstellt",
+        dashboard_no_upcoming_tasks:"Keine anstehenden Aufgaben",
         gardens:"Gärten", beds_fields:"Beete & Felder", plant_varieties:"Pflanzensorten",
         tasks_pending:"Offene Aufgaben", ready_to_harvest:"Erntebereit",
         upcoming_tasks:"📋 Anstehende Aufgaben", view_all:"Alle anzeigen →",
@@ -597,7 +721,7 @@ const LANG = {
         no_tasks:"Noch keine Aufgaben", no_gardens:"Noch keine Gärten",
         status_planned:"Geplant", status_sown:"Gesät", status_planted:"Gepflanzt",
         status_growing:"Wächst", status_harvestable:"Erntebereit!", status_harvested:"Geerntet", status_removed:"Entfernt",
-        task_pending:"Ausstehend", task_in_progress:"In Bearbeitung", task_done:"Fertig", task_skipped:"Übersprungen",
+        task_pending:"Ausstehend", task_in_progress:"In Bearbeitung", task_done:"Fertig", task_reopen:"Wieder öffnen", task_skipped:"Übersprungen",
         field_open:"Offenes Feld", field_raised:"Hochbeet", field_gh:"Gewächshausbeet",
         field_herb:"Kräuterbeet", field_flower:"Blumenbeet", field_fruit:"Obstbereich", field_nursery:"Anzucht",
         struct_greenhouse:"Gewächshaus", struct_tunnel:"Folientunnel", struct_compost:"Kompostplatz",
@@ -1405,6 +1529,7 @@ const syncAllUserProgress = (state) => {
                 structures: forUser(state.structures || [], user.id),
                 plants: forUser(state.plants || [], user.id),
                 tasks: forUser(state.tasks || [], user.id),
+                lang: user?.settings?.lang || state.lang || "en",
             });
             return {
                 ...user,
@@ -1432,7 +1557,11 @@ function reducer(state, { type, payload }) {
         case "ADD_USER":          nextState = { ...state, users: [...state.users, payload] }; break;
         case "UPDATE_USER":       nextState = { ...state, users: state.users.map(u => u.id===payload.id ? payload : u) }; break;
         case "DELETE_USER":       nextState = { ...state, users: state.users.filter(u => u.id!==payload), activeUserId: state.activeUserId===payload ? (state.users.find(u=>u.id!==payload)?.id||null) : state.activeUserId }; break;
-        case "SET_ACTIVE_USER":   nextState = { ...state, activeUserId: payload }; break;
+        case "SET_ACTIVE_USER": {
+            const nextGardenId = state.gardens.find(g => g.user_id === payload)?.id || null;
+            nextState = { ...state, activeUserId: payload, activeGardenId: nextGardenId };
+            break;
+        }
         case "ADD_GARDEN":        nextState = { ...state, gardens: [...state.gardens, inj(payload)], activeGardenId: payload.id }; break;
         case "UPDATE_GARDEN":     nextState = { ...state, gardens: state.gardens.map(g => g.id===payload.id ? payload : g) }; break;
         case "DELETE_GARDEN":     nextState = { ...state, gardens: state.gardens.filter(g => g.id!==payload), activeGardenId: state.activeGardenId===payload ? (state.gardens.find(g=>g.user_id===uid&&g.id!==payload)?.id||null) : state.activeGardenId }; break;
@@ -2799,19 +2928,12 @@ function LoginScreen({ state, dispatch, onLogin }) {
     const [color, setColor] = useState(USER_COLORS[0]);
     const [error, setError] = useState("");
     const [shake, setShake] = useState(false);
+    const onboardingJourneyBase = buildJourneyTrack({ user: null, gardens: [], fields: [], plants: [], structures: [], lang });
     const onboardingJourney = {
-        title: "Maak je tuinwereld stap voor stap",
-        subtitle: "Eerst je profiel, dan je eerste tuin, daarna bedden en crops.",
+        ...onboardingJourneyBase,
+        title: onboardingJourneyBase.headline,
+        subtitle: onboardingJourneyBase.subtitle,
         progress: mode === "register" ? 12 : 0,
-        steps: [
-            { key:"profile", icon:"👤", label:"Profiel", done:false, helper:"Maak een profiel aan om te starten." },
-            { key:"garden", icon:"🌿", label:"Eerste tuin", done:false, helper:"Geef je tuin een naam en vorm." },
-            { key:"layout", icon:"🛏️", label:"Bedden", done:false, helper:"Leg je eerste vakken neer." },
-            { key:"plants", icon:"🌱", label:"Crops", done:false, helper:"Daarna verschijnen je planten en oogst." },
-        ],
-        tokens: ["👤", "🌿", "🛏️", "🌱"],
-        reward: "Na je eerste tuin zie je de crops en planning echt tot leven komen.",
-        nextStep: { icon:"👤", label:"Profiel maken", helper:"Begin met een account. Daarna open je de tuinwereld." },
     };
 
     const doShake = () => { setShake(true); setTimeout(() => setShake(false), 500); };
@@ -2832,6 +2954,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
         if (state.users.find(u => u.email?.toLowerCase() === email.toLowerCase())) { setError(t("email_taken")); doShake(); return; }
         const newUser = { id:gid(), name:name.trim(), email:email.trim().toLowerCase(), password, avatar, color, settings:{ lang }, created_at:new Date().toISOString() };
         dispatch({ type:"ADD_USER", payload: newUser });
+        dispatch({ type:"SET_ACTIVE_USER", payload: newUser.id });
         setSession(newUser.id);
         onLogin(newUser.id);
     };
@@ -2863,16 +2986,17 @@ function LoginScreen({ state, dispatch, onLogin }) {
                     </div>
 
                     <div style={{ marginBottom:16 }}>
-                        <JourneyPanel
-                            headerLabel="Start van je tuinwereld"
-                            title={onboardingJourney.title}
-                            subtitle={onboardingJourney.subtitle}
-                            progress={onboardingJourney.progress}
-                            steps={onboardingJourney.steps}
-                            tokens={onboardingJourney.tokens}
-                            reward={onboardingJourney.reward}
-                            nextStep={onboardingJourney.nextStep}
-                        />
+            <JourneyPanel
+                headerLabel={t("dashboard_missions")}
+                title={onboardingJourney.title}
+                subtitle={onboardingJourney.subtitle}
+                progress={onboardingJourney.progress}
+                steps={onboardingJourney.steps}
+                tokens={onboardingJourney.tokens}
+                reward={onboardingJourney.reward}
+                nextStep={onboardingJourney.nextStep}
+                lang={lang}
+            />
                     </div>
 
                     {/* Card */}
@@ -2979,7 +3103,7 @@ function AccountScreen({ state, dispatch, navigate, lang, onLogout }) {
     const myPlants  = forUser(state.plants, uid);
     const myTasks   = forUser(state.tasks, uid);
     const myFields  = forUser(state.fields, uid);
-    const questBoard = buildUserQuestProgress({ user, gardens: myGardens, fields: myFields, structures: forUser(state.structures, uid), plants: myPlants, tasks: myTasks });
+    const questBoard = buildUserQuestProgress({ user, gardens: myGardens, fields: myFields, structures: forUser(state.structures, uid), plants: myPlants, tasks: myTasks, lang });
     const joined    = user.created_at ? new Date(user.created_at).toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"long",year:"numeric"}) : "—";
 
     const TABS = [["profile","👤",t("edit_profile")],["password","🔑",t("change_password")],["stats","📊",t("your_stats")]];
@@ -3005,15 +3129,16 @@ function AccountScreen({ state, dispatch, navigate, lang, onLogout }) {
     return (
         <div style={{ padding:28, maxWidth:600, margin:"0 auto" }}>
             <JourneyPanel
-                headerLabel="Profielstatus"
+                headerLabel={t("your_profile")}
                 title={questBoard.headline}
-                subtitle="Werk je profiel af en ontgrendel de rest van de tuinwereld."
+                subtitle={questBoard.subtitle}
                 progress={questBoard.progress}
                 steps={questBoard.steps}
                 tokens={questBoard.tokens}
                 reward={questBoard.reward}
                 nextStep={questBoard.nextStep}
                 onStepAction={handleQuestStep}
+                lang={lang}
                 action={saved ? <Badge color={T.success} bg={T.successBg}>✓ {t("account_saved")}</Badge> : null}
             />
 
@@ -3131,7 +3256,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     const plants = forUser(state.plants, uid);
     const structures = forUser(state.structures, uid);
     const tasks = forUser(state.tasks, uid);
-    const journey = buildJourneyTrack({ user, gardens, fields, plants, structures });
+    const journey = buildJourneyTrack({ user, gardens, fields, plants, structures, lang });
     const pending = tasks.filter(task => task.status !== "done");
     const overdue = pending.filter(task => isOverdue(task.due_date, task.status));
     const harvestable = plants.filter(p => p.status === "harvestable");
@@ -3201,7 +3326,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 meta={metaParts.join(" · ")}
                 status={{ label: t(TASK_STATUS_K[task.status]) || task.status, color: statusCfg.color, bg: statusCfg.bg }}
                 actions={[
-                    <Btn key="done" size="xs" variant="success" onClick={() => dispatch({ type: "UPDATE_TASK", payload: { ...task, status: "done" } })}>✓ Done</Btn>
+                    <Btn key="done" size="xs" variant="success" onClick={() => dispatch({ type: "UPDATE_TASK", payload: { ...task, status: "done" } })}>{t("task_done")}</Btn>
                 ]}
                 hint={task.notes}
             />
@@ -3216,7 +3341,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 icon={CAT_ICONS[plant.category] || "🌿"}
                 title={`${plant.name}${plant.variety ? ` (${plant.variety})` : ""}`}
                 meta={`${fmtDate(plant.harvest_date, lang)} · ${bed?.name || struct?.name || t("unassigned")}`}
-                hint={plant.quantity ? `${plant.quantity} pcs` : undefined}
+                hint={plant.quantity ? `×${plant.quantity}` : undefined}
                 actionSlot={<Badge color={T.textSub} bg={T.surfaceAlt}>×{plant.quantity || 1}</Badge>}
             />
         );
@@ -3232,24 +3357,24 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         const nextTask = gardenTasks.filter(t2 => t2.status !== "done" && t2.due_date).sort((a, b) => new Date(a.due_date) - new Date(b.due_date))[0];
         const lastTask = gardenTasks.sort((a, b) => new Date(b.due_date || 0) - new Date(a.due_date || 0))[0];
         const activityLabel = nextTask
-            ? `Next: ${fmtDate(nextTask.due_date, lang)} · ${nextTask.title}`
+            ? `${t("dashboard_next_prefix")}: ${fmtDate(nextTask.due_date, lang)} · ${nextTask.title}`
             : lastTask
-                ? `Last: ${fmtDate(lastTask.due_date, lang)} · ${lastTask.title}`
-                : `Created ${garden.created_at ? new Date(garden.created_at).toLocaleDateString() : "—"}`;
+                ? `${t("dashboard_last_prefix")}: ${fmtDate(lastTask.due_date, lang)} · ${lastTask.title}`
+                : `${t("dashboard_created_prefix")} ${garden.created_at ? new Date(garden.created_at).toLocaleDateString() : "—"}`;
         const isGreenhouse = garden.type?.toLowerCase().includes("greenhouse");
         return (
             <div key={garden.id} style={{ background:T.surface, border:`1px solid ${T.borderSoft}`, borderRadius:T.radiusLg, padding:16, boxShadow:"0 2px 6px rgba(0,0,0,0.06)", minHeight:190, display:"flex", flexDirection:"column", gap:10 }}>
                 <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:10 }}>
                     <div>
                         <div style={{ fontSize:15, fontWeight:800, color:T.text }}>{garden.name}</div>
-                        <div style={{ fontSize:11, color:T.textMuted }}>{garden.width} × {garden.height}m · {garden.type}</div>
+                        <div style={{ fontSize:11, color:T.textMuted }}>{garden.width} × {garden.height}m · {t(GARDEN_TYPE_LABEL_K[garden.type] || garden.type) || garden.type}</div>
                     </div>
-                    <Badge color={isGreenhouse?T.accent:T.primary} bg={isGreenhouse?T.accentBg:T.primaryBg}>{garden.type}</Badge>
+                    <Badge color={isGreenhouse?T.accent:T.primary} bg={isGreenhouse?T.accentBg:T.primaryBg}>{t(GARDEN_TYPE_LABEL_K[garden.type] || garden.type) || garden.type}</Badge>
                 </div>
                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                    <Badge color={T.primary} bg={T.primaryBg}>{bedCount} beds</Badge>
-                    <Badge color={T.textSub} bg={T.surfaceAlt}>{structCount} structures</Badge>
-                    <Badge color={T.textSub} bg={T.surfaceAlt}>{plantCount} plants</Badge>
+                    <Badge color={T.primary} bg={T.primaryBg}>{bedCount} {t("beds_fields").toLowerCase()}</Badge>
+                    <Badge color={T.textSub} bg={T.surfaceAlt}>{structCount} {t("dashboard_structures").toLowerCase()}</Badge>
+                    <Badge color={T.textSub} bg={T.surfaceAlt}>{plantCount} {t("plant_varieties").toLowerCase()}</Badge>
                 </div>
                 <div style={{ fontSize:12, color:T.textMuted }}>{activityLabel}</div>
                 <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginTop:"auto" }}>
@@ -3263,21 +3388,27 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     const suggestionItems = [
         {
             icon: "🧺",
-            label: nextHarvest ? `${t("harvest")} ${nextHarvest.name}` : "Review harvest",
-            helper: nextHarvest ? `Due ${fmtDate(nextHarvest.harvest_date, lang)}` : "No harvest scheduled soon",
+            label: nextHarvest ? `${t("harvest")} ${nextHarvest.name}` : t("dashboard_review_harvest"),
+            helper: nextHarvest ? `${t("due_date")} ${fmtDate(nextHarvest.harvest_date, lang)}` : t("dashboard_no_harvest_soon"),
             onClick: () => navigate("plants"),
         },
         {
             icon: "🪴",
-            label: emptyBeds.length ? `${emptyBeds.length} empty beds` : "All beds planted",
-            helper: emptyBeds.length ? "Fill them with quick greens" : "Great job keeping beds full",
+            label: emptyBeds.length ? `${emptyBeds.length} ${t("dashboard_empty_beds")}` : t("dashboard_all_beds_planted"),
+            helper: emptyBeds.length ? t("dashboard_fill_beds") : t("dashboard_keep_beds_full"),
             onClick: () => navigate("fields"),
         },
         {
             icon: "🌡️",
-            label: greenhouseCount ? `${greenhouseCount} greenhouse spots` : "Add a greenhouse",
-            helper: greenhouseCount ? "Check ventilation logs" : "Create a protected structure",
+            label: greenhouseCount ? `${greenhouseCount} ${t("dashboard_greenhouse_spots")}` : t("dashboard_add_greenhouse"),
+            helper: greenhouseCount ? t("dashboard_check_ventilation") : t("dashboard_create_protected"),
             onClick: () => navigate("greenhouses"),
+        },
+        {
+            icon: "🔎",
+            label: t("dashboard_seo_hub"),
+            helper: t("dashboard_seo_hub_helper"),
+            onClick: () => { window.location.href = "/seo/"; },
         },
     ];
     return (
@@ -3289,18 +3420,19 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 actions={quickActions}
             />
             <JourneyPanel
-                headerLabel="Tuinmissies"
-                title={journey.title || "Je tuin groeit verder"}
-                subtitle={journey.subtitle || "Maak je tuinwereld stap voor stap groter."}
+                headerLabel={t("dashboard_missions")}
+                title={journey.headline || t("dashboard_world_title")}
+                subtitle={journey.subtitle || t("dashboard_world_subtitle")}
                 progress={journey.progress}
                 steps={journey.steps}
                 tokens={journey.tokens}
                 reward={journey.reward}
                 nextStep={journey.nextStep}
                 onStepAction={handleQuestStep}
+                lang={lang}
                 action={
                     <Btn size="sm" variant="primary" onClick={() => navigate(journeyRoute)}>
-                        {journey.progress >= 100 ? "Open tuin" : "Ga naar volgende stap"}
+                        {journey.progress >= 100 ? t("dashboard_open_garden") : t("dashboard_next_step")}
                     </Btn>
                 }
             />
@@ -3316,34 +3448,34 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 16 }}>
                 <SectionPanel title={`📅 ${t("today")}`} subtitle={`${todayTasks.length} ${t("tasks_pending").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
                     {todayTasks.length ? todayTasks.map(renderTaskRow) : (
-                        <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>No tasks scheduled for today. Add a quick task or pick from your to-do list.</div>
+                        <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>{t("dashboard_no_tasks_today")}</div>
                     )}
                 </SectionPanel>
                 <SectionPanel title={t("ready_to_harvest")} subtitle={`${harvestable.length} ${t("ready_to_harvest").toLowerCase()}`} accent={{ border: T.accent, titleColor: T.text, subColor: T.textMuted }} action={<Btn size="sm" variant="ghost" onClick={() => navigate("plants")}>{t("view_all")}</Btn>}>
                     {harvestable.length ? harvestable.slice(0, 4).map(renderHarvestRow) : (
-                        <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>No crops marked as harvestable yet.</div>
+                        <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>{t("dashboard_no_harvest")}</div>
                     )}
                 </SectionPanel>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 16 }}>
-                <SectionPanel title="Aandacht nodig" subtitle={`${attentionTasks.length} focus items`} accent={{ border: T.danger, titleColor: T.danger }} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
+                <SectionPanel title={t("dashboard_attention_title")} subtitle={`${attentionTasks.length} ${t("dashboard_attention_subtitle")}`} accent={{ border: T.danger, titleColor: T.danger }} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
                     {attentionTasks.length ? attentionTasks.map(renderTaskRow) : (
-                        <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>Nothing urgent for now. Keep up the steady pace.</div>
+                        <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>{t("dashboard_nothing_urgent")}</div>
                     )}
                 </SectionPanel>
-                <SectionPanel title="Mijn tuin(en)" subtitle={`${gardens.length} ${t("gardens").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("gardens")}>{t("view_all")}</Btn>}>
+                <SectionPanel title={t("dashboard_my_gardens")} subtitle={`${gardens.length} ${t("gardens").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("gardens")}>{t("view_all")}</Btn>}>
                     {gardens.length ? (
                         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:12 }}>
                             {gardens.map(renderGardenCard)}
                         </div>
                     ) : (
                         <div style={{ padding: "24px 0" }}>
-                            <EmptyState icon="🌱" title={t("no_gardens")} subtitle="Create a garden to unlock these insights." action={<Btn variant="primary" onClick={() => navigate("gardens")} icon="+">{t("new_garden")}</Btn>} />
+                            <EmptyState icon="🌱" title={t("no_gardens")} subtitle={t("dashboard_create_garden_hint")} action={<Btn variant="primary" onClick={() => navigate("gardens")} icon="+">{t("new_garden")}</Btn>} />
                         </div>
                     )}
                 </SectionPanel>
             </div>
-            <SectionPanel title="Seizoenssuggesties" subtitle="Slimme tips op basis van jouw tuin" accent={{ border: T.primary, titleColor: T.text, subColor: T.textMuted }}>
+            <SectionPanel title={t("dashboard_seasonal_suggestions")} subtitle={t("dashboard_smart_tips")} accent={{ border: T.primary, titleColor: T.text, subColor: T.textMuted }}>
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                     {suggestionItems.map(s => (
                         <QuickAction key={s.label} icon={s.icon} label={s.label} helper={s.helper} onClick={s.onClick} />
@@ -3375,7 +3507,7 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
     };
     const totalArea = fields.reduce((sum, field) => sum + ((+field.width || 0) * (+field.height || 0)), 0).toFixed(1);
     const user = state.users.find(u => u.id === uid);
-    const journey = buildJourneyTrack({ user, gardens, fields, plants, structures });
+    const journey = buildJourneyTrack({ user, gardens, fields, plants, structures, lang });
     const metaBadges = [
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
         <MetaBadge key="area" value={`${totalArea}m²`} label={t("total_area")} />,
@@ -3389,14 +3521,15 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
                 actions={[<Btn key="new" icon="+" variant="primary" onClick={()=>setShow(true)}>{t("new_garden")}</Btn>]}
             />
             <JourneyPanel
-                headerLabel="Tuinwereld"
-                title={journey.title}
+                headerLabel={t("dashboard_missions")}
+                title={journey.headline}
                 subtitle={journey.subtitle}
                 progress={journey.progress}
                 steps={journey.steps}
                 tokens={journey.tokens}
                 reward={journey.reward}
                 nextStep={journey.nextStep}
+                lang={lang}
                 action={<Btn size="sm" variant="primary" icon="+" onClick={()=>setShow(true)}>{t("create_garden")}</Btn>}
             />
             {gardens.length===0 ? (
@@ -3719,7 +3852,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                             const typeLabel = LANG[lang]?.[FIELD_LABEL_K[f.type]] || f.type;
                             const nextTask = tasks.filter(t => t.field_id === f.id && t.status !== "done" && t.due_date)
                                 .sort((a, b) => (a.due_date||"").localeCompare(b.due_date||""))[0];
-                            const nextLabel = nextTask ? `Next: ${fmtDate(nextTask.due_date, lang)} · ${nextTask.title}` : "No upcoming tasks";
+    const nextLabel = nextTask ? `${t("dashboard_next_prefix")}: ${fmtDate(nextTask.due_date, lang)} · ${nextTask.title}` : t("dashboard_no_upcoming_tasks");
                             return (
                                 <ListRow
                                     key={f.id}
@@ -4395,14 +4528,14 @@ function TasksScreen({ state, dispatch, lang }) {
                 title={`✅ ${t("nav_tasks")}`}
                 subtitle={`${done}/${tasks.length} complete`}
                 meta={[
-                    <MetaBadge key="open" value={tasks.length - done} label="Open" />,
-                    <MetaBadge key="done" value={done} label="Done" />
+                    <MetaBadge key="open" value={tasks.length - done} label={t("task_pending")} />,
+                    <MetaBadge key="done" value={done} label={t("task_done")} />
                 ]}
                 actions={[<Btn key="add" variant="primary" icon="+" onClick={()=>setShow(true)}>{t("add_task")}</Btn>]}
             />
             {tasks.length>0 && (
                 <div style={{ marginBottom:18 }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:T.textSub, marginBottom:5 }}><span>{pct}% complete</span><span>{done}/{tasks.length}</span></div>
+                    <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:T.textSub, marginBottom:5 }}><span>{pct}% {t("task_done")}</span><span>{done}/{tasks.length}</span></div>
                     <div style={{ height:6, background:T.borderLight, borderRadius:99 }}><div style={{ height:"100%", width:`${pct}%`, background:T.success, borderRadius:99, transition:"width 0.4s" }}/></div>
                 </div>
             )}
@@ -4436,7 +4569,7 @@ function TasksScreen({ state, dispatch, lang }) {
                                 status={{ label: sc_l, color: sc_.color, bg: sc_.bg }}
                                 hint={LinkedHint(task, fields, structures, lang)}
                                 actions={[
-                                    <Btn key="toggle" size="xs" variant={task.status==="done"?"secondary":"success"} onClick={()=>dispatch({type:"UPDATE_TASK",payload:{...task,status:task.status==="done"?"pending":"done"}})}>{task.status==="done"?"Reopen":"Done"}</Btn>,
+                                    <Btn key="toggle" size="xs" variant={task.status==="done"?"secondary":"success"} onClick={()=>dispatch({type:"UPDATE_TASK",payload:{...task,status:task.status==="done"?"pending":"done"}})}>{task.status==="done"?t("task_reopen"):t("task_done")}</Btn>,
                                     <Btn key="delete" size="xs" variant="ghost" onClick={()=>{ if(window.confirm("Delete task?")) dispatch({type:"DELETE_TASK",payload:task.id}); }}>✕</Btn>
                                 ]}
                             />

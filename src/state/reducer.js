@@ -8,7 +8,10 @@ export function reducer(state, { type, payload }) {
         case "ADD_USER":          return { ...state, users: [...state.users, payload] };
         case "UPDATE_USER":       return { ...state, users: state.users.map(u => u.id===payload.id ? payload : u) };
         case "DELETE_USER":       return { ...state, users: state.users.filter(u => u.id!==payload), activeUserId: state.activeUserId===payload ? (state.users.find(u=>u.id!==payload)?.id||null) : state.activeUserId };
-        case "SET_ACTIVE_USER":   return { ...state, activeUserId: payload };
+        case "SET_ACTIVE_USER": {
+            const nextGardenId = state.gardens.find(g => g.user_id === payload)?.id || null;
+            return { ...state, activeUserId: payload, activeGardenId: nextGardenId };
+        }
         case "ADD_GARDEN":        return { ...state, gardens: [...state.gardens, inj(payload)], activeGardenId: payload.id };
         case "UPDATE_GARDEN":     return { ...state, gardens: state.gardens.map(g => g.id===payload.id ? payload : g) };
         case "DELETE_GARDEN":     return { ...state, gardens: state.gardens.filter(g => g.id!==payload), activeGardenId: state.activeGardenId===payload ? (state.gardens.find(g=>g.user_id===uid&&g.id!==payload)?.id||null) : state.activeGardenId };

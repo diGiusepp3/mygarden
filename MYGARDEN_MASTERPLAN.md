@@ -71,7 +71,7 @@ Wat nu al duidelijk is:
 - [ ] Laat schermbestanden hun eigen werk doen.
 - [ ] Laat helperbestanden geen UI renderen.
 - [ ] Laat UI onderdelen geen data logica doen. 
-- [ ] Laat state bestanden alleen state regelen.
+- [ ] Laat state bestanden alleen state regelen. 
 - [ ] Laat theme bestanden alleen visuele tokens bewaren.
 - [ ] Laat i18n bestanden alleen teksten bewaren.
 - [ ] Geef bestanden korte, duidelijke namen.
@@ -722,6 +722,8 @@ Wat nu al duidelijk is:
 - [x] Maak de eerste start meer als een kleine quest-lijn.
 - [x] Laat nieuwe gebruikers direct zien wat ze nog moeten doen.
 - [x] Laat de dashboard start meer voelen als een tuinwereld.
+- [x] Geef het dashboard een premium, gelaagde herontwerp.
+- [x] Maak dashboard teksten en knoplabels overal correct vertaalbaar.
 - [ ] Laat lege staten minder leeg en meer uitnodigend voelen.
 - [ ] Laat de eerste tuin visueel aanvoelen als een unlock-moment.
 - [ ] Laat crops pas echt opduiken nadat de eerste tuin is aangemaakt.
@@ -732,6 +734,7 @@ Wat nu al duidelijk is:
 - [x] Toon per stap een knop die naar de juiste pagina of functie wijst.
 - [x] Maak op de dev-pagina een Codex-plantbuilder voor nieuwe plantsoorten.
 - [x] Voeg een MySQL-seedbestand toe met meer dan 100 onboarding stappen.
+- [x] Maak crawlbare SEO-pagina's voor moestuin, siertuin, balkontuin, serre en AI SEO tips.
 - [x] Laat de dev-pagina eerst bestaande plantsoorten en variëteiten laden.
 - [x] Laat Codex bestaande variëteiten samenvoegen in plaats van zomaar dubbel op te slaan.
 
