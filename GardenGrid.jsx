@@ -206,7 +206,7 @@ const LANG = {
         good_morning:"Bonjour !", today:"Aujourd'hui",
         gardens:"Jardins", beds_fields:"Parterres & Champs", plant_varieties:"Variétés",
         tasks_pending:"Tâches en attente", ready_to_harvest:"Prêt à récolter",
-        upcoming_tasks:"📋 Tâches Ã  venir", view_all:"Voir tout →",
+        upcoming_tasks:"📋 Tâches à venir", view_all:"Voir tout →",
         maintenance:"Entretien",
         overdue:"⚠️ En retard", all_tasks_complete:"Toutes les tâches sont faites ! 🎉",
         nothing_ready:"Rien de prêt", harvest:"Récolter", mark_sown:"Marquer semé",
@@ -477,7 +477,7 @@ const CATEGORIES    = ["Vegetable","Herb","Fruit","Flower","Legume","Root","Leaf
 const CAT_ICONS     = { Vegetable:"🥦", Herb:"🌿", Fruit:"🍓", Flower:"🌸", Legume:"🫘", Root:"🥕", "Leafy Green":"🥬", Other:"🌻" };
 const GARDEN_TYPES  = ["mixed","vegetable","herb","flower","fruit","greenhouse","allotment"];
 const USER_COLORS   = ["#2B5C10","#1565C0","#C4622D","#7B1FA2","#00695C","#E65100","#37474F","#AD1457"];
-const USER_AVATARS  = ["ðŸ‘©â€🌾","ðŸ‘¨â€🌾","ðŸ§‘â€🌾","👩‍🍳","👨‍🍳","🧑‍🍳","🌱","🍀"];
+const USER_AVATARS  = ["👩‍🌾","👨‍🌾","🧑‍🌾","👩‍🍳","👨‍🍳","🧑‍🍳","🌱","🍀"];
 const GH_TYPES      = ["greenhouse","tunnel_greenhouse"];
 const MAINTENANCE_STRUCT_TYPES = new Set(["hedge","trellis","windbreak","orchard_row"]);
 
@@ -575,8 +575,8 @@ const gid = () => Math.random().toString(36).slice(2, 10);
 const SEED = {
     // Demo accounts used for the initial dashboard and login state.
     users: [
-        { id:"u1", name:"Alex", email:"alex@gardengrid.app", password:"garden123", avatar:"ðŸ‘©â€🌾", color:"#2B5C10", settings:{ lang:"en" }, created_at:"2026-01-15T10:00:00.000Z" },
-        { id:"u2", name:"Sam",  email:"sam@gardengrid.app",  password:"moestuin1", avatar:"ðŸ‘¨â€🌾", color:"#1565C0", settings:{ lang:"nl" }, created_at:"2026-02-01T09:00:00.000Z" },
+        { id:"u1", name:"Alex", email:"alex@gardengrid.app", password:"garden123", avatar:"👩‍🌾", color:"#2B5C10", settings:{ lang:"en" }, created_at:"2026-01-15T10:00:00.000Z" },
+        { id:"u2", name:"Sam",  email:"sam@gardengrid.app",  password:"moestuin1", avatar:"👨‍🌾", color:"#1565C0", settings:{ lang:"nl" }, created_at:"2026-02-01T09:00:00.000Z" },
     ],
     activeUserId: null,
     // Garden canvases with dimensions, type and notes.
@@ -1013,17 +1013,17 @@ const renderSlotSeedPlan = (slot, { compact = false } = {}) => {
 const slotDisplayLabel = (slot, allSlots = []) => {
     if (!slot) return "";
     const parent = slot.parent_type === "slot" ? allSlots.find(s => s.id === slot.parent_id) : null;
-    const base = `${SLOT_TYPE_ICONS[slot.type] || "â–¦"} ${slotBaseLabel(slot)}`;
+    const base = `${SLOT_TYPE_ICONS[slot.type] || "▦"} ${slotBaseLabel(slot)}`;
     const meta = [];
     if (slot.type === "tunnel_row" || slot.type === "bed_row") {
         if (slot.row_count) meta.push(`${slot.row_count} rows`);
         if (slot.spacing_cm) meta.push(`${slot.spacing_cm}cm`);
         if (slot.plant_count) meta.push(`${slot.plant_count} plants`);
-        meta.push(slot.orientation === "vertical" ? "90?" : "0?");
+        meta.push(slot.orientation === "vertical" ? "90°" : "0°");
     }
     if (slot.type === "greenhouse_tray" && slot.rows && slot.cols) meta.push(`${slot.rows} × ${slot.cols}`);
     const suffix = meta.length ? ` · ${meta.join(" · ")}` : "";
-    return parent ? `${slotDisplayLabel(parent, allSlots)} â€º ${base}${suffix}` : `${base}${suffix}`;
+    return parent ? `${slotDisplayLabel(parent, allSlots)} › ${base}${suffix}` : `${base}${suffix}`;
 };
 const childSlotsFor = (allSlots, parentType, parentId) => {
     const direct = allSlots.filter(s => s.parent_type === parentType && s.parent_id === parentId);
@@ -1286,7 +1286,7 @@ function Modal({ title, onClose, children, width=540 }) {
             <div style={{ background:T.surface, borderRadius:T.rl, width:"100%", maxWidth:width, maxHeight:"92vh", overflow:"auto", boxShadow:T.shLg }} onClick={e=>e.stopPropagation()}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 22px 16px", borderBottom:`1px solid ${T.border}`, position:"sticky", top:0, background:T.surface, zIndex:1 }}>
                     <h2 style={{ margin:0, fontSize:16, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>{title}</h2>
-                    <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.textMuted, padding:"2px 6px", lineHeight:1, borderRadius:T.rs }}>âœ•</button>
+                    <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.textMuted, padding:"2px 6px", lineHeight:1, borderRadius:T.rs }}>✕</button>
                 </div>
                 <div style={{ padding:22 }}>{children}</div>
             </div>
@@ -1388,10 +1388,10 @@ const PillFilter = ({ value, active, onClick, color, bg }) => {
 const BED_SHAPES = [
     { v:"rect",   label:"Rechthoek", d:<rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" strokeWidth="2"/> },
     { v:"circle", label:"Cirkel",    d:<ellipse cx="12" cy="12" rx="10" ry="8" fill="none" stroke="currentColor" strokeWidth="2"/> },
-    { v:"semi_n", label:"Halve â†‘",   d:<path d="M 2 20 A 10 16 0 0 0 22 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
-    { v:"semi_s", label:"Halve â†“",   d:<path d="M 2 4 A 10 16 0 0 1 22 4 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"semi_n", label:"Halve ↑",   d:<path d="M 2 20 A 10 16 0 0 0 22 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"semi_s", label:"Halve ↓",   d:<path d="M 2 4 A 10 16 0 0 1 22 4 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
     { v:"semi_e", label:"Halve →",   d:<path d="M 2 4 A 20 8 0 0 1 2 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
-    { v:"semi_w", label:"Halve â†",   d:<path d="M 22 4 A 20 8 0 0 0 22 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"semi_w", label:"Halve ←",   d:<path d="M 22 4 A 20 8 0 0 0 22 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
 ];
 function BedShapePicker({ value, onChange }) {
     return (
@@ -1483,7 +1483,7 @@ class ScreenErrorBoundary extends React.Component {
                 <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:24, background:T.bg, color:T.text, fontFamily:"DM Sans, sans-serif" }}>
                     <Card style={{ maxWidth:720, width:"100%", padding:22 }}>
                         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                            <div style={{ fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif" }}>âš ï¸ Screen crashed</div>
+                            <div style={{ fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif" }}>⚠️ Screen crashed</div>
                             <div style={{ fontSize:13, color:T.textSub, lineHeight:1.6 }}>
                                 The current screen failed to render. This boundary is here so the app does not disappear into a blank page.
                             </div>
@@ -1766,7 +1766,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
         structures.forEach(s => {
             const es_ = eff(s);
             if (wx >= es_.x && wx <= es_.x + es_.width && wy >= es_.y && wy <= es_.y + es_.height) {
-                hits.push({ kind:"struct", item:s, label:`${STRUCT_ICONS[s.type] || "ðŸ—ï¸"} ${s.name}` });
+                hits.push({ kind:"struct", item:s, label:`${STRUCT_ICONS[s.type] || "🏗️"} ${s.name}` });
             }
         });
         const unique = new Map();
@@ -2193,7 +2193,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                     <div style={{ fontSize:15, fontWeight:900, color:T.text, fontFamily:"Fraunces, serif" }}>{selItem.name}</div>
                                     <div style={{ fontSize:11, color:T.textMuted }}>{selKind==="zone" ? "Zone" : selKind==="struct" ? "Structure" : "Bed"}</div>
                                 </div>
-                                <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>âœ•</Btn>
+                                <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>✕</Btn>
                             </div>
                             {selKind === "zone" ? (
                                 <div style={{ display:"grid", gap:10 }}>
@@ -2204,7 +2204,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                         <Btn size="sm" variant="primary" onClick={saveEdit}>Save</Btn>
                                         <Btn size="sm" variant="danger" onClick={() => { if (window.confirm("Delete this zone?")) { dispatch({ type:"DELETE_ZONE", payload:selItem.id }); setSelId(null); setSelKind(null); } }}>Delete</Btn>
                                     </div>
-                                    <div style={{ fontSize:11, color:T.textMuted }}>Area: {polygonArea(selItem.points||[]).toFixed(1)}m?</div>
+                                    <div style={{ fontSize:11, color:T.textMuted }}>Area: {polygonArea(selItem.points||[]).toFixed(1)}m²</div>
                                 </div>
                             ) : (
                                 <div style={{ display:"grid", gap:10 }}>
@@ -2328,7 +2328,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                                 <button key={st.id} onClick={()=>{ setSelId(st.id); setSelKind("struct"); }} style={{ textAlign:"left", border:`1px solid ${selId===st.id&&selKind==="struct"?T.accent:T.border}`, background:selId===st.id&&selKind==="struct"?T.accentBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
                                                     <div style={{ display:"flex", justifyContent:"space-between", gap:8, alignItems:"start" }}>
                                                         <div>
-                                                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{STRUCT_ICONS[st.type] || "ðŸ—ï¸"} {st.name}</div>
+                                                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{STRUCT_ICONS[st.type] || "🏗️"} {st.name}</div>
                                                             <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[STRUCT_LABEL_K[st.type]] || st.type} · {st.width} × {st.height}m</div>
                                                         </div>
                                                         {st.linked_field_id && <Badge color={T.accent} bg={T.accentBg}>linked</Badge>}
@@ -2345,7 +2345,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                             {panelZones.map(z => (
                                                 <button key={z.id} onClick={()=>{ setSelId(z.id); setSelKind("zone"); }} style={{ textAlign:"left", border:`1px solid ${selId===z.id&&selKind==="zone"?T.primary:T.border}`, background:selId===z.id&&selKind==="zone"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
                                                     <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{ZONE_ICONS[z.type] || "🗺️"} {z.name}</div>
-                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type} · {polygonArea(z.points||[]).toFixed(1)}m?</div>
+                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type} · {polygonArea(z.points||[]).toFixed(1)}m²</div>
                                                 </button>
                                             ))}
                                         </div>
@@ -2406,12 +2406,12 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
             {selItem && editForm && (
                 <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderTop:"none", borderRadius:`0 0 ${T.r} ${T.r}`, padding:"14px 18px" }}>
                     <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
-                        <span style={{ fontSize:20 }}>{selKind==="struct" ? (STRUCT_ICONS[selItem.type]||"ðŸ—ï¸") : selKind==="zone" ? (ZONE_ICONS[selItem.type]||"🗺️") : selKind==="slot" ? "🪴" : "🛏️"}</span>
+                        <span style={{ fontSize:20 }}>{selKind==="struct" ? (STRUCT_ICONS[selItem.type]||"🏗️") : selKind==="zone" ? (ZONE_ICONS[selItem.type]||"🗺️") : selKind==="slot" ? "🪴" : "🛏️"}</span>
                         <div style={{ flex:1 }}>
                             <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{selItem.name}</div>
                             <div style={{ fontSize:11, color:T.textMuted }}>{selKind==="zone" ? "Polygon zone" : selKind==="slot" ? "Plantrij" : "Edit inline or type exact values"}</div>
                         </div>
-                        <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>âœ•</Btn>
+                        <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>✕</Btn>
                     </div>
                     {selKind === "zone" ? (
                         <>
@@ -2427,7 +2427,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                             </div>
                             <div style={{ marginTop:10, display:"flex", gap:8, alignItems:"center" }}>
                                 <Btn size="sm" variant="primary" onClick={saveEdit}>💾 Save Zone</Btn>
-                                <span style={{ fontSize:11, color:T.textMuted }}>? {selItem.points?.length || 0} points · {polygonArea(selItem.points||[]).toFixed(1)}m?</span>
+                                <span style={{ fontSize:11, color:T.textMuted }}>• {selItem.points?.length || 0} points · {polygonArea(selItem.points||[]).toFixed(1)}m²</span>
                                 <div style={{ flex:1 }} />
                                 <Btn size="sm" variant="danger" onClick={() => { if (window.confirm("Delete this zone?")) { dispatch({ type:"DELETE_ZONE", payload:selItem.id }); setSelId(null); setSelKind(null); } }}>Delete Zone</Btn>
                             </div>
@@ -2628,7 +2628,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
                         </h2>
                         <p style={{ margin:"0 0 20px", fontSize:13, color:T.textMuted }}>{mode==="login" ? t("login_sub") : t("register_sub")}</p>
 
-                        {error && <div style={{ background:T.dangerBg, border:`1px solid ${T.danger}33`, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger, marginBottom:14 }}>âš ï¸ {error}</div>}
+                        {error && <div style={{ background:T.dangerBg, border:`1px solid ${T.danger}33`, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger, marginBottom:14 }}>⚠️ {error}</div>}
 
                         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                             {mode==="register" && (
@@ -2649,8 +2649,8 @@ function LoginScreen({ state, dispatch, onLogin }) {
                                 </>
                             )}
                             <Input label={t("email")} value={email} onChange={setEmail} type="email" placeholder="naam@example.com" required/>
-                            <Input label={t("password")} value={password} onChange={setPassword} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
-                            {mode==="register" && <Input label={t("confirm_password")} value={confirmPw} onChange={setConfirmPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>}
+                            <Input label={t("password")} value={password} onChange={setPassword} type="password" placeholder="••••••••" required/>
+                            {mode==="register" && <Input label={t("confirm_password")} value={confirmPw} onChange={setConfirmPw} type="password" placeholder="••••••••" required/>}
                         </div>
 
                         <Btn variant="primary" size="lg" style={{ width:"100%", marginTop:18, justifyContent:"center" }} onClick={mode==="login"?handleLogin:handleRegister}>
@@ -2726,7 +2726,7 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
     const myTasks   = forUser(state.tasks, uid);
     const joined    = user.created_at ? new Date(user.created_at).toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"long",year:"numeric"}) : "—";
 
-    const TABS = [["profile","👤",t("edit_profile")],["password","🔑",t("change_password")],["stats","ðŸ“Š",t("your_stats")]];
+    const TABS = [["profile","👤",t("edit_profile")],["password","🔑",t("change_password")],["stats","📊",t("your_stats")]];
 
     return (
         <div style={{ padding:28, maxWidth:600, margin:"0 auto" }}>
@@ -2753,7 +2753,7 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
             {tab==="profile" && (
                 <Card style={{ padding:22 }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        {profileError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>âš ï¸ {profileError}</div>}
+                        {profileError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>⚠️ {profileError}</div>}
                         <Input label={t("display_name")} value={pName} onChange={setPName} required/>
                         <Input label={t("email")} value={pEmail} onChange={setPEmail} type="email"/>
                         <div>
@@ -2790,7 +2790,7 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                         <Input label={t("new_password")} value={newPw} onChange={setNewPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
                         <Input label={t("confirm_new")} value={confPw} onChange={setConfPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
                         <div style={{ fontSize:12, color:T.textMuted, padding:"8px 12px", background:T.surfaceAlt, borderRadius:T.rs }}>
-                            ðŸ”’ Wachtwoorden worden lokaal opgeslagen in je browser. MyGarden verstuurt geen gegevens naar een server.
+                            🔒 Wachtwoorden worden lokaal opgeslagen in je browser. MyGarden verstuurt geen gegevens naar een server.
                         </div>
                         <Btn variant="primary" onClick={savePassword} icon="🔑">{t("change_password")}</Btn>
                     </div>
@@ -2807,15 +2807,15 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                     </div>
                     <Card style={{ padding:16 }}>
                         <div style={{ fontSize:12, color:T.textMuted, display:"flex", flexDirection:"column", gap:6 }}>
-                            <div>ðŸ“… {t("joined")}: <strong style={{color:T.text}}>{joined}</strong></div>
+                            <div>📅 {t("joined")}: <strong style={{color:T.text}}>{joined}</strong></div>
                             <div>🌱 Total plants in garden: <strong style={{color:T.text}}>{myPlants.reduce((s,p)=>s+(+p.quantity||0),0)}</strong></div>
-                            <div>🛏️ Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}m?</strong></div>
+                            <div>🛏️ Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}m²</strong></div>
                             <div>✓ Tasks completed: <strong style={{color:T.success}}>{myTasks.filter(t2=>t2.status==="done").length}</strong></div>
                         </div>
                     </Card>
                     {/* Danger zone */}
                     <Card style={{ padding:16, border:`1px solid ${T.danger}44` }}>
-                        <div style={{ fontSize:13, fontWeight:700, color:T.danger, marginBottom:8 }}>âš ï¸ {t("danger_zone")}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:T.danger, marginBottom:8 }}>⚠️ {t("danger_zone")}</div>
                         <div style={{ fontSize:12, color:T.textSub, marginBottom:12 }}>{t("delete_account_confirm")}</div>
                         <Btn variant="danger" onClick={() => {
                             if (window.confirm(t("delete_account_confirm"))) {
@@ -2935,7 +2935,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     const instructionMeta = [
         <MetaBadge key="gardens" value={gardens.length} label={t("gardens")} />,
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
-        <MetaBadge key="area" value={`${totalArea}m?`} label={t("total_area")} />,
+        <MetaBadge key="area" value={`${totalArea}m²`} label={t("total_area")} />,
         <MetaBadge key="tasks" value={pending.length} label={t("tasks_pending")} />,
     ];
     const quickActions = [
@@ -3043,14 +3043,14 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     return (
         <PageShell width={1180}>
             <PageHeader
-                title={`${t("good_morning")} ðŸŒ¤ï¸`}
+                title={`${t("good_morning")} 🌤️`}
                 subtitle={todayLabel}
                 meta={instructionMeta}
                 actions={quickActions}
             />
             <PanelGroup>
                 <StatCard icon="🌿" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
-                <StatCard icon="🛏️" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m? ${t("total_area")}`} onClick={() => navigate("fields")} />
+                <StatCard icon="🛏️" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m² ${t("total_area")}`} onClick={() => navigate("fields")} />
                 <StatCard icon="🌱" label={t("plant_varieties")} value={plants.length} color="#388E3C" sub={`${plants.reduce((sum, p) => sum + (+p.quantity || 0), 0)} plants`} onClick={() => navigate("plants")} />
                 <StatCard icon="✅" label={t("tasks_pending")} value={pending.length} color={overdue.length > 0 ? T.danger : T.warning} sub={overdue.length > 0 ? `${overdue.length} ${t("overdue_badge")}` : t("all_on_track")} onClick={() => navigate("tasks")} />
                 {harvestable.length > 0 && (
@@ -3058,7 +3058,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 )}
             </PanelGroup>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 16 }}>
-                <SectionPanel title={`ðŸ“… ${t("today")}`} subtitle={`${todayTasks.length} ${t("tasks_pending").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
+                <SectionPanel title={`📅 ${t("today")}`} subtitle={`${todayTasks.length} ${t("tasks_pending").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
                     {todayTasks.length ? todayTasks.map(renderTaskRow) : (
                         <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>No tasks scheduled for today. Add a quick task or pick from your to-do list.</div>
                     )}
@@ -3118,7 +3118,7 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
     const totalArea = fields.reduce((sum, field) => sum + ((+field.width || 0) * (+field.height || 0)), 0).toFixed(1);
     const metaBadges = [
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
-        <MetaBadge key="area" value={`${totalArea}m?`} label={t("total_area")} />,
+        <MetaBadge key="area" value={`${totalArea}m²`} label={t("total_area")} />,
     ];
     return (
         <PageShell width={1040}>
@@ -3414,10 +3414,10 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
         <PageShell width={1120}>
             <PageHeader
                 title={`🛏️ ${t("nav_fields")}`}
-                subtitle={`${display.length} ${t("beds_total")} · ${displayArea}m? planned`}
+                subtitle={`${display.length} ${t("beds_total")} · ${displayArea}m² planned`}
                 meta={[
                     <MetaBadge key="beds" value={display.length} label={t("beds_fields")} />,
-                    <MetaBadge key="area" value={`${displayArea}m?`} label={t("total_area")} />
+                    <MetaBadge key="area" value={`${displayArea}m²`} label={t("total_area")} />
                 ]}
                 actions={[<Btn key="add" variant="primary" icon="+" onClick={()=>setShow(true)}>{t("add_bed")}</Btn>]}
             />
@@ -3464,7 +3464,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                                     actions={[
                                         <Btn key="slot" size="xs" variant="secondary" onClick={()=>openSlotModal(f)}>+ Row</Btn>,
                                         <Btn key="map" size="xs" variant="secondary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:f.garden_id}); navigate("editor"); }}>Map</Btn>,
-                                        <Btn key="del" size="xs" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_bed"))) dispatch({type:"DELETE_FIELD",payload:f.id}); }}>âœ•</Btn>,
+                                        <Btn key="del" size="xs" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_bed"))) dispatch({type:"DELETE_FIELD",payload:f.id}); }}>✕</Btn>,
                                     ]}
                                 />
                             );
@@ -3516,7 +3516,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {editSlot && editSlotForm && (
-                <Modal title={`âœï¸ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
+                <Modal title={`✏️ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <InfoBanner icon="ℹ️">Existing rows can be adjusted here. The preview updates from row count, spacing and plant count.</InfoBanner>
                         <FormRow cols={2}>
@@ -3880,7 +3880,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                     </InfoBanner>
                 )}
                 <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
-                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`ðŸ” ${t("search")}`} style={{ flex:1, minWidth:220, fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.radiusLg, padding:"10px 14px", outline:"none" }}/>
+                                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`🔍 ${t("search")}`} style={{ flex:1, minWidth:220, fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.radiusLg, padding:"10px 14px", outline:"none" }}/>
                     <span style={{ fontSize:12, color:T.textMuted }}>{filtered.length} / {plants.length} plants</span>
                 </div>
                 <div>
@@ -3926,10 +3926,10 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                                 </div>
                                 {slot && ["bed_row","tunnel_row"].includes(slot.type) && (p.sow_spacing_cm || p.row_plant_count || p.row_length_m) && (
                                     <div style={{ fontSize:11, color:T.textMuted, marginBottom:8, display:"flex", gap:8, flexWrap:"wrap" }}>
-                                        {p.row_count && <span>ðŸ§µ {p.row_count} rows</span>}
-                                        {p.sow_spacing_cm && <span>â†” {p.sow_spacing_cm} cm</span>}
+                                        {p.row_count && <span>🧵 {p.row_count} rows</span>}
+                                        {p.sow_spacing_cm && <span>↔ {p.sow_spacing_cm} cm</span>}
                                         {p.row_plant_count && <span>🌱 {p.row_plant_count} plants</span>}
-                                        {p.row_length_m && <span>ðŸ“ {p.row_length_m} m</span>}
+                                        {p.row_length_m && <span>📏 {p.row_length_m} m</span>}
                                     </div>
                                 )}
                                 {(p.sow_date||p.plant_date||p.harvest_date) && (
@@ -3944,7 +3944,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                                     <Btn size="sm" variant="secondary" onClick={()=>openEdit(p)}>{t("edit")}</Btn>
                                     {(p.status==="growing"||p.status==="harvestable") && <Btn size="sm" variant="accent" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"harvested"}})}>✓ {t("harvest")}</Btn>}
                                     {p.status==="planned" && <Btn size="sm" variant="success" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"sown",sow_date:p.sow_date||new Date().toISOString().slice(0,10)}})}>{t("mark_sown")}</Btn>}
-                                    <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_plant"))) dispatch({type:"DELETE_PLANT",payload:p.id}); }}>âœ•</Btn>
+                                    <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_plant"))) dispatch({type:"DELETE_PLANT",payload:p.id}); }}>✕</Btn>
                                 </div>
                             </Card>
                         );
@@ -3953,7 +3953,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
             )}
             {/* Add / Edit modal */}
             {show && (
-                <Modal title={editing?`âœï¸ Edit Plant`:`🌱 ${t("add_plant")}`} onClose={close}>
+                <Modal title={editing?`✏️ Edit Plant`:`🌱 ${t("add_plant")}`} onClose={close}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <FormRow>
                             <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Tomato" required/>
@@ -4000,7 +4000,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                 <Modal title={t("library_title")} onClose={()=>setShowLib(false)} width={780}>
                     <p style={{ margin:"0 0 14px", fontSize:13, color:T.textMuted }}>{t("library_sub")}</p>
                     <div style={{ display:"flex", gap:8, marginBottom:14, alignItems:"center", flexWrap:"wrap" }}>
-                        <input value={libSearch} onChange={e=>setLibSearch(e.target.value)} placeholder={`ðŸ” ${t("search")}`} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"7px 12px", outline:"none", minWidth:180 }}/>
+                        <input value={libSearch} onChange={e=>setLibSearch(e.target.value)} placeholder={`🔍 ${t("search")}`} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"7px 12px", outline:"none", minWidth:180 }}/>
                         <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
                             <PillFilter value={t("all")} active={libCat==="all"} onClick={()=>setLibCat("all")}/>
                             {CATEGORIES.map(c => <PillFilter key={c} value={`${CAT_ICONS[c]}`} active={libCat===c} onClick={()=>setLibCat(c)} title={c}/>)}
@@ -4166,7 +4166,7 @@ function TasksScreen({ state, dispatch, lang }) {
                                 hint={LinkedHint(task, fields, structures, lang)}
                                 actions={[
                                     <Btn key="toggle" size="xs" variant={task.status==="done"?"secondary":"success"} onClick={()=>dispatch({type:"UPDATE_TASK",payload:{...task,status:task.status==="done"?"pending":"done"}})}>{task.status==="done"?"Reopen":"Done"}</Btn>,
-                                    <Btn key="delete" size="xs" variant="ghost" onClick={()=>{ if(window.confirm("Delete task?")) dispatch({type:"DELETE_TASK",payload:task.id}); }}>âœ•</Btn>
+                                    <Btn key="delete" size="xs" variant="ghost" onClick={()=>{ if(window.confirm("Delete task?")) dispatch({type:"DELETE_TASK",payload:task.id}); }}>✕</Btn>
                                 ]}
                             />
                         );
@@ -4392,7 +4392,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                 <h2 style={{ margin:0, fontSize:18, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>{st.name}</h2>
                                                 <Badge color={stroke} bg={stroke+"20"}>{t(STRUCT_LABEL_K[st.type])||st.type}</Badge>
                                                 {garden && <Badge color={T.textSub} bg={T.surfaceAlt}>{garden.name}</Badge>}
-                                                {linkedField && <Badge color={T.accent} bg={T.accentBg}>ðŸ”— {linkedField.name}</Badge>}
+                                                {linkedField && <Badge color={T.accent} bg={T.accentBg}>🔗 {linkedField.name}</Badge>}
                                             </div>
                                             <div style={{ fontSize:12, color:T.textMuted, marginTop:4 }}>{st.width}m × {st.height}m = {(st.width*st.height).toFixed(1)}m² · Position ({st.x}m, {st.y}m)</div>
                                             {st.notes && <div style={{ fontSize:12, color:T.textSub, marginTop:4, lineHeight:1.5 }}>{st.notes}</div>}
@@ -4550,10 +4550,10 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                         <Btn size="sm" variant="secondary" onClick={()=>openSlotModal(st)}>🫙 Add {isTunnel ? "Row" : "Pot / Tray / Row"}</Btn>
                                         <Btn size="sm" variant="primary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:st.garden_id}); navigate("editor"); }}>📐 {t("nav_editor")}</Btn>
                                         <Btn size="sm" variant={st.ventilated?"ghost":"success"} onClick={()=>toggleVent(st)}>
-                                            {st.ventilated ? `ðŸ”’ ${t("close_vents")}` : `🌬️ ${t("ventilate")}`}
+                                            {st.ventilated ? `🔒 ${t("close_vents")}` : `🌬️ ${t("ventilate")}`}
                                         </Btn>
                                         <Btn size="sm" variant="secondary" onClick={()=>setEditGh(st)}>🌡️ Log Climate</Btn>
-                                        <Btn size="sm" variant="danger" onClick={()=>{ if(window.confirm(t("delete_struct"))) dispatch({type:"DELETE_STRUCT",payload:st.id}); }}>âœ• {t("delete")}</Btn>
+                                        <Btn size="sm" variant="danger" onClick={()=>{ if(window.confirm(t("delete_struct"))) dispatch({type:"DELETE_STRUCT",payload:st.id}); }}>✕ {t("delete")}</Btn>
                                     </div>
                                 </div>
                             </Card>
@@ -4605,7 +4605,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {editSlot && editSlotForm && (
-                <Modal title={`âœï¸ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
+                <Modal title={`✏️ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <InfoBanner icon="ℹ️">This edits an existing slot. Row count and spacing control the scale preview only for row-based slots.</InfoBanner>
                         <FormRow cols={2}>
@@ -4724,7 +4724,7 @@ function SettingsScreen({ state, dispatch, lang }) {
             <h1 style={{ margin:"0 0 24px", fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>⚙️ {t("nav_settings")}</h1>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>ðŸŒ {t("language")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>🌍 {t("language")}</h2>
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:8 }}>
                     {LANGS.map(([code,flag,name]) => (
@@ -4739,7 +4739,7 @@ function SettingsScreen({ state, dispatch, lang }) {
             </Card>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>ðŸ‘¥ {t("your_profile")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>👥 {t("your_profile")}</h2>
                 </div>
                 <div style={{ padding:18 }}>
                     <div style={{ display:"flex", gap:14, alignItems:"center", marginBottom:16 }}>
@@ -4751,7 +4751,7 @@ function SettingsScreen({ state, dispatch, lang }) {
             </Card>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>ðŸŒ¦ï¸ Weather & Storm Alerts</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>🌦️ Weather & Storm Alerts</h2>
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:14 }}>
                     <FormRow cols={2}>
@@ -4782,7 +4782,7 @@ function SettingsScreen({ state, dispatch, lang }) {
                                 <div>
                                     <div style={{ fontSize:12, color:T.textMuted }}>Current weather</div>
                                     <div style={{ fontSize:18, fontWeight:800, color:T.text }}>
-                                        {weather.current.temperature_2m}?C · {WEATHER_CODE_LABELS[weather.current.weather_code] || `Code ${weather.current.weather_code}`}
+                                        {weather.current.temperature_2m}°C · {WEATHER_CODE_LABELS[weather.current.weather_code] || `Code ${weather.current.weather_code}`}
                                     </div>
                                 </div>
                                 <div style={{ fontSize:12, color:T.textSub }}>
@@ -4804,7 +4804,7 @@ function SettingsScreen({ state, dispatch, lang }) {
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:12 }}>
                     <div style={{ fontSize:13, color:T.textSub, lineHeight:1.6, background:T.surfaceAlt, borderRadius:T.rs, padding:12 }}>
-                        ðŸ”’ Your garden data is now stored securely on the server in MySQL so it stays available across devices and sessions.
+                        🔒 Your garden data is now stored securely on the server in MySQL so it stays available across devices and sessions.
                     </div>
                     <div style={{ display:"flex", gap:8 }}>
                         <Btn variant="secondary" onClick={exportData} icon="📤">{t("export_backup")}</Btn>
@@ -4855,7 +4855,7 @@ function DevError({ msg }) {
     if (!msg) return null;
     return (
         <div style={{ background:"#FEE2E2", border:"1px solid #FCA5A5", borderRadius:T.radiusMd, padding:"12px 16px", color:"#991B1B", fontSize:13, marginBottom:16 }}>
-            âŒ {msg}
+            ❌ {msg}
         </div>
     );
 }
@@ -4919,7 +4919,7 @@ function DevPlantGenerator() {
                         <div key={i} style={{ padding:"8px 0", borderBottom: i < result.plants.length-1 ? `1px solid ${T.border}` : "none", fontSize:13 }}>
                             <span style={{ fontWeight:600 }}>{p.name}</span>
                             {p.description ? <span style={{ color:T.textMuted, marginLeft:8 }}>{p.description}</span> : null}
-                            {p.days_to_maturity ? <span style={{ color:T.textMuted, marginLeft:8 }}>ðŸ—“ {p.days_to_maturity}d</span> : null}
+                            {p.days_to_maturity ? <span style={{ color:T.textMuted, marginLeft:8 }}>🗓 {p.days_to_maturity}d</span> : null}
                         </div>
                     ))}
                 </AiResult>
@@ -5053,7 +5053,7 @@ Antwoord in het Nederlands. Wees praktisch en bondig.`;
                     )}
                 </div>
                 <Btn variant="primary" onClick={handleCheck} disabled={loading || !plantName.trim()} style={{ minWidth:180 }}>
-                    {loading ? "â³ Opzoeken..." : "🌿 Check compagnons"}
+                    {loading ? "⏳ Opzoeken..." : "🌿 Check compagnons"}
                 </Btn>
             </Card>
             <DevError msg={error}/>
@@ -5085,8 +5085,8 @@ function DevSowCalendar() {
 Structureer je antwoord als:
 🌱 BINNENSHUIS ZAAIEN: [lijst]
 🌿 BUITEN ZAAIEN / PLANTEN: [lijst]
-ðŸ”„ VERPLANTEN / OOGSTEN: [lijst]
-ðŸ’¡ TIPS VOOR ${monthName.toUpperCase()}: [2-3 praktische tips]
+🔄 VERPLANTEN / OOGSTEN: [lijst]
+💡 TIPS VOOR ${monthName.toUpperCase()}: [2-3 praktische tips]
 
 Antwoord in het Nederlands. Wees specifiek met plantnamen.`;
         try {
@@ -5112,7 +5112,7 @@ Antwoord in het Nederlands. Wees specifiek met plantnamen.`;
                 </div>
                 <div style={{ marginTop:16 }}>
                     <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:180 }}>
-                        {loading ? "⏳ Genereren..." : "ðŸ“… Genereer zaaiplan"}
+                        {loading ? "⏳ Genereren..." : "📅 Genereer zaaiplan"}
                     </Btn>
                 </div>
             </Card>
@@ -5158,7 +5158,7 @@ function DevFreeChat() {
                 />
                 <div style={{ marginTop:12 }}>
                     <Btn variant="primary" onClick={handleSend} disabled={loading || !prompt.trim()} style={{ minWidth:160 }}>
-                        {loading ? "â³ Nadenken..." : "ðŸ’¬ Vraag stellen"}
+                        {loading ? "⏳ Nadenken..." : "💬 Vraag stellen"}
                     </Btn>
                 </div>
             </Card>
@@ -5177,10 +5177,10 @@ function DevScreen({ state, dispatch, lang }) {
     const [tab, setTab] = useState("plants");
     const TABS = [
         { id:"plants",   icon:"🌱", label:"Planten genereren" },
-        { id:"advisor",  icon:"ðŸ§ ", label:"Tuinadviseur" },
+        { id:"advisor",  icon:"🧠", label:"Tuinadviseur" },
         { id:"companions", icon:"🌿", label:"Compagnons" },
-        { id:"calendar", icon:"ðŸ“…", label:"Zaaiplan" },
-        { id:"chat",     icon:"ðŸ’¬", label:"Vrije vraag" },
+        { id:"calendar", icon:"📅", label:"Zaaiplan" },
+        { id:"chat",     icon:"💬", label:"Vrije vraag" },
     ];
 
     return (
