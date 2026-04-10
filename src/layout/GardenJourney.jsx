@@ -41,7 +41,7 @@ export function buildJourneyTrack({ user, gardens = [], fields = [], plants = []
 
     const completed = steps.filter(step => step.done).length;
     const progress = Math.round((completed / steps.length) * 100);
-    const nextStep = steps.find(step => !step.done) || steps[steps.length - 1];
+    const nextStep = steps.find(step => !step.done) || null;
     const allOpen = progress === 100;
     const tokens = gardens.length === 0
         ? ["🪴", "🌱", "🧺"]
@@ -125,7 +125,7 @@ export function buildProfileJourney({ user, gardens = [], fields = [], plants = 
 
     const completed = steps.filter(step => step.done).length;
     const progress = Math.round((completed / steps.length) * 100);
-    const nextStep = steps.find(step => !step.done) || steps[steps.length - 1];
+    const nextStep = steps.find(step => !step.done) || null;
 
     return {
         steps,
@@ -277,7 +277,7 @@ export function buildUserQuestProgress({ user, gardens = [], fields = [], struct
 
     const completed = steps.filter(step => step.done).length;
     const progress = Math.round((completed / steps.length) * 100);
-    const nextStep = steps.find(step => !step.done) || steps[steps.length - 1];
+    const nextStep = steps.find(step => !step.done) || null;
     const aiSteps = [
         {
             key: "ai_tip_1",
