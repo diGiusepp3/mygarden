@@ -3566,7 +3566,6 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
     const [showDropdown, setShowDropdown] = useState(false);
     const [stage, setStage] = useState("jonge_plant");
     const [quantity, setQuantity] = useState("1");
-    const [showLocation, setShowLocation] = useState(false);
     const [placementType, setPlacementType] = useState("field");
     const [gardenId, setGardenId] = useState(gardens[0]?.id || "");
     const [fieldId, setFieldId] = useState("");
@@ -3696,39 +3695,36 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
                 {/* Quantity */}
                 <Input label="Aantal" value={quantity} onChange={setQuantity} type="number" min="1" max="999" />
 
-                {/* Location (collapsible) */}
-                {!showLocation ? (
-                    <button
-                        onClick={() => setShowLocation(true)}
-                        style={{ background:"none", border:`1.5px dashed ${T.borderSoft}`, borderRadius:T.radiusMd, padding:"10px 14px", cursor:"pointer", fontFamily:"inherit", fontSize:13, color:T.textMuted, textAlign:"left", transition:`all ${T.transitionFast}` }}
-                        onMouseEnter={e => e.currentTarget.style.borderColor = T.primary}
-                        onMouseLeave={e => e.currentTarget.style.borderColor = T.borderSoft}
-                    >
-                        + Locatie toewijzen (optioneel)
-                    </button>
-                ) : (
-                    <div style={{ display:"flex", flexDirection:"column", gap:10, background:T.surfaceSoft, borderRadius:T.radiusMd, padding:"12px 14px", border:`1px solid ${T.borderMuted}` }}>
-                        <Sel label="Tuin" value={gardenId} onChange={v => { setGardenId(v); setFieldId(""); setStructId(""); }}
-                            options={gardens.map(g => ({ value:g.id, label:g.name }))} />
+                <div style={{ display:"flex", flexDirection:"column", gap:10, background:T.surfaceSoft, borderRadius:T.radiusMd, padding:"12px 14px", border:`1px solid ${T.borderMuted}` }}>
+                    <div style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>Locatie</div>
+                    <Sel
+                        label="Tuin"
+                        value={gardenId}
+                        onChange={v => { setGardenId(v); setFieldId(""); setStructId(""); }}
+                        options={gardens.map(g => ({ value:g.id, label:g.name }))}
+                    />
+                    <Sel
+                        label="Koppelen aan"
+                        value={placementType}
+                        onChange={v => { setPlacementType(v); setFieldId(""); setStructId(""); }}
+                        options={[
+                            { value:"field", label:"Bed" },
+                            { value:"struct", label:"Serre" },
+                        ]}
+                    />
+                    {targetOptions.length > 0 ? (
                         <Sel
-                            label="Locatie type"
-                            value={placementType}
-                            onChange={v => { setPlacementType(v); setFieldId(""); setStructId(""); }}
-                            options={[
-                                { value:"field", label:"Bed" },
-                                { value:"struct", label:"Serre" },
-                            ]}
+                            label={targetLabel}
+                            value={placementType === "struct" ? structId : fieldId}
+                            onChange={placementType === "struct" ? setStructId : setFieldId}
+                            options={[{ value:"", label:`- Kies een ${targetLabel.toLowerCase()} -` }, ...targetOptions]}
                         />
-                        {targetOptions.length > 0 && (
-                            <Sel
-                                label={targetLabel}
-                                value={placementType === "struct" ? structId : fieldId}
-                                onChange={placementType === "struct" ? setStructId : setFieldId}
-                                options={[{ value:"", label:`- Kies een ${targetLabel.toLowerCase()} -` }, ...targetOptions]}
-                            />
-                        )}
-                    </div>
-                )}
+                    ) : (
+                        <InfoBanner icon="ℹ️">
+                            Er is geen {targetLabel.toLowerCase()} gevonden in deze tuin.
+                        </InfoBanner>
+                    )}
+                </div>
                 <FormActions onCancel={onClose} onSave={save} saveLabel="Toevoegen ✓" t={t} />
             </div>
         </Modal>
