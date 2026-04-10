@@ -734,3 +734,19 @@ Wat nu al duidelijk is:
 - [x] Voeg een MySQL-seedbestand toe met meer dan 100 onboarding stappen.
 - [x] Laat de dev-pagina eerst bestaande plantsoorten en variëteiten laden.
 - [x] Laat Codex bestaande variëteiten samenvoegen in plaats van zomaar dubbel op te slaan.
+
+## 31. Brede tuinwereld
+
+- [ ] Maak de plantbibliotheek veel breder dan alleen moestuinplanten.
+- [ ] Voeg siertuinplanten toe voor border, perk, terras en balkon.
+- [ ] Voeg vaste planten, struiken, klimplanten en bomen toe.
+- [ ] Voeg potplanten en containerplanten toe voor kleine ruimtes.
+- [ ] Voeg tuinplanten toe voor schaduw, halfschaduw en volle zon.
+- [ ] Voeg plantkeuzes toe voor balkon, patio, dakterras en kleine stadstuinen.
+- [ ] Maak tuinsoorten duidelijk voor moestuin, siertuin, balkon, serre en gemengde tuin.
+- [ ] Laat filters en suggesties per tuinsoort werken.
+- [ ] Laat de startflow van de app meteen zien dat er meer is dan alleen groenten.
+- [ ] Laat de app voorbeeldtuinen tonen voor moestuin, decoratietuin en balkon.
+- [ ] Maak import, generator en bibliotheek geschikt voor sier- en tuinplanten.
+- [ ] Voeg meer variëteiten toe per sierplant.
+- [ ] Laat de hele website voelen als een volledige tuinplanner.
