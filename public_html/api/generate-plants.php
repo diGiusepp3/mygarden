@@ -1,0 +1,102 @@
+<?php
+
+require_once __DIR__ . '/_bootstrap.php';
+
+$method = $_SERVER['REQUEST_METHOD'];
+if ($method !== 'POST') {
+    respond(['error' => 'Method not allowed'], 405);
+}
+
+$input = read_json_body();
+$count = max(1, min((int)($input['count'] ?? 3), 30));
+$category = trim((string)($input['category'] ?? 'vegetable'));
+$brief = trim((string)($input['prompt'] ?? ''));
+
+if ($brief !== '') {
+    $prompt = "Generate exactly $count unique plant entries for MyGarden in the category '$category'. Extra brief: $brief. Each entry must be a JSON object with: name, varieties (array of 2-4), description (1 sentence), sunlight (full sun/partial/shade), water_needs (low/medium/high), days_to_maturity (number), icon (emoji). Return ONLY the JSON array.";
+} else {
+    $prompt = "Generate exactly $count $category plant entries as a JSON array. Each must have: name, varieties (array of 2-3), description (1 sentence), sunlight (full sun/partial/shade), water_needs (low/medium/high), days_to_maturity (number), icon (emoji). Return ONLY the JSON array.";
+}
+
+try {
+    $models = ['mistral', 'gemma4:e2b'];
+    $response = null;
+    $lastError = '';
+
+    foreach ($models as $model) {
+        $ch = curl_init('http://localhost:11434/api/generate');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode(['model' => $model, 'prompt' => $prompt, 'stream' => false]),
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_TIMEOUT => 300,
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+
+        if (!$curl_error && $http_code === 200) {
+            break;
+        }
+        $lastError = $curl_error ?: $http_code;
+    }
+
+    if (!$response || $curl_error) {
+        respond(['error' => 'Ollama unavailable: ' . $lastError], 500);
+    }
+
+    $data = json_decode($response, true);
+    if (!isset($data['response'])) {
+        respond(['error' => 'Invalid Ollama response'], 500);
+    }
+
+    $text = $data['response'];
+    preg_match('/\[[\s\S]*\]/', $text, $matches);
+    if (empty($matches)) {
+        respond(['error' => 'Could not parse JSON from model'], 400);
+    }
+
+    $plants = json_decode($matches[0], true);
+    if (!is_array($plants)) {
+        respond(['error' => 'Invalid JSON array'], 400);
+    }
+
+    $db = db();
+    $saved = 0;
+    $failed = [];
+
+    foreach ($plants as $plant) {
+        try {
+            $name = $plant['name'] ?? 'Unknown';
+            $varieties = json_encode($plant['varieties'] ?? []);
+            $description = $plant['description'] ?? '';
+            $sunlight = $plant['sunlight'] ?? 'full sun';
+            $water_needs = $plant['water_needs'] ?? 'medium';
+            $days = (int)($plant['days_to_maturity'] ?? 60);
+            $zone = $plant['hardiness_zone'] ?? '';
+            $icon = $plant['icon'] ?? '🌱';
+
+            $stmt = $db->prepare(
+                'INSERT INTO plants_library (name, category, varieties, description, sunlight, water_needs, days_to_maturity, hardiness_zone, icon)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            );
+            $stmt->bind_param('ssssssiss', $name, $category, $varieties, $description, $sunlight, $water_needs, $days, $zone, $icon);
+            $stmt->execute();
+            $saved++;
+        } catch (Exception $e) {
+            $failed[] = $plant['name'] ?? 'Unknown';
+        }
+    }
+
+    respond([
+        'status' => 'success',
+        'saved' => $saved,
+        'failed' => count($failed),
+        'plants' => array_slice($plants, 0, 3),
+    ]);
+} catch (Exception $e) {
+    respond(['error' => 'Server error'], 500);
+}

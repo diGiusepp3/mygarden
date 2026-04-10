@@ -70,7 +70,7 @@ Wat nu al duidelijk is:
 - [ ] Laat `main.jsx` alleen opstarten.
 - [ ] Laat schermbestanden hun eigen werk doen.
 - [ ] Laat helperbestanden geen UI renderen.
-- [ ] Laat UI onderdelen geen data logica doen.
+- [ ] Laat UI onderdelen geen data logica doen. 
 - [ ] Laat state bestanden alleen state regelen.
 - [ ] Laat theme bestanden alleen visuele tokens bewaren.
 - [ ] Laat i18n bestanden alleen teksten bewaren.
@@ -730,3 +730,5 @@ Wat nu al duidelijk is:
 - [ ] Laat de app een beetje groeien mee met de gebruiker.
 - [x] Bewaar user voortgang in de opgeslagen state/database.
 - [x] Toon per stap een knop die naar de juiste pagina of functie wijst.
+- [x] Maak op de dev-pagina een Codex-plantbuilder voor nieuwe plantsoorten.
+- [x] Voeg een MySQL-seedbestand toe met meer dan 100 onboarding stappen.

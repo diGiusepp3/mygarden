@@ -4,7 +4,7 @@
 // THEME
 // ----
 import { PageShell, PageHeader, SectionPanel, PanelGroup, QuickAction, MetaBadge } from "./src/layout/PageChrome.jsx";
-import { JourneyPanel, buildJourneyTrack, buildProfileJourney } from "./src/layout/GardenJourney.jsx";
+import { JourneyPanel, buildJourneyTrack, buildProfileJourney, buildUserQuestProgress } from "./src/layout/GardenJourney.jsx";
 import { SCREEN_ROUTES, SCREEN_NAMES, getRouteFromHash, formatScreenHash } from "./src/routes.js";
 
 class ScreenErrorBoundary extends React.Component {
@@ -4851,44 +4851,83 @@ function AiResult({ children, model }) {
 }
 
 // ----
-function DevPlantGenerator() {
+function DevCodexPlantBuilder() {
     const [category, setCategory] = useState("Vegetable");
-    const [count, setCount]       = useState(5);
+    const [count, setCount]       = useState(8);
+    const [brief, setBrief]       = useState("More easy-to-grow crops for a mixed kitchen garden.");
     const [loading, setLoading]   = useState(false);
     const [result, setResult]     = useState(null);
     const [error, setError]       = useState(null);
 
+    const presets = [
+        { label: "Easy crops", text: "Focus on beginner-friendly crops with short maturity times." },
+        { label: "Pollinators", text: "Add more flower species that help pollinators and companion planting." },
+        { label: "Greenhouse", text: "Create greenhouse-friendly vegetables and herbs." },
+        { label: "Autumn", text: "Generate hardy late-season crops for a Belgian garden." },
+    ];
+
     async function handleGenerate() {
-        setLoading(true); setResult(null); setError(null);
+        setLoading(true);
+        setResult(null);
+        setError(null);
         try {
             const res = await fetch("/api/generate-plants.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ count, category }),
+                body: JSON.stringify({ count, category, prompt: brief }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Server error");
             setResult(data);
-        } catch (e) { setError(e.message); }
-        finally { setLoading(false); }
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
         <>
-            <div style={{ fontSize:13, color:T.textMuted, marginBottom:20 }}>
-                Genereert nieuwe planten via Ollama en slaat ze op in de plantendatabase.
+            <div style={{ fontSize:13, color:T.textMuted, marginBottom:20, lineHeight:1.6 }}>
+                Gebruik Codex om nieuwe plantsoorten te maken en direct in de plantenbibliotheek op te slaan.
             </div>
             <Card style={{ padding:24, marginBottom:4 }}>
-                <div style={{ display:"flex", gap:16, flexWrap:"wrap", alignItems:"flex-end" }}>
-                    <div style={{ flex:1, minWidth:160 }}>
-                        <Sel label="Categorie" value={category} onChange={v=>setCategory(v)} options={DEV_CATEGORIES}/>
-                    </div>
-                    <div style={{ width:110 }}>
-                        <Input label="Aantal" type="number" value={count} min={1} max={20} onChange={e=>setCount(Number(e.target.value))}/>
-                    </div>
-                    <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:160, height:38 }}>
-                        {loading ? "⏳ Genereren..." : "⚡ Genereer"}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))", gap:14, alignItems:"end" }}>
+                    <Sel label="Categorie" value={category} onChange={v=>setCategory(v)} options={DEV_CATEGORIES}/>
+                    <Input label="Aantal" type="number" value={count} min={1} max={30} onChange={e=>setCount(Number(e.target.value) || 1)}/>
+                    <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:170, height:38, justifySelf:"start" }}>
+                        {loading ? "⏳ Genereren..." : "⚡ Codex genereer"}
                     </Btn>
+                </div>
+                <div style={{ marginTop:14, display:"flex", gap:8, flexWrap:"wrap" }}>
+                    {presets.map(p => (
+                        <button
+                            key={p.label}
+                            onClick={() => setBrief(p.text)}
+                            style={{
+                                border:`1px solid ${T.borderSoft}`,
+                                background:T.surfaceSoft,
+                                color:T.text,
+                                borderRadius:T.radiusRound,
+                                padding:"7px 11px",
+                                fontSize:12,
+                                fontWeight:700,
+                                cursor:"pointer",
+                            }}
+                        >
+                            {p.label}
+                        </button>
+                    ))}
+                </div>
+                <div style={{ marginTop:14 }}>
+                    <Textarea
+                        label="Codex prompt"
+                        value={brief}
+                        onChange={setBrief}
+                        rows={4}
+                        placeholder="Beschrijf welke nieuwe plantsoorten je wil laten maken."
+                        hint="Hoe duidelijker de prompt, hoe beter de plantsoorten worden."
+                    />
                 </div>
             </Card>
             <DevError msg={error}/>
@@ -5159,6 +5198,7 @@ function DevScreen({ state, dispatch, lang }) {
     const [tab, setTab] = useState("plants");
     const TABS = [
         { id:"plants",   icon:"🌱", label:"Planten genereren" },
+        { id:"codex",    icon:"🧠", label:"Codex plantsoorten" },
         { id:"advisor",  icon:"🧠", label:"Tuinadviseur" },
         { id:"companions", icon:"🌿", label:"Compagnons" },
         { id:"calendar", icon:"📅", label:"Zaaiplan" },
@@ -5184,7 +5224,8 @@ function DevScreen({ state, dispatch, lang }) {
                 ))}
             </div>
 
-            {tab === "plants"     && <DevPlantGenerator/>}
+            {tab === "plants"     && <DevCodexPlantBuilder/>}
+            {tab === "codex"      && <DevCodexPlantBuilder/>}
             {tab === "advisor"    && <DevGardenAdvisor state={state}/>}
             {tab === "companions" && <DevCompanions state={state}/>}
             {tab === "calendar"   && <DevSowCalendar/>}

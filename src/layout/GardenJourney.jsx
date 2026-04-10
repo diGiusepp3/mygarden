@@ -278,16 +278,54 @@ export function buildUserQuestProgress({ user, gardens = [], fields = [], struct
     const completed = steps.filter(step => step.done).length;
     const progress = Math.round((completed / steps.length) * 100);
     const nextStep = steps.find(step => !step.done) || steps[steps.length - 1];
+    const aiSteps = [
+        {
+            key: "ai_tip_1",
+            icon: "🧠",
+            label: "AI tuincoach",
+            done: true,
+            helper: "Vraag om een slim plan voor je volgende tuinwerk.",
+            route: "dev",
+            actionLabel: "Open coach",
+        },
+        {
+            key: "ai_tip_2",
+            icon: "✨",
+            label: "Slimme plant tips",
+            done: true,
+            helper: "Laat AI een plantadvies of combinatie voorstellen.",
+            route: "plants",
+            actionLabel: "Open planten",
+        },
+        {
+            key: "ai_tip_3",
+            icon: "📐",
+            label: "Tuinanalyse",
+            done: true,
+            helper: "Vraag om een check van indeling, ruimte en balans.",
+            route: "editor",
+            actionLabel: "Open editor",
+        },
+        {
+            key: "ai_tip_4",
+            icon: "🌦️",
+            label: "Weer & planning",
+            done: true,
+            helper: "Gebruik AI om je komende week slim in te delen.",
+            route: "tasks",
+            actionLabel: "Open taken",
+        },
+    ];
 
     return {
-        steps,
+        steps: progress >= 100 ? aiSteps : steps,
         completed,
         progress,
-        nextStep,
-        tokens: ["👤", "🌿", "🛏️", "🏡", "🌱", "🔗", "📋", "🧺"],
-        headline: progress >= 100 ? "Je profiel is helemaal klaar." : "Vul je tuinwereld stap voor stap aan.",
+        nextStep: progress >= 100 ? aiSteps[0] : nextStep,
+        tokens: progress >= 100 ? ["🧠", "✨", "📐", "🌦️"] : ["👤", "🌿", "🛏️", "🏡", "🌱", "🔗", "📋", "🧺"],
+        headline: progress >= 100 ? "Je tuin is klaar. Vraag de AI-coach om de volgende zet." : "Vul je tuinwereld stap voor stap aan.",
         reward: progress >= 100
-            ? "Nu is je tuinwereld compleet en klaar voor dagelijks gebruik."
+            ? "Nu draait de kaart over naar slimme AI-stappen."
             : "Meer stappen maken de app speelser en duidelijker.",
     };
 }
