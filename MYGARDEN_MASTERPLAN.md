@@ -78,6 +78,7 @@ Wat nu al duidelijk is:
 - [ ] Zet verwante dingen bij elkaar.
 - [ ] Verplaats stukken pas als de nieuwe plek logisch voelt.
 - [x] Haal de sidebar uit `GardenGrid.jsx` en zet hem in losse layoutbestanden.
+- [x] Haal de page chrome uit `GardenGrid.jsx` en zet hem in losse layoutbestanden.
 
 ## 3. Thema en fonts
 

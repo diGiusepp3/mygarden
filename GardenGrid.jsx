@@ -3,6 +3,48 @@
 // ----
 // THEME
 // ----
+import { PageShell, PageHeader, SectionPanel, PanelGroup, QuickAction, MetaBadge } from "./src/layout/PageChrome.jsx";
+import { SCREEN_ROUTES, getRouteFromHash, formatScreenHash } from "./src/routes.js";
+
+class ScreenErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { error: null };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { error };
+    }
+
+    componentDidCatch(error, info) {
+        console.error("GardenGrid screen crashed:", error, info);
+    }
+
+    render() {
+        if (this.state.error) {
+            return (
+                <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:24, background:T.bg, color:T.text, fontFamily:"DM Sans, sans-serif" }}>
+                    <Card style={{ maxWidth:720, width:"100%", padding:22 }}>
+                        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                            <div style={{ fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif" }}>⚠️ Screen crashed</div>
+                            <div style={{ fontSize:13, color:T.textSub, lineHeight:1.6 }}>
+                                The current screen failed to render. This boundary is here so the app does not disappear into a blank page.
+                            </div>
+                            <pre style={{ margin:0, padding:14, background:T.surfaceAlt, borderRadius:T.rs, overflow:"auto", fontSize:12, color:T.danger, whiteSpace:"pre-wrap" }}>
+                                {String(this.state.error?.message || this.state.error)}
+                            </pre>
+                            <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                                <Btn variant="primary" onClick={this.props.onGoDashboard}>Go to dashboard</Btn>
+                                <Btn variant="secondary" onClick={() => { this.setState({ error: null }); this.props.onRetry?.(); }}>Retry screen</Btn>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 const T = {
     // Backgrounds & Surfaces
     bg:"#F5F0E8", surface:"#FFFFFF", surfaceAlt:"#EDE8DF", surfaceSoft:"#FBF9F4",
@@ -1413,150 +1455,7 @@ function BedShapePicker({ value, onChange }) {
     );
 }
 
-const PageShell = ({ children, width = 1180 }) => (
-    <div style={{ padding:"32px 0 48px", maxWidth:width, margin:"0 auto", display:"flex", flexDirection:"column", gap:26 }}>
-        {children}
-    </div>
-);
-
-const PageHeader = ({ title, subtitle, meta, actions }) => (
-    <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:18, flexWrap:"wrap" }}>
-            <div>
-                <h1 style={{ margin:0, fontSize:30, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>{title}</h1>
-                {subtitle && <p style={{ margin:"6px 0 0", fontSize:13, color:T.textMuted }}>{subtitle}</p>}
-            </div>
-            {actions && <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>{actions}</div>}
-        </div>
-        {meta && <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>{meta}</div>}
-    </div>
-);
-
-const SCREEN_ROUTES = {
-    dashboard: "#/dashboard",
-    gardens: "#/gardens",
-    editor: "#/editor",
-    fields: "#/fields",
-    plants: "#/plants",
-    tasks: "#/tasks",
-    greenhouses: "#/greenhouses",
-    account: "#/account",
-    settings: "#/settings",
-    dev: "#/dev",
-};
-const SCREEN_NAMES = new Set(Object.keys(SCREEN_ROUTES));
-const getRouteFromHash = () => {
-    if (typeof window === "undefined") return "dashboard";
-    const raw = window.location.hash.replace(/^#\/?/, "");
-    const [path, query = ""] = raw.split("?");
-    const screen = (path || "dashboard").match(/^[a-z-]+/i)?.[0] || "dashboard";
-    return {
-        screen: SCREEN_NAMES.has(screen) ? screen : "dashboard",
-        params: Object.fromEntries(new URLSearchParams(query).entries()),
-    };
-};
-const formatScreenHash = (screen, params = {}) => {
-    const base = SCREEN_ROUTES[screen] || SCREEN_ROUTES.dashboard;
-    const search = new URLSearchParams(
-        Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
-    ).toString();
-    return search ? `${base}?${search}` : base;
-};
-
 const Sidebar = React.lazy(() => import("./src/layout/Sidebar.jsx"));
-
-class ScreenErrorBoundary extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { error: null };
-    }
-
-    static getDerivedStateFromError(error) {
-        return { error };
-    }
-
-    componentDidCatch(error, info) {
-        console.error("GardenGrid screen crashed:", error, info);
-    }
-
-    render() {
-        if (this.state.error) {
-            return (
-                <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:24, background:T.bg, color:T.text, fontFamily:"DM Sans, sans-serif" }}>
-                    <Card style={{ maxWidth:720, width:"100%", padding:22 }}>
-                        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                            <div style={{ fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif" }}>⚠️ Screen crashed</div>
-                            <div style={{ fontSize:13, color:T.textSub, lineHeight:1.6 }}>
-                                The current screen failed to render. This boundary is here so the app does not disappear into a blank page.
-                            </div>
-                            <pre style={{ margin:0, padding:14, background:T.surfaceAlt, borderRadius:T.rs, overflow:"auto", fontSize:12, color:T.danger, whiteSpace:"pre-wrap" }}>
-                                {String(this.state.error?.message || this.state.error)}
-                            </pre>
-                            <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                                <Btn variant="primary" onClick={this.props.onGoDashboard}>Go to dashboard</Btn>
-                                <Btn variant="secondary" onClick={() => { this.setState({ error: null }); this.props.onRetry?.(); }}>Retry screen</Btn>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            );
-        }
-        return this.props.children;
-    }
-}
-
-const SectionPanel = ({ title, subtitle, action, children, style, accent }) => (
-    <Card variant={accent?.variant?"soft":"surface"} style={{
-        padding:"20px 22px",
-        background:accent?.bg||T.surface,
-        borderColor:accent?.border||T.cardBorder,
-        minHeight:subtitle||action?0:120,
-        ...style
-    }}>
-        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:14, marginBottom:subtitle||action?12:8 }}>
-            <div>
-                <h3 style={{ margin:0, fontSize:15, fontWeight:900, fontFamily:"Fraunces, serif", color:accent?.titleColor||T.text }}>{title}</h3>
-                {subtitle && <p style={{ margin:"6px 0 0", fontSize:12, color:accent?.subColor||T.textMuted }}>{subtitle}</p>}
-            </div>
-            {action && <div>{action}</div>}
-        </div>
-        {children}
-    </Card>
-);
-
-const PanelGroup = ({ children, cols = "repeat(auto-fit,minmax(240px,1fr))" }) => (
-    <div style={{ display:"grid", gridTemplateColumns:cols, gap:16 }}>{children}</div>
-);
-
-const QuickAction = ({ icon, label, helper, onClick }) => (
-    <button onClick={onClick} style={{
-        border:`1px solid ${T.borderSoft}`,
-        borderRadius:T.radiusLg,
-        padding:"12px 18px",
-        background:T.surfaceSoft,
-        display:"flex",
-        alignItems:"center",
-        gap:12,
-        cursor:"pointer",
-        fontSize:13,
-        fontWeight:600,
-        color:T.text,
-        boxShadow:T.sh,
-        transition:"transform 0.2s ease"
-    }}>
-        <span style={{ fontSize:20 }}>{icon}</span>
-        <div style={{ textAlign:"left" }}>
-            <div style={{ fontWeight:700 }}>{label}</div>
-            {helper && <div style={{ fontSize:12, color:T.textMuted }}>{helper}</div>}
-        </div>
-    </button>
-);
-
-const MetaBadge = ({ label, value }) => (
-    <Badge color={T.textSub} bg={T.surfaceAlt} style={{ fontSize:11, padding:"4px 10px" }}>
-        <span style={{ fontWeight:600, color:T.text }}>{value}</span> {label}
-    </Badge>
-);
 // ----
 // GARDEN EDITOR (SVG with drag/resize/edit)
 // ----
@@ -5307,4 +5206,3 @@ export default function GardenGridApp() {
         </ScreenErrorBoundary>
     );
 }
-
