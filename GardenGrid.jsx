@@ -1,31 +1,1140 @@
-import { useState, useEffect, useReducer, useCallback, useMemo, useRef, createContext, useContext } from "react";
-import { T, SCALE } from "./src/theme.js";
-import { LANG, useT, LOCALE_MAP } from "./src/i18n.js";
-import {
-    FIELD_TYPES, FIELD_LABEL_K, FIELD_COLORS,
-    STRUCT_TYPES, STRUCT_LABEL_K, STRUCT_ICONS, STRUCT_FILL, STRUCT_STROKE,
-    ZONE_TYPES, ZONE_LABEL_K, ZONE_ICONS, ZONE_FILL, ZONE_STROKE,
-    PLANT_STATUSES, STATUS_K, STATUS_CFG,
-    TASK_STATUS_K, TASK_STATUS_C, TASK_TYPES, TASK_ICONS,
-    CATEGORIES, CAT_ICONS, GARDEN_TYPES, USER_COLORS, USER_AVATARS, GH_TYPES,
-    SLOT_TYPE_LABELS, SLOT_TYPE_ICONS, WEATHER_CODE_LABELS, SLOT_SEED_COLORS,
-} from "./src/constants.js";
-import { PLANT_LIB } from "./src/plantLibrary.js";
-import { SEED } from "./src/seed.js";
-import {
-    normalizeState, loadState, saveState, resetState, getSession, setSession,
-} from "./src/state/persistence.js";
-import {
-    fmtDate, isSameDay, isOverdue, clamp, forUser, isInsideGH, gid,
-    getHarvestTaskForPlant, syncHarvestTask, removeHarvestTask,
-    slotTypeLabel, slotBaseLabel, slotSeedPlan, slotDisplayLabel, childSlotsFor,
-    findFieldAtPoint, polygonPointsString, polygonArea, pointInPolygon, polygonCentroid,
-} from "./src/helpers.js";
-import { reducer } from "./src/state/reducer.js";
+﻿import React, { useState, useEffect, useReducer, useCallback, useMemo, useRef, createContext, useContext } from "react";
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// THEME
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const T = {
+    // Backgrounds & Surfaces
+    bg:"#F5F0E8", surface:"#FFFFFF", surfaceAlt:"#EDE8DF", surfaceSoft:"#FBF9F4",
+    surfaceMuted:"#F4F0EA", surfaceHov:"#F0EBE2",
+    surfaceGlass:"rgba(255,255,255,0.7)", surfaceGlassHov:"rgba(255,255,255,0.85)",
+    panelBg:"#FBF8F7",
+    // Borders
+    border:"#DDD6CC", borderLight:"#EAE4DA",
+    borderSoft:"rgba(31,46,26,0.12)", borderMuted:"rgba(31,46,26,0.08)",
+    borderGlass:"rgba(31,46,26,0.15)",
+    // Primary (Green)
+    primary:"#2B5C10", primaryHov:"#3A7318", primaryActive:"#1F4007",
+    primaryBg:"#E8F2DF", primaryBgLight:"#F1F7E9", primaryLight:"#EEF5E8",
+    primaryFocus:"rgba(43,92,16,0.4)",
+    // Accent (Orange)
+    accent:"#C4622D", accentHov:"#A84F20", accentActive:"#8C3F18",
+    accentBg:"#FAE8DA", accentBgLight:"#FDF2EA",
+    // Text
+    text:"#1A1916", textSub:"#5E5955", textMuted:"#9B9690", textLight:"#B8B0A8",
+    // Semantic
+    success:"#2E7D32", successBg:"#E8F5E9", successHov:"#388E3C",
+    warning:"#D4890A", warningBg:"#FFF8E0", warningHov:"#E0931A",
+    danger:"#C62828", dangerBg:"#FFEBEE", dangerHov:"#D32F2F",
+    info:"#1565C0", infoBg:"#E3F2FD", infoHov:"#1976D2",
+    // Spacing
+    spacing:16, spacingLg:24, spacingSm:8, spacingXs:4,
+    // Border Radius
+    r:"10px", rs:"6px", rl:"16px",
+    radiusLg:"14px", radiusMd:"10px", radiusSm:"6px", radiusRound:"9999px",
+    // Shadows
+    sh:"0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04)",
+    shMd:"0 4px 14px rgba(0,0,0,0.1)",
+    shLg:"0 8px 32px rgba(0,0,0,0.14)",
+    shUp:"0 -2px 8px rgba(0,0,0,0.08)",
+    shInset:"inset 0 1px 0 rgba(255,255,255,0.4)",
+    // Glass
+    glassBlur:"blur(12px)", glassBlurSm:"blur(8px)", glassBlurLg:"blur(16px)",
+    glassBg:"rgba(255,255,255,0.7)", glassBgDim:"rgba(255,255,255,0.6)",
+    glassBgStrong:"rgba(255,255,255,0.85)", glassBorder:"rgba(255,255,255,0.25)",
+    // Focus
+    focusRing:"0 0 0 3px rgba(43,92,16,0.2)", focusRingColor:"rgba(43,92,16,0.2)",
+    // Transitions
+    transitionFast:"0.15s ease", transitionBase:"0.2s ease", transitionSlow:"0.3s ease",
+    // Card
+    cardBorder:"rgba(33,33,33,0.08)", cardBg:"#FFFFFF", cardGlass:"rgba(255,255,255,0.7)",
+};
+const SCALE = 62; 
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// I18N
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const LANG = {
+    en: {
+        app_subtitle:"Kitchen Garden Planner",
+        nav_dashboard:"Dashboard", nav_gardens:"My Gardens", nav_editor:"Garden Editor",
+        nav_fields:"Beds & Fields", nav_plants:"Plants & Crops", nav_tasks:"Tasks",
+        nav_greenhouses:"Greenhouses", nav_settings:"Settings",
+        save:"Save", cancel:"Cancel", delete:"Delete", edit:"Edit", add:"Add",
+        back:"â† Back", search:"Searchâ€¦", notes:"Notes", name:"Name", type:"Type",
+        width:"Width", height:"Height", position:"Position", area:"Area",
+        good_morning:"Good morning!", today:"Today",
+        gardens:"Gardens", beds_fields:"Beds & Fields", plant_varieties:"Plant Varieties",
+        tasks_pending:"Tasks Pending", ready_to_harvest:"Ready to Harvest",
+        upcoming_tasks:"ðŸ“‹ Upcoming Tasks", view_all:"View all â†’",
+        maintenance:"Maintenance",
+        overdue:"âš ï¸ Overdue", all_tasks_complete:"All tasks complete! ðŸŽ‰",
+        nothing_ready:"Nothing ready yet", harvest:"Harvest", mark_sown:"Mark Sown",
+        variety:"Variety", category:"Category", quantity:"Quantity",
+        sow_date:"Sow Date", plant_date:"Plant / Transplant Date", harvest_date:"Expected Harvest",
+        add_plant:"Add Plant", add_from_library:"ðŸ“š Plant Library",
+        new_garden:"New Garden", open_editor:"Open Editor", create_garden:"Create Garden",
+        add_bed:"Add Bed", add_structure:"Add Structure", add_task:"Add Task",
+        due_date:"Due Date", linked_to:"Linked To",
+        language:"Language", data_mgmt:"Data Management",
+        export_backup:"Export JSON Backup", reset_all:"Reset All Data",
+        reset_confirm:"Reset ALL garden data? This cannot be undone.",
+        greenhouses:"Greenhouses & Tunnels", no_greenhouses:"No greenhouses yet",
+        no_gh_sub:"Add a greenhouse or tunnel structure in the Garden Editor first.",
+        ventilated:"Ventilated ðŸŒ¬ï¸", closed:"Closed ðŸ”’", ventilate:"Open Vents",
+        close_vents:"Close Vents", inside_beds:"Beds inside", inside_plants:"Plants inside",
+        temp:"Temperature", humidity:"Humidity %",
+        switch_user:"Switch Profile", add_user:"Add Profile", your_profile:"Profile",
+        create_profile:"Create Profile", profile_name:"Display Name", colour:"Colour",
+        library_title:"ðŸŒ± Plant Library", library_sub:"Click a plant to pre-fill the form",
+        all:"All", all_categories:"All Categories", all_statuses:"All Statuses",
+        beds_total:"beds total", no_beds:"No beds yet", no_plants:"No plants yet",
+        no_tasks:"No tasks yet", no_gardens:"No gardens yet",
+        status_planned:"Planned", status_sown:"Sown", status_planted:"Planted",
+        status_growing:"Growing", status_harvestable:"Harvestable!", status_harvested:"Harvested", status_removed:"Removed",
+        task_pending:"Pending", task_in_progress:"In Progress", task_done:"Done", task_skipped:"Skipped",
+        field_open:"Open Field", field_raised:"Raised Bed", field_gh:"Greenhouse Bed",
+        field_herb:"Herb Bed", field_flower:"Flower Bed", field_fruit:"Fruit Area", field_nursery:"Nursery",
+        struct_greenhouse:"Greenhouse", struct_tunnel:"Tunnel Greenhouse", struct_compost:"Compost Zone",
+        struct_water:"Water Point", struct_shed:"Shed / Storage", struct_path:"Path / Walkway",
+        struct_fence:"Fence", struct_animal:"Animal Enclosure", struct_chicken_coop:"Chicken Coop", struct_chicken_run:"Chicken Run",
+        struct_cold_frame:"Cold Frame", struct_raised_tunnel:"Raised Tunnel", struct_rain_barrel:"Rain Barrel",
+        struct_potting_bench:"Potting Bench", struct_tool_rack:"Tool Rack", struct_insect_hotel:"Insect Hotel", struct_hedge:"Hedge",
+        struct_trellis:"Trellis", struct_windbreak:"Windbreak", struct_orchard_row:"Orchard Row",
+        delete_garden:"Delete garden?", delete_bed:"Delete this bed?",
+        delete_plant:"Delete plant?", delete_struct:"Delete this structure?",
+        select_garden:"â€” Select garden â€”", unassigned:"â€” Unassigned â€”",
+        total_area:"total area", harvestable_badge:"Harvestable!", overdue_badge:"overdue!",
+        all_on_track:"All on track",
+        login:"Log in", logout:"Log out", register:"Create account",
+        email:"Email address", password:"Password", confirm_password:"Confirm password",
+        login_title:"Welcome back", login_sub:"Sign in to your MyGarden account",
+        register_title:"Create account", register_sub:"Start planning your kitchen garden",
+        no_account:"Don't have an account?", have_account:"Already have an account?",
+        wrong_password:"Incorrect email or password.", passwords_no_match:"Passwords do not match.",
+        email_taken:"That email address is already registered.",
+        account:"My Account", account_sub:"Manage your profile and preferences",
+        edit_profile:"Edit Profile", change_password:"Change Password",
+        current_password:"Current password", new_password:"New password",
+        confirm_new:"Confirm new password",
+        wrong_current:"Current password is incorrect.",
+        account_saved:"Changes saved!", display_name:"Display name",
+        danger_zone:"Danger Zone", delete_account:"Delete account",
+        delete_account_confirm:"Delete your account and ALL your garden data? This cannot be undone.",
+        joined:"Member since", your_stats:"Your Stats",
+        switch_account:"Switch account",
+        zone_grass:"Grass", zone_path:"Path", zone_gravel:"Gravel", zone_border:"Border", zone_mulch:"Mulch", zone_shade:"Shade", zone_pond:"Pond", zone_animal:"Animal area", zone_herb:"Herb zone", zone_flower:"Flower zone", zone_tree:"Tree area",
+    },
+    nl: {
+        app_subtitle:"Moestuinplanner",
+        nav_dashboard:"Dashboard", nav_gardens:"Mijn Tuinen", nav_editor:"Tuineditor",
+        nav_fields:"Bedden & Velden", nav_plants:"Planten & Gewassen", nav_tasks:"Taken",
+        nav_greenhouses:"Kassen", nav_settings:"Instellingen",
+        save:"Opslaan", cancel:"Annuleren", delete:"Verwijderen", edit:"Bewerken", add:"Toevoegen",
+        back:"â† Terug", search:"Zoekenâ€¦", notes:"Notities", name:"Naam", type:"Type",
+        width:"Breedte", height:"Hoogte", position:"Positie", area:"Oppervlak",
+        good_morning:"Goedemorgen!", today:"Vandaag",
+        gardens:"Tuinen", beds_fields:"Bedden & Velden", plant_varieties:"Plantensoorten",
+        tasks_pending:"Openstaande Taken", ready_to_harvest:"Oogstklaar",
+        upcoming_tasks:"ðŸ“‹ Aankomende Taken", view_all:"Alles bekijken â†’",
+        maintenance:"Onderhoud",
+        overdue:"âš ï¸ Te laat", all_tasks_complete:"Alle taken klaar! ðŸŽ‰",
+        nothing_ready:"Nog niets klaar", harvest:"Oogsten", mark_sown:"Als gezaaid",
+        variety:"VariÃ«teit", category:"Categorie", quantity:"Aantal",
+        sow_date:"Zaaidatum", plant_date:"Plant- / Verplaatsingsdatum", harvest_date:"Verwachte Oogst",
+        add_plant:"Plant Toevoegen", add_from_library:"ðŸ“š Plantenbibliotheek",
+        new_garden:"Nieuwe Tuin", open_editor:"Editor Openen", create_garden:"Tuin Aanmaken",
+        add_bed:"Bed Toevoegen", add_structure:"Structuur Toevoegen", add_task:"Taak Toevoegen",
+        due_date:"Vervaldatum", linked_to:"Gekoppeld aan",
+        language:"Taal", data_mgmt:"Gegevensbeheer",
+        export_backup:"JSON Back-up Exporteren", reset_all:"Alle Gegevens Wissen",
+        reset_confirm:"Alle tuingegevens wissen? Dit kan niet ongedaan worden.",
+        greenhouses:"Kassen & Tunnels", no_greenhouses:"Nog geen kassen",
+        no_gh_sub:"Voeg eerst een kas of tunnel toe in de tuineditor.",
+        ventilated:"Geventileerd ðŸŒ¬ï¸", closed:"Gesloten ðŸ”’", ventilate:"Ventielen Openen",
+        close_vents:"Ventielen Sluiten", inside_beds:"Bedden binnen", inside_plants:"Planten binnen",
+        temp:"Temperatuur", humidity:"Luchtvochtigheid %",
+        switch_user:"Profiel Wisselen", add_user:"Profiel Toevoegen", your_profile:"Profiel",
+        create_profile:"Profiel Aanmaken", profile_name:"Weergavenaam", colour:"Kleur",
+        library_title:"ðŸŒ± Plantenbibliotheek", library_sub:"Klik op een plant om het formulier in te vullen",
+        all:"Alle", all_categories:"Alle CategorieÃ«n", all_statuses:"Alle Statussen",
+        beds_total:"bedden totaal", no_beds:"Nog geen bedden", no_plants:"Nog geen planten",
+        no_tasks:"Nog geen taken", no_gardens:"Nog geen tuinen",
+        status_planned:"Gepland", status_sown:"Gezaaid", status_planted:"Geplant",
+        status_growing:"Groeiend", status_harvestable:"Oogstbaar!", status_harvested:"Geoogst", status_removed:"Verwijderd",
+        task_pending:"Openstaand", task_in_progress:"Bezig", task_done:"Klaar", task_skipped:"Overgeslagen",
+        field_open:"Open Veld", field_raised:"Verhoogd Bed", field_gh:"Kasbed",
+        field_herb:"Kruidenbed", field_flower:"Bloemenbed", field_fruit:"Fruitzone", field_nursery:"Kwekerij",
+        struct_greenhouse:"Kas", struct_tunnel:"Tunnelkas", struct_compost:"Composthoop",
+        struct_water:"Wateraansluiting", struct_shed:"Schuur", struct_path:"Pad",
+        struct_fence:"Hek", struct_animal:"Dierenweide", struct_chicken_coop:"Kippenhok", struct_chicken_run:"Kippenren",
+        struct_cold_frame:"Koude bak", struct_raised_tunnel:"Verhoogde tunnel", struct_rain_barrel:"Regenton",
+        struct_potting_bench:"Pottafel", struct_tool_rack:"Gereedschapsrek", struct_insect_hotel:"Insectenhotel", struct_hedge:"Haag",
+        struct_trellis:"Trellis", struct_windbreak:"Windscherm", struct_orchard_row:"Fruitrij",
+        delete_garden:"Tuin verwijderen?", delete_bed:"Dit bed verwijderen?",
+        delete_plant:"Plant verwijderen?", delete_struct:"Deze structuur verwijderen?",
+        select_garden:"â€” Selecteer tuin â€”", unassigned:"â€” Niet toegewezen â€”",
+        total_area:"totale oppervlakte", harvestable_badge:"Oogstbaar!", overdue_badge:"te laat!",
+        all_on_track:"Alles op schema",
+        login:"Inloggen", logout:"Uitloggen", register:"Account aanmaken",
+        email:"E-mailadres", password:"Wachtwoord", confirm_password:"Wachtwoord bevestigen",
+        login_title:"Welkom terug", login_sub:"Meld je aan bij jouw MyGarden-account",
+        register_title:"Account aanmaken", register_sub:"Begin met het plannen van jouw moestuin",
+        no_account:"Nog geen account?", have_account:"Al een account?",
+        wrong_password:"Onjuist e-mailadres of wachtwoord.", passwords_no_match:"Wachtwoorden komen niet overeen.",
+        email_taken:"Dit e-mailadres is al geregistreerd.",
+        account:"Mijn Account", account_sub:"Beheer je profiel en voorkeuren",
+        edit_profile:"Profiel bewerken", change_password:"Wachtwoord wijzigen",
+        current_password:"Huidig wachtwoord", new_password:"Nieuw wachtwoord",
+        confirm_new:"Nieuw wachtwoord bevestigen",
+        wrong_current:"Huidig wachtwoord is onjuist.",
+        account_saved:"Wijzigingen opgeslagen!", display_name:"Weergavenaam",
+        danger_zone:"Gevarenzone", delete_account:"Account verwijderen",
+        delete_account_confirm:"Je account en AL jouw tuingegevens verwijderen? Dit kan niet ongedaan worden.",
+        joined:"Lid sinds", your_stats:"Jouw Statistieken",
+        switch_account:"Van account wisselen",
+        zone_grass:"Gras", zone_path:"Pad", zone_gravel:"Grind", zone_border:"Rand", zone_mulch:"Mulch", zone_shade:"Schaduw", zone_pond:"Vijver", zone_animal:"Dierenzone", zone_herb:"Kruidenzone", zone_flower:"Bloemenzone", zone_tree:"Bomenzone",
+    },
+    fr: {
+        app_subtitle:"Planificateur de jardin",
+        nav_dashboard:"Tableau de bord", nav_gardens:"Mes Jardins", nav_editor:"Ã‰diteur",
+        nav_fields:"Parterres & Champs", nav_plants:"Plantes & Cultures", nav_tasks:"TÃ¢ches",
+        nav_greenhouses:"Serres", nav_settings:"ParamÃ¨tres",
+        save:"Enregistrer", cancel:"Annuler", delete:"Supprimer", edit:"Modifier", add:"Ajouter",
+        back:"â† Retour", search:"Rechercherâ€¦", notes:"Notes", name:"Nom", type:"Type",
+        width:"Largeur", height:"Hauteur", position:"Position", area:"Surface",
+        good_morning:"Bonjour !", today:"Aujourd'hui",
+        gardens:"Jardins", beds_fields:"Parterres & Champs", plant_varieties:"VariÃ©tÃ©s",
+        tasks_pending:"TÃ¢ches en attente", ready_to_harvest:"PrÃªt Ã  rÃ©colter",
+        upcoming_tasks:"ðŸ“‹ TÃ¢ches Ã  venir", view_all:"Voir tout â†’",
+        maintenance:"Entretien",
+        overdue:"âš ï¸ En retard", all_tasks_complete:"Toutes les tÃ¢ches sont faites ! ðŸŽ‰",
+        nothing_ready:"Rien de prÃªt", harvest:"RÃ©colter", mark_sown:"Marquer semÃ©",
+        variety:"VariÃ©tÃ©", category:"CatÃ©gorie", quantity:"QuantitÃ©",
+        sow_date:"Date de semis", plant_date:"Date de plantation", harvest_date:"RÃ©colte prÃ©vue",
+        add_plant:"Ajouter une plante", add_from_library:"ðŸ“š BibliothÃ¨que",
+        new_garden:"Nouveau jardin", open_editor:"Ouvrir l'Ã©diteur", create_garden:"CrÃ©er un jardin",
+        add_bed:"Ajouter un parterre", add_structure:"Ajouter une structure", add_task:"Ajouter une tÃ¢che",
+        due_date:"Date d'Ã©chÃ©ance", linked_to:"LiÃ© Ã ",
+        language:"Langue", data_mgmt:"Gestion des donnÃ©es",
+        export_backup:"Exporter en JSON", reset_all:"RÃ©initialiser tout",
+        reset_confirm:"RÃ©initialiser TOUTES les donnÃ©es ? Cette action est irrÃ©versible.",
+        greenhouses:"Serres & Tunnels", no_greenhouses:"Aucune serre",
+        no_gh_sub:"Ajoutez d'abord une serre ou un tunnel dans l'Ã©diteur de jardin.",
+        ventilated:"VentilÃ© ðŸŒ¬ï¸", closed:"FermÃ© ðŸ”’", ventilate:"Ouvrir les aÃ©rations",
+        close_vents:"Fermer les aÃ©rations", inside_beds:"Parterres Ã  l'intÃ©rieur", inside_plants:"Plantes Ã  l'intÃ©rieur",
+        temp:"TempÃ©rature", humidity:"HumiditÃ© %",
+        switch_user:"Changer de profil", add_user:"Ajouter un profil", your_profile:"Profil",
+        create_profile:"CrÃ©er un profil", profile_name:"Nom affichÃ©", colour:"Couleur",
+        library_title:"ðŸŒ± BibliothÃ¨que de plantes", library_sub:"Cliquez sur une plante pour prÃ©-remplir le formulaire",
+        all:"Tout", all_categories:"Toutes les catÃ©gories", all_statuses:"Tous les statuts",
+        beds_total:"parterres au total", no_beds:"Aucun parterre", no_plants:"Aucune plante",
+        no_tasks:"Aucune tÃ¢che", no_gardens:"Aucun jardin",
+        status_planned:"PlanifiÃ©", status_sown:"SemÃ©", status_planted:"PlantÃ©",
+        status_growing:"En croissance", status_harvestable:"Ã€ rÃ©colter !", status_harvested:"RÃ©coltÃ©", status_removed:"RetirÃ©",
+        task_pending:"En attente", task_in_progress:"En cours", task_done:"TerminÃ©", task_skipped:"IgnorÃ©",
+        field_open:"Pleine terre", field_raised:"CarrÃ© surÃ©levÃ©", field_gh:"Parterre de serre",
+        field_herb:"Jardin d'herbes", field_flower:"Parterre fleuri", field_fruit:"Zone fruitiÃ¨re", field_nursery:"PÃ©piniÃ¨re",
+        struct_greenhouse:"Serre", struct_tunnel:"Tunnel serre", struct_compost:"Zone de compost",
+        struct_water:"Point d'eau", struct_shed:"Abri", struct_path:"AllÃ©e",
+        struct_fence:"ClÃ´ture", struct_animal:"Enclos animal", struct_chicken_coop:"Poulailler", struct_chicken_run:"Parc Ã  poules",
+        struct_cold_frame:"ChÃ¢ssis froid", struct_raised_tunnel:"Tunnel surÃ©levÃ©", struct_rain_barrel:"Tonneau de pluie",
+        struct_potting_bench:"Table de rempotage", struct_tool_rack:"RÃ¢telier Ã  outils", struct_insect_hotel:"HÃ´tel Ã  insectes", struct_hedge:"Haie",
+        struct_trellis:"Trellis", struct_windbreak:"Brise-vent", struct_orchard_row:"RangÃ©e fruitiÃ¨re",
+        delete_garden:"Supprimer ce jardin ?", delete_bed:"Supprimer ce parterre ?",
+        delete_plant:"Supprimer cette plante ?", delete_struct:"Supprimer cette structure ?",
+        select_garden:"â€” SÃ©lectionner un jardin â€”", unassigned:"â€” Non assignÃ© â€”",
+        total_area:"surface totale", harvestable_badge:"Ã€ rÃ©colter !", overdue_badge:"en retard !",
+        all_on_track:"Tout est dans les temps",
+        login:"Se connecter", logout:"Se dÃ©connecter", register:"CrÃ©er un compte",
+        email:"Adresse e-mail", password:"Mot de passe", confirm_password:"Confirmer le mot de passe",
+        login_title:"Bon retour !", login_sub:"Connectez-vous Ã  votre compte MyGarden",
+        register_title:"CrÃ©er un compte", register_sub:"Commencez Ã  planifier votre jardin",
+        no_account:"Pas encore de compte ?", have_account:"DÃ©jÃ  un compte ?",
+        wrong_password:"E-mail ou mot de passe incorrect.", passwords_no_match:"Les mots de passe ne correspondent pas.",
+        email_taken:"Cette adresse e-mail est dÃ©jÃ  utilisÃ©e.",
+        account:"Mon Compte", account_sub:"GÃ©rer votre profil et vos prÃ©fÃ©rences",
+        edit_profile:"Modifier le profil", change_password:"Changer le mot de passe",
+        current_password:"Mot de passe actuel", new_password:"Nouveau mot de passe",
+        confirm_new:"Confirmer le nouveau mot de passe",
+        wrong_current:"Mot de passe actuel incorrect.",
+        account_saved:"Modifications enregistrÃ©es !", display_name:"Nom affichÃ©",
+        danger_zone:"Zone de danger", delete_account:"Supprimer le compte",
+        delete_account_confirm:"Supprimer votre compte et TOUTES vos donnÃ©es ? Cette action est irrÃ©versible.",
+        joined:"Membre depuis", your_stats:"Vos Statistiques",
+        switch_account:"Changer de compte",
+        zone_grass:"Gazon", zone_path:"Chemin", zone_gravel:"Gravier", zone_border:"Bordure", zone_mulch:"Paillis", zone_shade:"Ombre", zone_pond:"Bassin", zone_animal:"Zone animale", zone_herb:"Zone d'herbes", zone_flower:"Zone de fleurs", zone_tree:"Zone d'arbres",
+    },
+    de: {
+        app_subtitle:"KÃ¼chengarten-Planer",
+        nav_dashboard:"Dashboard", nav_gardens:"Meine GÃ¤rten", nav_editor:"Garteneditor",
+        nav_fields:"Beete & Felder", nav_plants:"Pflanzen & Ernte", nav_tasks:"Aufgaben",
+        nav_greenhouses:"GewÃ¤chshÃ¤user", nav_settings:"Einstellungen",
+        save:"Speichern", cancel:"Abbrechen", delete:"LÃ¶schen", edit:"Bearbeiten", add:"HinzufÃ¼gen",
+        back:"â† ZurÃ¼ck", search:"Suchenâ€¦", notes:"Notizen", name:"Name", type:"Typ",
+        width:"Breite", height:"HÃ¶he", position:"Position", area:"FlÃ¤che",
+        good_morning:"Guten Morgen!", today:"Heute",
+        gardens:"GÃ¤rten", beds_fields:"Beete & Felder", plant_varieties:"Pflanzensorten",
+        tasks_pending:"Offene Aufgaben", ready_to_harvest:"Erntebereit",
+        upcoming_tasks:"ðŸ“‹ Anstehende Aufgaben", view_all:"Alle anzeigen â†’",
+        maintenance:"Wartung",
+        overdue:"âš ï¸ ÃœberfÃ¤llig", all_tasks_complete:"Alle Aufgaben erledigt! ðŸŽ‰",
+        nothing_ready:"Noch nichts bereit", harvest:"Ernten", mark_sown:"Als gesÃ¤t markieren",
+        variety:"Sorte", category:"Kategorie", quantity:"Menge",
+        sow_date:"Aussaatdatum", plant_date:"Pflanzdatum", harvest_date:"Erntedatum (geplant)",
+        add_plant:"Pflanze hinzufÃ¼gen", add_from_library:"ðŸ“š Pflanzenbibliothek",
+        new_garden:"Neuer Garten", open_editor:"Editor Ã¶ffnen", create_garden:"Garten erstellen",
+        add_bed:"Beet hinzufÃ¼gen", add_structure:"Struktur hinzufÃ¼gen", add_task:"Aufgabe hinzufÃ¼gen",
+        due_date:"FÃ¤lligkeitsdatum", linked_to:"VerknÃ¼pft mit",
+        language:"Sprache", data_mgmt:"Datenverwaltung",
+        export_backup:"JSON-Backup exportieren", reset_all:"Alle Daten zurÃ¼cksetzen",
+        reset_confirm:"ALLE Gartendaten zurÃ¼cksetzen? Dieser Vorgang kann nicht rÃ¼ckgÃ¤ngig gemacht werden.",
+        greenhouses:"GewÃ¤chshÃ¤user & Tunnel", no_greenhouses:"Noch keine GewÃ¤chshÃ¤user",
+        no_gh_sub:"FÃ¼ge zuerst ein GewÃ¤chshaus oder einen Tunnel im Garteneditor hinzu.",
+        ventilated:"BelÃ¼ftet ðŸŒ¬ï¸", closed:"Geschlossen ðŸ”’", ventilate:"LÃ¼ftung Ã¶ffnen",
+        close_vents:"LÃ¼ftung schlieÃŸen", inside_beds:"Beete drinnen", inside_plants:"Pflanzen drinnen",
+        temp:"Temperatur", humidity:"Luftfeuchtigkeit %",
+        switch_user:"Profil wechseln", add_user:"Profil hinzufÃ¼gen", your_profile:"Profil",
+        create_profile:"Profil erstellen", profile_name:"Anzeigename", colour:"Farbe",
+        library_title:"ðŸŒ± Pflanzenbibliothek", library_sub:"Klicke auf eine Pflanze, um das Formular auszufÃ¼llen",
+        all:"Alle", all_categories:"Alle Kategorien", all_statuses:"Alle Status",
+        beds_total:"Beete gesamt", no_beds:"Noch keine Beete", no_plants:"Noch keine Pflanzen",
+        no_tasks:"Noch keine Aufgaben", no_gardens:"Noch keine GÃ¤rten",
+        status_planned:"Geplant", status_sown:"GesÃ¤t", status_planted:"Gepflanzt",
+        status_growing:"WÃ¤chst", status_harvestable:"Erntebereit!", status_harvested:"Geerntet", status_removed:"Entfernt",
+        task_pending:"Ausstehend", task_in_progress:"In Bearbeitung", task_done:"Fertig", task_skipped:"Ãœbersprungen",
+        field_open:"Offenes Feld", field_raised:"Hochbeet", field_gh:"GewÃ¤chshausbeet",
+        field_herb:"KrÃ¤uterbeet", field_flower:"Blumenbeet", field_fruit:"Obstbereich", field_nursery:"Anzucht",
+        struct_greenhouse:"GewÃ¤chshaus", struct_tunnel:"Folientunnel", struct_compost:"Kompostplatz",
+        struct_water:"Wasserstelle", struct_shed:"Schuppen", struct_path:"Weg",
+        struct_fence:"Zaun", struct_animal:"Tiergehege", struct_chicken_coop:"HÃ¼hnerstall", struct_chicken_run:"HÃ¼hnerauslauf",
+        struct_cold_frame:"FrÃ¼hbeet", struct_raised_tunnel:"Hochtunnel", struct_rain_barrel:"Regentonne",
+        struct_potting_bench:"Topftisch", struct_tool_rack:"Werkzeughalter", struct_insect_hotel:"Insektenhotel", struct_hedge:"Hecke",
+        struct_trellis:"Rankhilfe", struct_windbreak:"Windschutz", struct_orchard_row:"Obstreihe",
+        delete_garden:"Garten lÃ¶schen?", delete_bed:"Dieses Beet lÃ¶schen?",
+        delete_plant:"Pflanze lÃ¶schen?", delete_struct:"Diese Struktur lÃ¶schen?",
+        select_garden:"â€” Garten auswÃ¤hlen â€”", unassigned:"â€” Nicht zugewiesen â€”",
+        total_area:"GesamtflÃ¤che", harvestable_badge:"Erntebereit!", overdue_badge:"Ã¼berfÃ¤llig!",
+        all_on_track:"Alles im Plan",
+        login:"Anmelden", logout:"Abmelden", register:"Konto erstellen",
+        email:"E-Mail-Adresse", password:"Passwort", confirm_password:"Passwort bestÃ¤tigen",
+        login_title:"Willkommen zurÃ¼ck", login_sub:"Melde dich bei deinem MyGarden-Konto an",
+        register_title:"Konto erstellen", register_sub:"Fang an, deinen Garten zu planen",
+        no_account:"Noch kein Konto?", have_account:"Bereits ein Konto?",
+        wrong_password:"Falsche E-Mail oder falsches Passwort.", passwords_no_match:"PasswÃ¶rter stimmen nicht Ã¼berein.",
+        email_taken:"Diese E-Mail-Adresse ist bereits registriert.",
+        account:"Mein Konto", account_sub:"Profil und Einstellungen verwalten",
+        edit_profile:"Profil bearbeiten", change_password:"Passwort Ã¤ndern",
+        current_password:"Aktuelles Passwort", new_password:"Neues Passwort",
+        confirm_new:"Neues Passwort bestÃ¤tigen",
+        wrong_current:"Aktuelles Passwort ist falsch.",
+        account_saved:"Ã„nderungen gespeichert!", display_name:"Anzeigename",
+        danger_zone:"Gefahrenzone", delete_account:"Konto lÃ¶schen",
+        delete_account_confirm:"Dein Konto und ALLE Gartendaten lÃ¶schen? Dieser Vorgang kann nicht rÃ¼ckgÃ¤ngig gemacht werden.",
+        joined:"Mitglied seit", your_stats:"Deine Statistiken",
+        switch_account:"Konto wechseln",
+        zone_grass:"Rasen", zone_path:"Weg", zone_gravel:"Kies", zone_border:"Rand", zone_mulch:"Mulch", zone_shade:"Schatten", zone_pond:"Teich", zone_animal:"Tierbereich", zone_herb:"KrÃ¤uterbereich", zone_flower:"Blumenbereich", zone_tree:"Baumbereich",
+    },
+};
+const useT = (lang) => useCallback((k) => LANG[lang]?.[k] ?? LANG.en[k] ?? k, [lang]);
+const LOCALE_MAP = { en:"en-GB", nl:"nl-BE", fr:"fr-BE", de:"de-DE" };
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// CONSTANTS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Bed and field types shown in the garden editor and in the dashboard labels.
+const FIELD_TYPES   = ["open_field","raised_bed","greenhouse_bed","herb_bed","flower_bed","fruit_area","nursery"];
+const FIELD_LABEL_K = { open_field:"field_open", raised_bed:"field_raised", greenhouse_bed:"field_gh", herb_bed:"field_herb", flower_bed:"field_flower", fruit_area:"field_fruit", nursery:"field_nursery" };
+const FIELD_COLORS  = { open_field:"#7CB342", raised_bed:"#558B2F", greenhouse_bed:"#00838F", herb_bed:"#43A047", flower_bed:"#BA68C8", fruit_area:"#FB8C00", nursery:"#8D6E63" };
+// Freestanding structures that can be placed in a garden.
+const STRUCT_TYPES  = [
+    "greenhouse",
+    "tunnel_greenhouse",
+    "compost_zone",
+    "water_point",
+    "shed",
+    "path",
+    "fence",
+    "animal_enclosure",
+    "chicken_coop",
+    "chicken_run",
+    "cold_frame",
+    "raised_tunnel",
+    "rain_barrel",
+    "potting_bench",
+    "tool_rack",
+    "insect_hotel",
+    "hedge",
+    "trellis",
+    "windbreak",
+    "orchard_row",
+];
+const STRUCT_LABEL_K= {
+    greenhouse:"struct_greenhouse",
+    tunnel_greenhouse:"struct_tunnel",
+    compost_zone:"struct_compost",
+    water_point:"struct_water",
+    shed:"struct_shed",
+    path:"struct_path",
+    fence:"struct_fence",
+    animal_enclosure:"struct_animal",
+    chicken_coop:"struct_chicken_coop",
+    chicken_run:"struct_chicken_run",
+    cold_frame:"struct_cold_frame",
+    raised_tunnel:"struct_raised_tunnel",
+    rain_barrel:"struct_rain_barrel",
+    potting_bench:"struct_potting_bench",
+    tool_rack:"struct_tool_rack",
+    insect_hotel:"struct_insect_hotel",
+    hedge:"struct_hedge",
+    trellis:"struct_trellis",
+    windbreak:"struct_windbreak",
+    orchard_row:"struct_orchard_row",
+};
+const STRUCT_ICONS  = {
+    greenhouse:"ðŸ¡",
+    tunnel_greenhouse:"â›º",
+    compost_zone:"â™»ï¸",
+    water_point:"ðŸ’§",
+    shed:"ðŸšï¸",
+    path:"ðŸ›¤ï¸",
+    fence:"ðŸš§",
+    animal_enclosure:"ðŸ“",
+    chicken_coop:"ðŸ”",
+    chicken_run:"ðŸªµ",
+    cold_frame:"ðŸ§Š",
+    raised_tunnel:"ðŸŒ¿",
+    rain_barrel:"ðŸ›¢ï¸",
+    potting_bench:"ðŸª´",
+    tool_rack:"ðŸ§°",
+    insect_hotel:"ðŸž",
+    hedge:"ðŸŒ³",
+    trellis:"ðŸªœ",
+    windbreak:"ðŸ›¡ï¸",
+    orchard_row:"ðŸŽ",
+};
+const STRUCT_FILL   = {
+    greenhouse:"rgba(0,131,143,0.18)",
+    tunnel_greenhouse:"rgba(0,150,136,0.18)",
+    compost_zone:"rgba(121,85,72,0.22)",
+    water_point:"rgba(66,165,245,0.55)",
+    shed:"rgba(121,85,72,0.28)",
+    path:"rgba(188,170,164,0.42)",
+    fence:"rgba(78,52,46,0.4)",
+    animal_enclosure:"rgba(255,183,77,0.3)",
+    chicken_coop:"rgba(255,213,79,0.26)",
+    chicken_run:"rgba(245,124,0,0.18)",
+    cold_frame:"rgba(96,125,139,0.18)",
+    raised_tunnel:"rgba(76,175,80,0.16)",
+    rain_barrel:"rgba(33,150,243,0.22)",
+    potting_bench:"rgba(139,195,74,0.18)",
+    tool_rack:"rgba(158,158,158,0.22)",
+    insect_hotel:"rgba(255,193,7,0.20)",
+    hedge:"rgba(76,175,80,0.20)",
+    trellis:"rgba(121,85,72,0.18)",
+    windbreak:"rgba(96,125,139,0.22)",
+    orchard_row:"rgba(255,152,0,0.18)",
+};
+const STRUCT_STROKE = {
+    greenhouse:"#00838F",
+    tunnel_greenhouse:"#009688",
+    compost_zone:"#795548",
+    water_point:"#1976D2",
+    shed:"#5D4037",
+    path:"#8D6E63",
+    fence:"#4E342E",
+    animal_enclosure:"#F57C00",
+    chicken_coop:"#C9A227",
+    chicken_run:"#E65100",
+    cold_frame:"#607D8B",
+    raised_tunnel:"#2E7D32",
+    rain_barrel:"#1565C0",
+    potting_bench:"#558B2F",
+    tool_rack:"#616161",
+    insect_hotel:"#F9A825",
+    hedge:"#2E7D32",
+    trellis:"#795548",
+    windbreak:"#607D8B",
+    orchard_row:"#FB8C00",
+};
+// Ground cover / zone types used for decorative or zoning overlays.
+const ZONE_TYPES    = ["grass","path","gravel","border","mulch","shade","pond","animal","herb","flower","tree"];
+const ZONE_LABEL_K  = { grass:"zone_grass", path:"zone_path", gravel:"zone_gravel", border:"zone_border", mulch:"zone_mulch", shade:"zone_shade", pond:"zone_pond", animal:"zone_animal", herb:"zone_herb", flower:"zone_flower", tree:"zone_tree" };
+const ZONE_ICONS    = { grass:"ðŸŒ¿", path:"ðŸª¨", gravel:"ðŸªµ", border:"ðŸª´", mulch:"ðŸ‚", shade:"â›±ï¸", pond:"ðŸ’§", animal:"ðŸ“", herb:"ðŸŒ±", flower:"ðŸŒ¸", tree:"ðŸŒ³" };
+const ZONE_FILL     = { grass:"rgba(76,175,80,0.24)", path:"rgba(188,170,164,0.48)", gravel:"rgba(158,158,158,0.32)", border:"rgba(139,195,74,0.20)", mulch:"rgba(121,85,72,0.22)", shade:"rgba(96,125,139,0.18)", pond:"rgba(33,150,243,0.25)", animal:"rgba(255,183,77,0.22)", herb:"rgba(67,160,71,0.22)", flower:"rgba(186,104,200,0.20)", tree:"rgba(46,125,50,0.24)" };
+const ZONE_STROKE   = { grass:"#4CAF50", path:"#8D6E63", gravel:"#757575", border:"#7CB342", mulch:"#795548", shade:"#607D8B", pond:"#2196F3", animal:"#F57C00", herb:"#43A047", flower:"#BA68C8", tree:"#2E7D32" };
+// Plant lifecycle states, mapped to translation keys and UI chips.
+const PLANT_STATUSES= ["planned","sown","planted","growing","harvestable","harvested","removed"];
+const STATUS_K      = { planned:"status_planned", sown:"status_sown", planted:"status_planted", growing:"status_growing", harvestable:"status_harvestable", harvested:"status_harvested", removed:"status_removed" };
+const STATUS_CFG    = { planned:{color:T.info,bg:T.infoBg}, sown:{color:"#5D4037",bg:"#EFEBE9"}, planted:{color:"#2E7D32",bg:"#E8F5E9"}, growing:{color:"#388E3C",bg:"#F1F8E9"}, harvestable:{color:T.accent,bg:T.accentBg}, harvested:{color:"#1B5E20",bg:"#E8F5E9"}, removed:{color:"#757575",bg:"#F5F5F5"} };
+// Task lifecycle states and task type icons used across task cards and filters.
+const TASK_STATUS_K = { pending:"task_pending", in_progress:"task_in_progress", done:"task_done", skipped:"task_skipped" };
+const TASK_STATUS_C = { pending:{color:T.warning,bg:T.warningBg}, in_progress:{color:T.info,bg:T.infoBg}, done:{color:T.success,bg:T.successBg}, skipped:{color:T.textMuted,bg:T.surfaceAlt} };
+const TASK_TYPES    = ["sowing","planting","watering","fertilizing","pruning","harvesting","cleaning","repair","general"];
+const TASK_ICONS    = { sowing:"ðŸŒ±", planting:"ðŸŒ¿", watering:"ðŸ’§", fertilizing:"ðŸŒ¾", pruning:"âœ‚ï¸", harvesting:"ðŸ§º", cleaning:"ðŸ§¹", repair:"ðŸ”§", general:"ðŸ“‹" };
+// Category and garden-type buckets for the plant library and setup flows.
+const CATEGORIES    = ["Vegetable","Herb","Fruit","Flower","Legume","Root","Leafy Green","Other"];
+const CAT_ICONS     = { Vegetable:"ðŸ¥¦", Herb:"ðŸŒ¿", Fruit:"ðŸ“", Flower:"ðŸŒ¸", Legume:"ðŸ«˜", Root:"ðŸ¥•", "Leafy Green":"ðŸ¥¬", Other:"ðŸŒ»" };
+const GARDEN_TYPES  = ["mixed","vegetable","herb","flower","fruit","greenhouse","allotment"];
+const USER_COLORS   = ["#2B5C10","#1565C0","#C4622D","#7B1FA2","#00695C","#E65100","#37474F","#AD1457"];
+const USER_AVATARS  = ["ðŸ‘©â€ðŸŒ¾","ðŸ‘¨â€ðŸŒ¾","ðŸ§‘â€ðŸŒ¾","ðŸ‘©â€ðŸ³","ðŸ‘¨â€ðŸ³","ðŸ§‘â€ðŸ³","ðŸŒ±","ðŸ€"];
+const GH_TYPES      = ["greenhouse","tunnel_greenhouse"];
+const MAINTENANCE_STRUCT_TYPES = new Set(["hedge","trellis","windbreak","orchard_row"]);
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// PLANT LIBRARY (60+ species)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const PLANT_LIB = [
+    // Vegetables
+    { name:"Tomato",       category:"Vegetable",   varieties:["Roma","Cherry","Beefsteak","San Marzano","Black Krim","Yellow Pear","Gardener's Delight"] },
+    { name:"Pepper",       category:"Vegetable",   varieties:["Sweet Bell","Paprika","JalapeÃ±o","Cayenne","Habanero","Banana Pepper"] },
+    { name:"Aubergine",    category:"Vegetable",   varieties:["Black Beauty","Listada di Gandia","White Egg","Slim Jim"] },
+    { name:"Zucchini",     category:"Vegetable",   varieties:["Dark Green","Golden","Romanesco","Patio Star","Cocozelle"] },
+    { name:"Cucumber",     category:"Vegetable",   varieties:["Marketmore","Gherkin","Mini Munch","Straight Eight","Crystal Apple"] },
+    { name:"Pumpkin",      category:"Vegetable",   varieties:["Hokkaido","Butternut","Crown Prince","Atlantic Giant","Uchiki Kuri"] },
+    { name:"Broccoli",     category:"Vegetable",   varieties:["Calabrese","Purple Sprouting","Romanesco","Tenderstem"] },
+    { name:"Cauliflower",  category:"Vegetable",   varieties:["Snowball","Violetta","Graffiti","All the Year Round"] },
+    { name:"Cabbage",      category:"Vegetable",   varieties:["January King","Savoy","Red Drumhead","Pointed","Hispi"] },
+    { name:"Kale",         category:"Leafy Green", varieties:["Cavolo Nero","Curly Scotch","Red Russian","Dwarf Green Curled"] },
+    { name:"Chard",        category:"Leafy Green", varieties:["Rainbow","Bright Lights","White Silver","Rhubarb Chard","Fordhook Giant"] },
+    { name:"Lettuce",      category:"Leafy Green", varieties:["Butterhead","Cos","Little Gem","Oakleaf","Lollo Rosso","Batavia","Webb's Wonderful"] },
+    { name:"Spinach",      category:"Leafy Green", varieties:["Baby Leaf","Monstrueux de Viroflay","Matador","Giant Noble"] },
+    { name:"Rocket",       category:"Leafy Green", varieties:["Wild","Cultivated","Sky Rocket","Wasabi"] },
+    { name:"Pak Choi",     category:"Leafy Green", varieties:["Canton White","Joi Choi","Purple Rain","Mei Qing Choi"] },
+    { name:"Chicory",      category:"Leafy Green", varieties:["Radicchio","Endive","Witloof","Puntarelle","Sugar Loaf"] },
+    { name:"Fennel",       category:"Vegetable",   varieties:["Florence","Romanesco","Zefa Fino","Perfection"] },
+    { name:"Celery",       category:"Vegetable",   varieties:["Utah","Self-blanching","Giant Red","Tall Utah"] },
+    { name:"Leek",         category:"Vegetable",   varieties:["Musselburgh","King Richard","Bleu de Solaise","Autumn Giant"] },
+    { name:"Onion",        category:"Vegetable",   varieties:["Red Baron","Stuttgart","Sturon","White Lisbon","Ailsa Craig"] },
+    { name:"Garlic",       category:"Vegetable",   varieties:["Softneck","Hardneck","Elephant","Solent Wight","Lautrec Wight"] },
+    { name:"Shallot",      category:"Vegetable",   varieties:["Zebrune","Ambition","Red Sun","Mikor"] },
+    { name:"Sweetcorn",    category:"Vegetable",   varieties:["Earlibird","Golden Bantam","Painted Mountain","Swift","Lark"] },
+    { name:"Artichoke",    category:"Vegetable",   varieties:["Green Globe","Violetto","Romanesco","Gros Vert de Laon"] },
+    { name:"Asparagus",    category:"Vegetable",   varieties:["Jersey Knight","Gijnlim","Connover's Colossal","Pacific Purple"] },
+    { name:"Courgette",    category:"Vegetable",   varieties:["Atena","Venus","Defender","Black Forest"] },
+    { name:"Peas (Sugar)", category:"Legume",      varieties:["Oregon Sugar Pod","Carouby de Maussane","Golden Sweet","Shiraz"] },
+    // Roots
+    { name:"Carrot",       category:"Root",        varieties:["Nantes","Chantenay","Paris Market","Cosmic Purple","White Satin","Autumn King"] },
+    { name:"Beetroot",     category:"Root",        varieties:["Boltardy","Chioggia","Golden","Cylindra","Bull's Blood","Action"] },
+    { name:"Parsnip",      category:"Root",        varieties:["Gladiator","Tender & True","Hollow Crown","White Gem"] },
+    { name:"Turnip",       category:"Root",        varieties:["Purple Top","Tokyo Cross","Milan White","Golden Ball"] },
+    { name:"Radish",       category:"Root",        varieties:["French Breakfast","Cherry Belle","Watermelon","Daikon","Black Spanish"] },
+    { name:"Potato",       category:"Root",        varieties:["Charlotte","Maris Piper","King Edward","Desiree","Pink Fir Apple","Jersey Royal"] },
+    { name:"Sweet Potato", category:"Root",        varieties:["Beauregard","Hernandez","O'Henry","Erato Orange"] },
+    { name:"Celeriac",     category:"Root",        varieties:["Prinz","Giant Prague","Monarch","Brilliant"] },
+    { name:"Swede",        category:"Root",        varieties:["Marian","Best of All","Wilhemsburger"] },
+    // Herbs
+    { name:"Basil",        category:"Herb",        varieties:["Genovese","Thai","Purple Opal","Lemon","Holy","Greek Miniature"] },
+    { name:"Parsley",      category:"Herb",        varieties:["Flat-leaf","Curly","Hamburg Root","Italian Giant"] },
+    { name:"Cilantro",     category:"Herb",        varieties:["Leisure","Confetti","Santo","Calypso"] },
+    { name:"Dill",         category:"Herb",        varieties:["Bouquet","Fernleaf","Mammoth","Dukat"] },
+    { name:"Chives",       category:"Herb",        varieties:["Common","Garlic Chives","Giant Siberian","Staro"] },
+    { name:"Mint",         category:"Herb",        varieties:["Spearmint","Peppermint","Apple Mint","Chocolate Mint","Moroccan"] },
+    { name:"Oregano",      category:"Herb",        varieties:["Greek","Italian","Golden","Compactum"] },
+    { name:"Thyme",        category:"Herb",        varieties:["Common","Lemon","Silver Posie","Creeping","Doone Valley"] },
+    { name:"Rosemary",     category:"Herb",        varieties:["Tuscan Blue","Miss Jessopp","Majorca Pink","Prostratus"] },
+    { name:"Sage",         category:"Herb",        varieties:["Common","Purple","Tricolor","Pineapple","Icterina"] },
+    { name:"Tarragon",     category:"Herb",        varieties:["French","Russian","Mexican"] },
+    { name:"Lemon Balm",   category:"Herb",        varieties:["Common","Variegated","Aurea","Quedlinburger"] },
+    { name:"Lavender",     category:"Herb",        varieties:["Hidcote","Munstead","Vera","Grosso","Phenomenal"] },
+    { name:"Borage",       category:"Herb",        varieties:["Common","White Flowered","Creeping"] },
+    { name:"Chervil",      category:"Herb",        varieties:["Common","Curled","Brussels Winter"] },
+    { name:"Lovage",       category:"Herb",        varieties:["Common"] },
+    { name:"Marjoram",     category:"Herb",        varieties:["Sweet","Pot","Golden","Compact"] },
+    // Legumes
+    { name:"French Bean",  category:"Legume",      varieties:["Blue Lake","Cobra","Borlotti","Dwarf Tendergreen","Climbing Neckarqueen"] },
+    { name:"Runner Bean",  category:"Legume",      varieties:["Scarlet Emperor","Enorma","White Lady","Painted Lady","Hestia"] },
+    { name:"Broad Bean",   category:"Legume",      varieties:["Aquadulce Claudia","The Sutton","Witkiem Manita","Imperial Green Longpod"] },
+    { name:"Pea",          category:"Legume",      varieties:["Kelvedon Wonder","Sugar Snap","Mangetout","Petit Pois","Telephone"] },
+    { name:"Borlotti Bean",category:"Legume",      varieties:["Lingua di Fuoco","Lamon","Yin Yang"] },
+    // Fruits
+    { name:"Strawberry",   category:"Fruit",       varieties:["Elsanta","Mara des Bois","Honeoye","Aromel","Cambridge Favourite"] },
+    { name:"Raspberry",    category:"Fruit",       varieties:["Glen Ample","Autumn Bliss","Joan J","Tulameen","Polka"] },
+    { name:"Blueberry",    category:"Fruit",       varieties:["Bluecrop","Duke","Chandler","Pink Lemonade","Patriot"] },
+    { name:"Rhubarb",      category:"Fruit",       varieties:["Timperley Early","Victoria","Champagne","Glaskin's Perpetual"] },
+    { name:"Gooseberry",   category:"Fruit",       varieties:["Invicta","HinnonmÃ¤ki Red","Captivator","Pax"] },
+    { name:"Currant",      category:"Fruit",       varieties:["Ben Sarek (Black)","Jonkheer van Tets (Red)","White Versailles"] },
+    { name:"Fig",          category:"Fruit",       varieties:["Brown Turkey","Brunswick","White Marseilles","Violette de SolliÃ¨s"] },
+    { name:"Melon",        category:"Fruit",       varieties:["Blenheim Orange","Sweetheart","Emir","Ogen"] },
+    // Flowers (companion/edible)
+    { name:"Marigold",     category:"Flower",      varieties:["French Dwarf","African Giant","Crackerjack","Lemon Gem","Disco Orange"] },
+    { name:"Nasturtium",   category:"Flower",      varieties:["Jewel Mix","Alaska","Empress of India","Climbing","Black Velvet"] },
+    { name:"Sunflower",    category:"Flower",      varieties:["Dwarf Sunspot","Giant Russian","Teddy Bear","Velvet Queen","Strawberry Blonde"] },
+    { name:"Calendula",    category:"Flower",      varieties:["Orange King","Lemon Cream","Pacific Beauty","Indian Prince"] },
+    { name:"Sweet Pea",    category:"Flower",      varieties:["Old Spice Mix","Matucana","Cupani","Spencer Mixed","Wiltshire Ripple"] },
+    { name:"Cosmos",       category:"Flower",      varieties:["Purity","Sensation Mix","Dazzler","Fizzy","Cupcakes"] },
+    { name:"Borage",       category:"Flower",      varieties:["Blue","White","Creeping"] },
+    { name:"Phacelia",     category:"Flower",      varieties:["Common","Lacy"] },
+];
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SEED DATA
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const gid = () => Math.random().toString(36).slice(2, 10);
+
+const SEED = {
+    // Demo accounts used for the initial dashboard and login state.
+    users: [
+        { id:"u1", name:"Alex", email:"alex@gardengrid.app", password:"garden123", avatar:"ðŸ‘©â€ðŸŒ¾", color:"#2B5C10", settings:{ lang:"en" }, created_at:"2026-01-15T10:00:00.000Z" },
+        { id:"u2", name:"Sam",  email:"sam@gardengrid.app",  password:"moestuin1", avatar:"ðŸ‘¨â€ðŸŒ¾", color:"#1565C0", settings:{ lang:"nl" }, created_at:"2026-02-01T09:00:00.000Z" },
+    ],
+    activeUserId: null,
+    // Garden canvases with dimensions, type and notes.
+    gardens: [
+        { id:"g1", user_id:"u1", name:"Backyard Kitchen Garden", width:14, height:10, unit:"m", type:"mixed",     notes:"Main veg garden â€” raised beds, open rows, greenhouse and tunnel." },
+        { id:"g2", user_id:"u1", name:"Herb & Flower Garden",    width:8,  height:6,  unit:"m", type:"herb",      notes:"Dedicated herb and pollinator garden." },
+        { id:"g3", user_id:"u2", name:"Sam's Allotment",         width:10, height:8,  unit:"m", type:"allotment", notes:"Rented allotment plot â€” mostly vegetables." },
+    ],
+    // Field rectangles placed inside each garden.
+    fields: [
+        // Garden 1
+        { id:"f1",  garden_id:"g1", user_id:"u1", name:"Tomato Bed",       type:"raised_bed",    x:0.5,  y:0.5,  width:3.5, height:2.5, notes:"South-facing, great drainage" },
+        { id:"f2",  garden_id:"g1", user_id:"u1", name:"Herb Corner",      type:"herb_bed",      x:4.5,  y:0.5,  width:2.5, height:2.5, notes:"Perennial and annual herbs" },
+        { id:"f3",  garden_id:"g1", user_id:"u1", name:"Leafy Greens",     type:"open_field",    x:0.5,  y:3.5,  width:6,   height:2.5, notes:"Lettuce, kale, spinach, chard" },
+        { id:"f4",  garden_id:"g1", user_id:"u1", name:"Root Veg Bed",     type:"raised_bed",    x:7.5,  y:0.5,  width:3,   height:3.5, notes:"Carrots, beets, parsnips" },
+        { id:"f5",  garden_id:"g1", user_id:"u1", name:"Legume Row",       type:"open_field",    x:0.5,  y:6.5,  width:6,   height:2.5, notes:"Beans and peas rotation" },
+        { id:"f6",  garden_id:"g1", user_id:"u1", name:"GH Propagation",   type:"greenhouse_bed",x:8.5,  y:5.5,  width:4,   height:3.5, notes:"Inside the main greenhouse" },
+        // Garden 2
+        { id:"f7",  garden_id:"g2", user_id:"u1", name:"Mediterranean Herbs", type:"herb_bed",   x:0.5,  y:0.5,  width:3,   height:2,   notes:"Thyme, rosemary, oregano, sage" },
+        { id:"f8",  garden_id:"g2", user_id:"u1", name:"Annual Herbs",     type:"herb_bed",      x:4,    y:0.5,  width:3.5, height:2,   notes:"Basil, cilantro, dill, parsley" },
+        { id:"f9",  garden_id:"g2", user_id:"u1", name:"Companion Flowers",type:"flower_bed",    x:0.5,  y:3,    width:7,   height:2.5, notes:"Marigolds, nasturtiums, calendula" },
+        // Garden 3
+        { id:"f10", garden_id:"g3", user_id:"u2", name:"Brassica Bed",     type:"raised_bed",    x:0.5,  y:0.5,  width:4,   height:3,   notes:"Cabbages, broccoli, kale" },
+        { id:"f11", garden_id:"g3", user_id:"u2", name:"Allotment Rows",   type:"open_field",    x:0.5,  y:4,    width:9,   height:3.5, notes:"Traditional rows â€” mixed veg" },
+        { id:"f12", garden_id:"g3", user_id:"u2", name:"Soft Fruit Corner",type:"fruit_area",    x:5,    y:0.5,  width:4.5, height:3,   notes:"Raspberries, strawberries, currants" },
+    ],
+    // Non-field structures like greenhouses, paths and water points.
+    structures: [
+        // Garden 1
+        { id:"s1", garden_id:"g1", user_id:"u1", type:"greenhouse",         name:"Main Greenhouse",   x:7.5, y:4.5, width:5.5, height:5, notes:"Full glass greenhouse â€” year-round growing", ventilated:false, temperature:"", humidity:"" },
+        { id:"s2", garden_id:"g1", user_id:"u1", type:"tunnel_greenhouse",  name:"Poly Tunnel",       x:0.5, y:9,   width:6,   height:0.8,notes:"Early season extension tunnel", ventilated:false, temperature:"", humidity:"" },
+        { id:"s3", garden_id:"g1", user_id:"u1", type:"compost_zone",       name:"Compost Corner",    x:0.5, y:6.5, width:0,   height:0, notes:"3-bin composting system" },
+        { id:"s4", garden_id:"g1", user_id:"u1", type:"water_point",        name:"Main Water Tap",    x:13.2,y:0.8, width:0.6, height:0.6,notes:"Municipal supply" },
+        { id:"s5", garden_id:"g1", user_id:"u1", type:"path",               name:"Central Path",      x:6.8, y:3.5, width:0.6, height:6, notes:"Main walkway" },
+        // Garden 2
+        { id:"s6", garden_id:"g2", user_id:"u1", type:"tunnel_greenhouse",  name:"Herb Tunnel",       x:0.5, y:5.3, width:7,   height:0.6,notes:"Extends the herb season into winter", ventilated:true,  temperature:"14Â°C", humidity:"" },
+        { id:"s7", garden_id:"g2", user_id:"u1", type:"water_point",        name:"Rainwater Butt",    x:7,   y:4.5, width:0.8, height:0.8,notes:"1000L rainwater collector" },
+        // Garden 3
+        { id:"s8", garden_id:"g3", user_id:"u2", type:"greenhouse",         name:"Sam's Mini GH",     x:5,   y:4.2, width:4.5, height:3.5,notes:"Unheated â€” tomatoes in summer", ventilated:true,  temperature:"", humidity:"65" },
+        { id:"s9", garden_id:"g3", user_id:"u2", type:"shed",               name:"Tool Shed",         x:0.5, y:4.5, width:2,   height:2,  notes:"Tools and supplies storage" },
+        { id:"s10", garden_id:"g1", user_id:"u1", type:"rain_barrel",       name:"Rain Barrel",       x:13.0,y:1.7, width:0.8, height:1.0,notes:"Collects roof runoff" },
+        { id:"s11", garden_id:"g1", user_id:"u1", type:"potting_bench",    name:"Potting Bench",     x:11.0,y:9.0, width:2.4, height:0.8,notes:"Seed sowing and transplanting" },
+        { id:"s12", garden_id:"g2", user_id:"u1", type:"cold_frame",        name:"Cold Frame",        x:0.5, y:5.8, width:1.8, height:1.0,notes:"Hardening off seedlings" },
+        { id:"s13", garden_id:"g2", user_id:"u1", type:"insect_hotel",      name:"Insect Hotel",      x:7.3, y:2.8, width:0.8, height:0.8,notes:"Pollinator habitat" },
+        { id:"s14", garden_id:"g2", user_id:"u1", type:"tool_rack",         name:"Tool Rack",         x:6.7, y:5.7, width:1.0, height:0.5,notes:"Hand tools and labels" },
+        { id:"s15", garden_id:"g3", user_id:"u2", type:"chicken_coop",      name:"Chicken Coop",      x:7.0, y:0.7, width:1.9, height:1.6,notes:"Shelter for laying hens" },
+        { id:"s16", garden_id:"g3", user_id:"u2", type:"chicken_run",       name:"Chicken Run",       x:6.6, y:2.4, width:3.0, height:2.2,notes:"Outdoor run attached to coop" },
+        { id:"s17", garden_id:"g3", user_id:"u2", type:"raised_tunnel",     name:"Raised Tunnel",     x:0.6, y:0.5, width:3.8, height:0.7,notes:"Early crops and salad greens" },
+        { id:"s18", garden_id:"g2", user_id:"u1", type:"hedge",             name:"Beech Hedge",       x:0.2, y:0.2, width:7.2, height:0.5,notes:"Boundary hedge; prune twice per year", species:"Beech", info:"Evergreen-style boundary screen with dense growth", maintenance_notes:"Clip after first flush and again in late summer", prune_interval_weeks:20, next_prune_date:"2026-04-15" },
+        { id:"s19", garden_id:"g1", user_id:"u1", type:"trellis",           name:"Bean Trellis",      x:3.8, y:6.4, width:1.4, height:0.4,notes:"Climbing support for beans and peas", info:"Low timber trellis for vertical cropping", maintenance_notes:"Check ties, straighten stakes and replace damaged canes", prune_interval_weeks:12, next_prune_date:"2026-04-08" },
+        { id:"s20", garden_id:"g3", user_id:"u2", type:"windbreak",         name:"North Windbreak",   x:0.2, y:7.4, width:9.2, height:0.5,notes:"Shelters the plot from prevailing wind", species:"Mixed native shrubs", info:"Dense wind shelter on the north edge", maintenance_notes:"Light trim once per year and inspect for gaps", prune_interval_weeks:52, next_prune_date:"2026-10-01" },
+        { id:"s21", garden_id:"g3", user_id:"u2", type:"orchard_row",       name:"Apple Row",         x:0.6, y:7.2, width:4.0, height:0.8,notes:"Dwarf apples on a single line", species:"Apple", info:"Compact fruit row with training wire", maintenance_notes:"Winter prune and summer tie-in", prune_interval_weeks:26, next_prune_date:"2026-02-15" },
+    ],
+    // Crop and plant entries linked to a field and tracked by growth state.
+    plants: [
+        // Garden 1 â€” Tomato Bed
+        { id:"pl1",  garden_id:"g1", user_id:"u1", field_id:"f1", name:"Tomato",        variety:"San Marzano",    category:"Vegetable",  status:"growing",     quantity:8,  sow_date:"2026-03-01", plant_date:"2026-04-20", harvest_date:"2026-07-15", notes:"Needs regular tying in" },
+        { id:"pl2",  garden_id:"g1", user_id:"u1", field_id:"f1", name:"Tomato",        variety:"Gardener's Delight",category:"Vegetable",status:"growing",     quantity:4,  sow_date:"2026-03-01", plant_date:"2026-04-20", harvest_date:"2026-07-01", notes:"Cherry â€” very prolific" },
+        { id:"pl3",  garden_id:"g1", user_id:"u1", field_id:"f1", name:"Basil",         variety:"Genovese",       category:"Herb",       status:"planted",     quantity:6,  sow_date:"2026-03-15", plant_date:"2026-04-20", harvest_date:"2026-06-01", notes:"Companion to tomatoes" },
+        // Garden 1 â€” Herb Corner
+        { id:"pl4",  garden_id:"g1", user_id:"u1", field_id:"f2", name:"Rosemary",      variety:"Tuscan Blue",    category:"Herb",       status:"growing",     quantity:2,  sow_date:"2026-01-15", plant_date:"2026-03-10", harvest_date:"",           notes:"Perennial â€” prune after flowering" },
+        { id:"pl5",  garden_id:"g1", user_id:"u1", field_id:"f2", name:"Thyme",         variety:"Common",         category:"Herb",       status:"growing",     quantity:3,  sow_date:"2026-02-01", plant_date:"2026-03-15", harvest_date:"",           notes:"Drought-tolerant perennial" },
+        { id:"pl6",  garden_id:"g1", user_id:"u1", field_id:"f2", name:"Chives",        variety:"Common",         category:"Herb",       status:"growing",     quantity:4,  sow_date:"2026-02-15", plant_date:"2026-03-20", harvest_date:"",           notes:"Cut and come again" },
+        { id:"pl7",  garden_id:"g1", user_id:"u1", field_id:"f2", name:"Mint",          variety:"Spearmint",      category:"Herb",       status:"growing",     quantity:2,  sow_date:"2026-02-10", plant_date:"2026-03-15", harvest_date:"",           notes:"Contained in pots to stop spreading" },
+        // Garden 1 â€” Leafy Greens
+        { id:"pl8",  garden_id:"g1", user_id:"u1", field_id:"f3", name:"Lettuce",       variety:"Butterhead",     category:"Leafy Green",status:"harvestable", quantity:20, sow_date:"2026-03-01", plant_date:"2026-03-20", harvest_date:"2026-05-15", notes:"Ready for outer leaf harvest" },
+        { id:"pl9",  garden_id:"g1", user_id:"u1", field_id:"f3", name:"Lettuce",       variety:"Lollo Rosso",    category:"Leafy Green",status:"growing",     quantity:15, sow_date:"2026-03-10", plant_date:"2026-03-28", harvest_date:"2026-05-20", notes:"" },
+        { id:"pl10", garden_id:"g1", user_id:"u1", field_id:"f3", name:"Spinach",       variety:"Baby Leaf",      category:"Leafy Green",status:"sown",        quantity:30, sow_date:"2026-03-20", plant_date:"",           harvest_date:"2026-05-10", notes:"" },
+        { id:"pl11", garden_id:"g1", user_id:"u1", field_id:"f3", name:"Kale",          variety:"Cavolo Nero",    category:"Leafy Green",status:"growing",     quantity:10, sow_date:"2026-02-20", plant_date:"2026-04-01", harvest_date:"2026-06-01", notes:"" },
+        { id:"pl12", garden_id:"g1", user_id:"u1", field_id:"f3", name:"Chard",         variety:"Rainbow",        category:"Leafy Green",status:"growing",     quantity:12, sow_date:"2026-03-05", plant_date:"2026-04-10", harvest_date:"2026-05-25", notes:"Pick outer leaves" },
+        // Garden 1 â€” Root Veg
+        { id:"pl13", garden_id:"g1", user_id:"u1", field_id:"f4", name:"Carrot",        variety:"Nantes",         category:"Root",       status:"growing",     quantity:60, sow_date:"2026-03-10", plant_date:"2026-03-10", harvest_date:"2026-06-20", notes:"Direct sown, thin to 5cm" },
+        { id:"pl14", garden_id:"g1", user_id:"u1", field_id:"f4", name:"Beetroot",      variety:"Boltardy",       category:"Root",       status:"sown",        quantity:25, sow_date:"2026-03-22", plant_date:"",           harvest_date:"2026-06-15", notes:"" },
+        { id:"pl15", garden_id:"g1", user_id:"u1", field_id:"f4", name:"Parsnip",       variety:"Gladiator",      category:"Root",       status:"sown",        quantity:20, sow_date:"2026-03-15", plant_date:"",           harvest_date:"2026-10-01", notes:"Slow germinator â€” be patient" },
+        { id:"pl16", garden_id:"g1", user_id:"u1", field_id:"f4", name:"Radish",        variety:"French Breakfast",category:"Root",      status:"harvestable", quantity:30, sow_date:"2026-03-01", plant_date:"",           harvest_date:"2026-03-25", notes:"Fast crop â€” harvest before bolting" },
+        // Garden 1 â€” Legume Row
+        { id:"pl17", garden_id:"g1", user_id:"u1", field_id:"f5", name:"French Bean",   variety:"Cobra",          category:"Legume",     status:"planned",     quantity:30, sow_date:"2026-04-20", plant_date:"2026-05-05", harvest_date:"2026-07-15", notes:"Climbing variety â€” needs canes" },
+        { id:"pl18", garden_id:"g1", user_id:"u1", field_id:"f5", name:"Pea",           variety:"Sugar Snap",     category:"Legume",     status:"sown",        quantity:40, sow_date:"2026-03-18", plant_date:"",           harvest_date:"2026-06-01", notes:"Direct sown in guttering" },
+        { id:"pl19", garden_id:"g1", user_id:"u1", field_id:"f5", name:"Broad Bean",    variety:"Aquadulce Claudia",category:"Legume",   status:"growing",     quantity:25, sow_date:"2026-11-01", plant_date:"2026-11-01", harvest_date:"2026-06-10", notes:"Autumn sown â€” well established" },
+        // Garden 1 â€” Greenhouse Bed
+        { id:"pl20", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Pepper",        variety:"Sweet Bell",     category:"Vegetable",  status:"growing",     quantity:6,  sow_date:"2026-02-10", plant_date:"2026-04-01", harvest_date:"2026-08-01", notes:"In greenhouse â€” needs high heat" },
+        { id:"pl21", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Aubergine",     variety:"Black Beauty",   category:"Vegetable",  status:"planted",     quantity:3,  sow_date:"2026-02-15", plant_date:"2026-04-10", harvest_date:"2026-08-15", notes:"Keep warm â€” minimum 18Â°C" },
+        { id:"pl22", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Cucumber",      variety:"Mini Munch",     category:"Vegetable",  status:"growing",     quantity:4,  sow_date:"2026-03-10", plant_date:"2026-04-15", harvest_date:"2026-07-01", notes:"Train up vertical wire" },
+        { id:"pl23", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Melon",         variety:"Sweetheart",     category:"Fruit",      status:"sown",        quantity:2,  sow_date:"2026-03-20", plant_date:"",           harvest_date:"2026-08-20", notes:"Needs greenhouse warmth" },
+        // Garden 2 â€” Mediterranean Herbs
+        { id:"pl24", garden_id:"g2", user_id:"u1", field_id:"f7", name:"Oregano",       variety:"Greek",          category:"Herb",       status:"growing",     quantity:3,  sow_date:"2026-02-01", plant_date:"2026-03-15", harvest_date:"",           notes:"Perennial" },
+        { id:"pl25", garden_id:"g2", user_id:"u1", field_id:"f7", name:"Sage",          variety:"Common",         category:"Herb",       status:"growing",     quantity:2,  sow_date:"2026-01-20", plant_date:"2026-03-10", harvest_date:"",           notes:"Prune hard each spring" },
+        { id:"pl26", garden_id:"g2", user_id:"u1", field_id:"f7", name:"Lavender",      variety:"Hidcote",        category:"Herb",       status:"growing",     quantity:4,  sow_date:"2026-02-05", plant_date:"2026-03-20", harvest_date:"",           notes:"Great for pollinators" },
+        { id:"pl27", garden_id:"g2", user_id:"u1", field_id:"f7", name:"Rosemary",      variety:"Majorca Pink",   category:"Herb",       status:"growing",     quantity:1,  sow_date:"2026-01-10", plant_date:"2026-03-01", harvest_date:"",           notes:"Pink flowering variety" },
+        // Garden 2 â€” Annual Herbs
+        { id:"pl28", garden_id:"g2", user_id:"u1", field_id:"f8", name:"Basil",         variety:"Thai",           category:"Herb",       status:"sown",        quantity:8,  sow_date:"2026-03-25", plant_date:"",           harvest_date:"2026-06-01", notes:"Needs warmth to germinate" },
+        { id:"pl29", garden_id:"g2", user_id:"u1", field_id:"f8", name:"Parsley",       variety:"Flat-leaf",      category:"Herb",       status:"growing",     quantity:6,  sow_date:"2026-02-20", plant_date:"2026-03-20", harvest_date:"2026-05-01", notes:"Slow to germinate â€” worth the wait" },
+        { id:"pl30", garden_id:"g2", user_id:"u1", field_id:"f8", name:"Dill",          variety:"Bouquet",        category:"Herb",       status:"sown",        quantity:10, sow_date:"2026-03-20", plant_date:"",           harvest_date:"2026-05-20", notes:"Direct sown" },
+        { id:"pl31", garden_id:"g2", user_id:"u1", field_id:"f8", name:"Cilantro",      variety:"Leisure",        category:"Herb",       status:"planned",     quantity:8,  sow_date:"2026-04-01", plant_date:"",           harvest_date:"2026-05-25", notes:"Sow successionally to avoid bolt" },
+        // Garden 2 â€” Flowers
+        { id:"pl32", garden_id:"g2", user_id:"u1", field_id:"f9", name:"Marigold",      variety:"French Dwarf",   category:"Flower",     status:"sown",        quantity:30, sow_date:"2026-03-15", plant_date:"",           harvest_date:"",           notes:"Pest repellent" },
+        { id:"pl33", garden_id:"g2", user_id:"u1", field_id:"f9", name:"Nasturtium",    variety:"Jewel Mix",      category:"Flower",     status:"sown",        quantity:20, sow_date:"2026-03-20", plant_date:"",           harvest_date:"",           notes:"Edible flowers and aphid trap" },
+        { id:"pl34", garden_id:"g2", user_id:"u1", field_id:"f9", name:"Calendula",     variety:"Orange King",    category:"Flower",     status:"growing",     quantity:15, sow_date:"2026-03-01", plant_date:"2026-03-25", harvest_date:"",           notes:"Edible petals â€” great for skin" },
+        { id:"pl35", garden_id:"g2", user_id:"u1", field_id:"f9", name:"Borage",        variety:"Common",         category:"Flower",     status:"planned",     quantity:10, sow_date:"2026-04-05", plant_date:"",           harvest_date:"",           notes:"Pollinator magnet" },
+        // Garden 3 â€” Sam's plots
+        { id:"pl36", garden_id:"g3", user_id:"u2", field_id:"f10", name:"Broccoli",     variety:"Calabrese",      category:"Vegetable",  status:"growing",     quantity:8,  sow_date:"2026-03-01", plant_date:"2026-04-15", harvest_date:"2026-06-20", notes:"Net against cabbage white" },
+        { id:"pl37", garden_id:"g3", user_id:"u2", field_id:"f10", name:"Cabbage",      variety:"January King",   category:"Vegetable",  status:"planted",     quantity:6,  sow_date:"2026-03-10", plant_date:"2026-04-20", harvest_date:"2026-10-01", notes:"Winter cabbage" },
+        { id:"pl38", garden_id:"g3", user_id:"u2", field_id:"f10", name:"Kale",         variety:"Red Russian",    category:"Leafy Green",status:"growing",     quantity:10, sow_date:"2026-02-28", plant_date:"2026-04-10", harvest_date:"2026-06-10", notes:"Cut and come again" },
+        { id:"pl39", garden_id:"g3", user_id:"u2", field_id:"f11", name:"Potato",       variety:"Charlotte",      category:"Root",       status:"planted",     quantity:40, sow_date:"2026-03-01", plant_date:"2026-03-28", harvest_date:"2026-07-01", notes:"Salad potato â€” chit in Feb" },
+        { id:"pl40", garden_id:"g3", user_id:"u2", field_id:"f11", name:"Sweetcorn",    variety:"Earlibird",      category:"Vegetable",  status:"sown",        quantity:20, sow_date:"2026-04-01", plant_date:"",           harvest_date:"2026-08-15", notes:"Sow in blocks for pollination" },
+        { id:"pl41", garden_id:"g3", user_id:"u2", field_id:"f11", name:"Leek",         variety:"Musselburgh",    category:"Vegetable",  status:"sown",        quantity:30, sow_date:"2026-03-15", plant_date:"",           harvest_date:"2026-11-01", notes:"" },
+        { id:"pl42", garden_id:"g3", user_id:"u2", field_id:"f11", name:"Onion",        variety:"Sturon",         category:"Vegetable",  status:"planted",     quantity:50, sow_date:"2026-03-10", plant_date:"2026-03-25", harvest_date:"2026-08-01", notes:"From sets" },
+        { id:"pl43", garden_id:"g3", user_id:"u2", field_id:"f12", name:"Raspberry",    variety:"Autumn Bliss",   category:"Fruit",      status:"growing",     quantity:8,  sow_date:"",           plant_date:"2026-03-01", harvest_date:"2026-09-01", notes:"Autumn fruiting â€” cut all canes in Feb" },
+        { id:"pl44", garden_id:"g3", user_id:"u2", field_id:"f12", name:"Strawberry",   variety:"Cambridge Favourite",category:"Fruit", status:"growing",     quantity:20, sow_date:"",           plant_date:"2026-03-15", harvest_date:"2026-06-15", notes:"Mulch with straw before fruiting" },
+        { id:"pl45", garden_id:"g3", user_id:"u2", field_id:"f12", name:"Currant",      variety:"Ben Sarek (Black)",category:"Fruit",   status:"growing",     quantity:3,  sow_date:"",           plant_date:"2026-02-20", harvest_date:"2026-07-15", notes:"Net before fruiting" },
+    ],
+    // Action list linked to gardens, fields, structures or plants.
+    tasks: [
+        { id:"tk1",  user_id:"u1", title:"Water tomato bed",             type:"watering",    status:"pending",  due_date:"2026-03-23", linked_type:"field",  linked_id:"f1", notes:"" },
+        { id:"tk2",  user_id:"u1", title:"Harvest outer lettuce leaves", type:"harvesting",  status:"pending",  due_date:"2026-03-22", linked_type:"field",  linked_id:"f3", notes:"Pick outer leaves only" },
+        { id:"tk3",  user_id:"u1", title:"Sow French beans",             type:"sowing",      status:"pending",  due_date:"2026-04-20", linked_type:"field",  linked_id:"f5", notes:"2 rows, 40 cm apart" },
+        { id:"tk4",  user_id:"u1", title:"Add compost to raised beds",   type:"fertilizing", status:"done",     due_date:"2026-03-15", linked_type:"garden", linked_id:"g1", notes:"Used homemade compost" },
+        { id:"tk5",  user_id:"u1", title:"Ventilate main greenhouse",    type:"general",     status:"pending",  due_date:"2026-03-22", linked_type:"struct", linked_id:"s1", notes:"Open roof vents on warm afternoons" },
+        { id:"tk6",  user_id:"u1", title:"Prune herb corner",            type:"pruning",     status:"pending",  due_date:"2026-04-05", linked_type:"field",  linked_id:"f2", notes:"Cut back woody rosemary growth" },
+        { id:"tk7",  user_id:"u1", title:"Thin carrot seedlings",        type:"general",     status:"pending",  due_date:"2026-04-10", linked_type:"field",  linked_id:"f4", notes:"Thin to 5 cm spacing" },
+        { id:"tk8",  user_id:"u1", title:"Pot on pepper seedlings",      type:"planting",    status:"pending",  due_date:"2026-04-05", linked_type:"field",  linked_id:"f6", notes:"Up to 3L pots" },
+        { id:"tk9",  user_id:"u1", title:"Deadhead calendula",           type:"pruning",     status:"pending",  due_date:"2026-04-15", linked_type:"field",  linked_id:"f9", notes:"Regular deadheading extends flowering" },
+        { id:"tk10", user_id:"u2", title:"Earth up potatoes",            type:"general",     status:"pending",  due_date:"2026-04-20", linked_type:"field",  linked_id:"f11",notes:"Draw up soil around stems" },
+        { id:"tk11", user_id:"u2", title:"Net brassica bed",             type:"general",     status:"pending",  due_date:"2026-04-10", linked_type:"field",  linked_id:"f10",notes:"Protect against cabbage white butterfly" },
+        { id:"tk12", user_id:"u2", title:"Harvest radishes",             type:"harvesting",  status:"pending",  due_date:"2026-03-25", linked_type:"garden", linked_id:"g3", notes:"Check size â€” harvest before bolt" },
+    ],
+    // UI-specific empty collections that get filled when the editor creates slots/zones.
+    slots: [],
+    zones: [],
+    activeGardenId: "g1",
+};
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// PERSISTENCE
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const SK = "gardengrid_v4";
+const SESSION_KEY = "gardengrid_session";
+const normalizeState = (state) => state ? { ...state, slots: state.slots || [], zones: state.zones || [] } : null;
+const apiJson = async (url, options = {}) => {
+    const res = await fetch(url, {
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options,
+    });
+    if (!res.ok) {
+        throw new Error(`Request failed: ${res.status}`);
+    }
+    return res.json();
+};
+const getLegacyState = () => {
+    try {
+        const raw = localStorage.getItem(SK);
+        return raw ? normalizeState(JSON.parse(raw)) : null;
+    } catch {
+        return null;
+    }
+};
+const clearLegacyStorage = () => {
+    try {
+        localStorage.removeItem(SK);
+        localStorage.removeItem(SESSION_KEY);
+    } catch {}
+};
+const loadState = async () => {
+    try {
+        const payload = await apiJson("/api/state.php");
+        if (payload?.state) {
+            clearLegacyStorage();
+            return normalizeState(payload.state);
+        }
+    } catch {}
+    const legacy = getLegacyState();
+    if (legacy) {
+        await saveState(legacy);
+        clearLegacyStorage();
+        return legacy;
+    }
+    return null;
+};
+const saveState = async (state) => {
+    await apiJson("/api/state.php", {
+        method: "POST",
+        body: JSON.stringify({ state }),
+    });
+};
+const resetState = async () => {
+    await apiJson("/api/state.php", { method: "DELETE" });
+    clearLegacyStorage();
+};
+const getSession = async () => {
+    try {
+        const payload = await apiJson("/api/session.php");
+        if (payload?.uid) {
+            try { localStorage.removeItem(SESSION_KEY); } catch {}
+            return payload.uid;
+        }
+    } catch {}
+    try {
+        const legacyUid = localStorage.getItem(SESSION_KEY) || null;
+        if (legacyUid) {
+            await setSession(legacyUid);
+            localStorage.removeItem(SESSION_KEY);
+            return legacyUid;
+        }
+    } catch {}
+    return null;
+};
+const setSession = async (uid) => {
+    if (uid) {
+        await apiJson("/api/session.php", {
+            method: "POST",
+            body: JSON.stringify({ uid }),
+        });
+    } else {
+        await apiJson("/api/session.php", { method: "DELETE" });
+    }
+};
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// HELPERS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const fmtDate = (d, lang="en") => {
+    if (!d) return "â€”";
+    try { return new Date(d+"T00:00:00").toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"short",year:"numeric"}); }
+    catch { return d; }
+};
+const isSameDay = (d, ref = new Date()) => {
+    if (!d) return false;
+    const value = new Date(d+"T00:00:00");
+    return value.getFullYear() === ref.getFullYear() && value.getMonth() === ref.getMonth() && value.getDate() === ref.getDate();
+};
+const isOverdue = (d, status) => { if (!d||status==="done") return false; return new Date(d+"T00:00:00") < new Date(new Date().toDateString()); };
+const clamp = (v, mn, mx) => Math.max(mn, Math.min(mx, v));
+const forUser = (arr, uid) => arr.filter(x => !x.user_id || x.user_id === uid);
+const isInsideGH = (field, gh) => {
+    const cx = field.x + field.width/2, cy = field.y + field.height/2;
+    return cx >= gh.x && cx <= gh.x+gh.width && cy >= gh.y && cy <= gh.y+gh.height;
+};
+const SLOT_TYPE_LABELS = {
+    bed_row: "Row",
+    bed_section: "Section",
+    greenhouse_pot: "Pot",
+    greenhouse_tray: "Tray",
+    greenhouse_table: "Table",
+    tray_cell: "Cell",
+    tunnel_row: "Tunnel Row",
+};
+const SLOT_TYPE_ICONS = {
+    bed_row: "ðŸª´",
+    bed_section: "â–¦",
+    greenhouse_pot: "ðŸ«™",
+    greenhouse_tray: "ðŸ§º",
+    greenhouse_table: "ðŸªµ",
+    tray_cell: "â–«ï¸",
+    tunnel_row: "ðŸ§µ",
+};
+const WEATHER_CODE_LABELS = {
+    0: "Clear",
+    1: "Mostly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Fog",
+    51: "Light drizzle",
+    61: "Rain",
+    71: "Snow",
+    80: "Rain showers",
+    95: "Thunderstorm",
+    96: "Thunderstorm with hail",
+    99: "Severe thunderstorm",
+};
+const getHarvestTaskForPlant = (plant, uid) => {
+    if (!plant?.harvest_date || plant.status==="harvested" || plant.status==="removed") return null;
+    return {
+        id: `harvest_${plant.id}`,
+        user_id: uid,
+        title: `Harvest ${plant.name}${plant.variety ? ` (${plant.variety})` : ""}`,
+        type: "harvesting",
+        status: "pending",
+        due_date: plant.harvest_date,
+        linked_type: "plant",
+        linked_id: plant.id,
+        notes: plant.notes || "",
+    };
+};
+const syncHarvestTask = (tasks, plant, uid) => {
+    const nextTask = getHarvestTaskForPlant(plant, uid);
+    const existing = tasks.find(t => t.id===`harvest_${plant.id}`);
+    if (!nextTask) {
+        return existing ? tasks.filter(t => t.id!==existing.id) : tasks;
+    }
+    if (existing) {
+        return tasks.map(t => t.id===existing.id ? { ...existing, ...nextTask, status: plant.status==="harvested" ? "done" : existing.status==="done" ? "done" : "pending" } : t);
+    }
+    return [...tasks, nextTask];
+};
+const removeHarvestTask = (tasks, plantId) => tasks.filter(t => t.id!==`harvest_${plantId}`);
+const getStructureMaintenanceTask = (struct, uid) => {
+    if (!struct) return null;
+    const maintenanceMap = {
+        hedge: { type:"pruning", label:"Prune hedge", dueKey:"next_prune_date" },
+        trellis: { type:"repair", label:"Inspect trellis", dueKey:"next_prune_date" },
+        windbreak: { type:"pruning", label:"Trim windbreak", dueKey:"next_prune_date" },
+        orchard_row: { type:"pruning", label:"Prune orchard row", dueKey:"next_prune_date" },
+    };
+    const cfg = maintenanceMap[struct.type];
+    if (!cfg) return null;
+    return {
+        id: `maint_${struct.id}`,
+        user_id: uid,
+        title: `${cfg.label}: ${struct.name}`,
+        type: cfg.type,
+        status: "pending",
+        due_date: struct[cfg.dueKey] || struct.next_prune_date || "",
+        linked_type: "struct",
+        linked_id: struct.id,
+        notes: struct.maintenance_notes || struct.info || struct.notes || "",
+    };
+};
+const syncStructureTasks = (tasks, struct, uid) => {
+    if (!struct) return tasks;
+    const nextTask = getStructureMaintenanceTask(struct, uid);
+    const existing = tasks.find(t => t.id === `maint_${struct.id}`);
+    if (!nextTask) {
+        return existing ? tasks.filter(t => t.id !== existing.id) : tasks;
+    }
+    if (existing) {
+        return tasks.map(t => t.id === existing.id ? { ...existing, ...nextTask } : t);
+    }
+    return [...tasks, nextTask];
+};
+const removeStructureTasks = (tasks, structId) => tasks.filter(t => t.id !== `maint_${structId}`);
+const slotTypeLabel = (slot, t = null) => {
+    const key = SLOT_TYPE_LABELS[slot?.type] || slot?.type || "Slot";
+    return t && typeof t === "function" ? t(key) || key : key;
+};
+const slotBaseLabel = (slot) => slot?.label || slot?.name || slot?.type || "Slot";
+const SLOT_SEED_COLORS = ["#7AAE39", "#8BC34A", "#9CCC65", "#AED581", "#66BB6A", "#5FA043"];
+const slotSeedPlan = (slot) => {
+    if (!slot || !["tunnel_row", "bed_row"].includes(slot.type)) return null;
+    const orientation = slot.orientation === "vertical" ? "vertical" : "horizontal";
+    const rows = Math.max(1, Math.floor(Number(slot.row_count) || 1));
+    const plants = Math.max(0, Math.floor(Number(slot.plant_count) || 0));
+    const spacingCm = Math.max(0, Number(slot.spacing_cm) || 0);
+    const rowLengthM = Number(slot.row_length_m) > 0
+        ? Number(slot.row_length_m)
+        : (plants > 1 && spacingCm ? ((Math.ceil(plants / rows) - 1) * spacingCm) / 100 : 0);
+    const maxDots = 240;
+    const visiblePlants = Math.min(plants, maxDots);
+    const perRow = plants > 0 ? Math.max(1, Math.ceil(plants / rows)) : 0;
+    const visiblePerRow = visiblePlants > 0 ? Math.max(1, Math.ceil(visiblePlants / rows)) : 0;
+    const rowsData = [];
+    let remainingVisible = visiblePlants;
+    for (let r = 0; r < rows; r++) {
+        const plannedCount = plants > 0 ? Math.min(perRow, Math.max(0, plants - (r * perRow))) : 0;
+        const drawCount = Math.min(visiblePerRow, remainingVisible);
+        const seeds = [];
+        for (let c = 0; c < drawCount; c++) {
+            seeds.push({
+                id: `${slot.id}-seed-${r}-${c}`,
+                color: SLOT_SEED_COLORS[(r + c) % SLOT_SEED_COLORS.length],
+            });
+        }
+        remainingVisible -= drawCount;
+        rowsData.push({
+            index: r,
+            label: `R${r + 1}`,
+            plannedCount,
+            drawCount,
+            hiddenCount: Math.max(0, plannedCount - drawCount),
+            seeds,
+        });
+    }
+    return { rows, plants, perRow, spacingCm, rowLengthM, visiblePlants, hiddenPlants: Math.max(0, plants - visiblePlants), rowsData, orientation };
+};
+const renderSlotSeedPlan = (slot, { compact = false } = {}) => {
+    const plan = slotSeedPlan(slot);
+    if (!plan || plan.plants <= 0) return null;
+    const dotSize = compact ? 8 : 10;
+    const dotGap = compact ? 3 : 4;
+    const isVertical = plan.orientation === "vertical";
+    return (
+        <div style={{ marginTop:8, display:"flex", flexDirection:isVertical ? "row" : "column", gap:6, flexWrap:isVertical ? "wrap" : "nowrap" }}>
+            {plan.rowsData.map(row => (
+                <div
+                    key={row.label}
+                    style={{
+                        display:"flex",
+                        flexDirection:isVertical ? "column" : "row",
+                        alignItems:isVertical ? "stretch" : "center",
+                        gap:8,
+                        minWidth:isVertical ? 54 : 0,
+                        flex:isVertical ? "1 1 54px" : "unset",
+                    }}
+                >
+                    <Badge color={T.primary} bg={T.primaryBg} style={{ flexShrink:0, alignSelf:isVertical ? "flex-start" : "auto" }}>{row.label}</Badge>
+                    <div
+                        style={{
+                            display:"flex",
+                            flexDirection:isVertical ? "column" : "row",
+                            alignItems:"center",
+                            gap:dotGap,
+                            flexWrap:"nowrap",
+                            overflowX:isVertical ? "hidden" : "auto",
+                            overflowY:isVertical ? "auto" : "hidden",
+                            minWidth:0,
+                            minHeight:isVertical ? 0 : "unset",
+                            flex:1,
+                            paddingBottom:isVertical ? 0 : 2,
+                            paddingRight:isVertical ? 2 : 0,
+                        }}
+                    >
+                        {row.seeds.map(seed => (
+                            <span
+                                key={seed.id}
+                                title={`${row.label} seed`}
+                                style={{
+                                    width:dotSize,
+                                    height:dotSize,
+                                    borderRadius:"50%",
+                                    background:seed.color,
+                                    flexShrink:0,
+                                    boxShadow:"inset 0 0 0 1px rgba(255,255,255,0.55), 0 0 0 1px rgba(0,0,0,0.08)",
+                                }}
+                            />
+                        ))}
+                        {row.hiddenCount > 0 && <span style={{ fontSize:11, color:T.textMuted, whiteSpace:"nowrap" }}>+{row.hiddenCount}</span>}
+                    </div>
+                </div>
+            ))}
+            {plan.hiddenPlants > 0 && <div style={{ fontSize:11, color:T.textMuted }}>+{plan.hiddenPlants} more seedlings hidden for performance</div>}
+        </div>
+    );
+};
+const slotDisplayLabel = (slot, allSlots = []) => {
+    if (!slot) return "";
+    const parent = slot.parent_type === "slot" ? allSlots.find(s => s.id === slot.parent_id) : null;
+    const base = `${SLOT_TYPE_ICONS[slot.type] || "â–¦"} ${slotBaseLabel(slot)}`;
+    const meta = [];
+    if (slot.type === "tunnel_row" || slot.type === "bed_row") {
+        if (slot.row_count) meta.push(`${slot.row_count} rows`);
+        if (slot.spacing_cm) meta.push(`${slot.spacing_cm}cm`);
+        if (slot.plant_count) meta.push(`${slot.plant_count} plants`);
+        meta.push(slot.orientation === "vertical" ? "90Â°" : "0Â°");
+    }
+    if (slot.type === "greenhouse_tray" && slot.rows && slot.cols) meta.push(`${slot.rows}Ã—${slot.cols}`);
+    const suffix = meta.length ? ` Â· ${meta.join(" Â· ")}` : "";
+    return parent ? `${slotDisplayLabel(parent, allSlots)} â€º ${base}${suffix}` : `${base}${suffix}`;
+};
+const childSlotsFor = (allSlots, parentType, parentId) => {
+    const direct = allSlots.filter(s => s.parent_type === parentType && s.parent_id === parentId);
+    if (parentType === "struct") {
+        const trayChildren = allSlots.filter(s => s.parent_type === "slot" && direct.some(d => d.id === s.parent_id));
+        return [...direct, ...trayChildren];
+    }
+    return direct;
+};
+const findFieldAtPoint = (fields, x, y) => fields.find(f => x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.height) || null;
+const polygonPointsString = (points=[]) => points.map(p => `${p.x},${p.y}`).join(" ");
+const polygonArea = (points=[]) => {
+    if (!points || points.length < 3) return 0;
+    let area = 0;
+    for (let i = 0; i < points.length; i++) {
+        const a = points[i];
+        const b = points[(i + 1) % points.length];
+        area += (a.x * b.y) - (b.x * a.y);
+    }
+    return Math.abs(area / 2);
+};
+const pointInPolygon = (x, y, points=[]) => {
+    if (!points || points.length < 3) return false;
+    let inside = false;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+        const xi = points[i].x, yi = points[i].y;
+        const xj = points[j].x, yj = points[j].y;
+        const intersect = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1e-9) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+};
+const polygonCentroid = (points=[]) => {
+    if (!points || points.length === 0) return { x: 0, y: 0 };
+    const sum = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+    return { x: sum.x / points.length, y: sum.y / points.length };
+};
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// REDUCER
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function reducer(state, { type, payload }) {
+    const uid = state.activeUserId;
+    const inj = (p) => ({ ...p, user_id: uid });
+    switch (type) {
+        case "ADD_USER":          return { ...state, users: [...state.users, payload] };
+        case "UPDATE_USER":       return { ...state, users: state.users.map(u => u.id===payload.id ? payload : u) };
+        case "DELETE_USER":       return { ...state, users: state.users.filter(u => u.id!==payload), activeUserId: state.activeUserId===payload ? (state.users.find(u=>u.id!==payload)?.id||null) : state.activeUserId };
+        case "SET_ACTIVE_USER":   return { ...state, activeUserId: payload };
+        case "ADD_GARDEN":        return { ...state, gardens: [...state.gardens, inj(payload)], activeGardenId: payload.id };
+        case "UPDATE_GARDEN":     return { ...state, gardens: state.gardens.map(g => g.id===payload.id ? payload : g) };
+        case "DELETE_GARDEN":     return { ...state, gardens: state.gardens.filter(g => g.id!==payload), activeGardenId: state.activeGardenId===payload ? (state.gardens.find(g=>g.user_id===uid&&g.id!==payload)?.id||null) : state.activeGardenId };
+        case "SET_ACTIVE_GARDEN": return { ...state, activeGardenId: payload };
+        case "ADD_FIELD":         return { ...state, fields: [...state.fields, inj(payload)] };
+        case "UPDATE_FIELD":      return { ...state, fields: state.fields.map(f => f.id===payload.id ? payload : f) };
+        case "DELETE_FIELD":      return { ...state, fields: state.fields.filter(f => f.id!==payload) };
+        case "ADD_STRUCT": {
+            const struct = inj(payload);
+            return { ...state, structures: [...state.structures, struct], tasks: syncStructureTasks(state.tasks, struct, uid) };
+        }
+        case "UPDATE_STRUCT": {
+            const struct = payload;
+            return { ...state, structures: state.structures.map(s => s.id===payload.id ? payload : s), tasks: syncStructureTasks(state.tasks, struct, uid) };
+        }
+        case "DELETE_STRUCT": {
+            const nextStructs = state.structures.filter(s => s.id!==payload);
+            const removedTasks = removeStructureTasks(state.tasks, payload);
+            return { ...state, structures: nextStructs, tasks: removedTasks };
+        }
+        case "ADD_SLOT":          return { ...state, slots: [...(state.slots||[]), inj(payload)] };
+        case "UPDATE_SLOT":       return { ...state, slots: (state.slots||[]).map(s => s.id===payload.id ? payload : s) };
+        case "DELETE_SLOT":       return { ...state, slots: (state.slots||[]).filter(s => s.id!==payload) };
+        case "ADD_ZONE":          return { ...state, zones: [...(state.zones||[]), inj(payload)] };
+        case "UPDATE_ZONE":       return { ...state, zones: (state.zones||[]).map(z => z.id===payload.id ? payload : z) };
+        case "DELETE_ZONE":       return { ...state, zones: (state.zones||[]).filter(z => z.id!==payload) };
+        case "ADD_PLANT": {
+            const plant = inj(payload);
+            return { ...state, plants: [...state.plants, plant], tasks: syncHarvestTask(state.tasks, plant, uid) };
+        }
+        case "UPDATE_PLANT": {
+            const plant = payload;
+            return { ...state, plants: state.plants.map(p => p.id===payload.id ? payload : p), tasks: syncHarvestTask(state.tasks, plant, uid) };
+        }
+        case "DELETE_PLANT":      return { ...state, plants: state.plants.filter(p => p.id!==payload), tasks: removeHarvestTask(state.tasks, payload) };
+        case "ADD_TASK":          return { ...state, tasks: [...state.tasks, inj(payload)] };
+        case "UPDATE_TASK":       return { ...state, tasks: state.tasks.map(t => t.id===payload.id ? payload : t) };
+        case "DELETE_TASK":       return { ...state, tasks: state.tasks.filter(t => t.id!==payload) };
+        case "SYNC_HARVEST_TASKS": {
+            const syncedPlants = state.plants.filter(p => !p.user_id || p.user_id===uid);
+            const untouchedTasks = state.tasks.filter(t => !String(t.id).startsWith("harvest_"));
+            const harvestTasks = syncedPlants.map(p => getHarvestTaskForPlant(p, uid)).filter(Boolean);
+            return { ...state, tasks: [...untouchedTasks, ...harvestTasks] };
+        }
+        case "SYNC_STRUCTURE_TASKS": {
+            const syncedStructs = state.structures.filter(s => !s.user_id || s.user_id===uid);
+            let nextTasks = state.tasks.filter(t => !String(t.id).startsWith("maint_"));
+            syncedStructs.forEach(struct => {
+                const task = getStructureMaintenanceTask(struct, uid);
+                if (task) nextTasks.push(task);
+            });
+            return { ...state, tasks: nextTasks };
+        }
+        case "HYDRATE_STATE":     return normalizeState(payload) || state;
+        case "SET_SETTING":       return { ...state, users: state.users.map(u => u.id===uid ? {...u, settings:{...u.settings,...payload}} : u) };
+        default: return state;
+    }
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // UI PRIMITIVES
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function Btn({ children, variant="primary", size="md", onClick, disabled, style, icon, title }) {
     const [hov, setHov] = useState(false);
     const padding = size==="xs" ? "4px 11px" : size==="sm" ? "6px 14px" : size==="lg" ? "12px 26px" : "9px 18px";
@@ -177,14 +1286,14 @@ function Modal({ title, onClose, children, width=540 }) {
             <div style={{ background:T.surface, borderRadius:T.rl, width:"100%", maxWidth:width, maxHeight:"92vh", overflow:"auto", boxShadow:T.shLg }} onClick={e=>e.stopPropagation()}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 22px 16px", borderBottom:`1px solid ${T.border}`, position:"sticky", top:0, background:T.surface, zIndex:1 }}>
                     <h2 style={{ margin:0, fontSize:16, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>{title}</h2>
-                    <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.textMuted, padding:"2px 6px", lineHeight:1, borderRadius:T.rs }}>✕</button>
+                    <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.textMuted, padding:"2px 6px", lineHeight:1, borderRadius:T.rs }}>âœ•</button>
                 </div>
                 <div style={{ padding:22 }}>{children}</div>
             </div>
         </div>
     );
 }
-function EmptyState({ icon="🌱", title, subtitle, action }) {
+function EmptyState({ icon="ðŸŒ±", title, subtitle, action }) {
     return (
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:12, padding:"60px 24px", textAlign:"center" }}>
             <div style={{ fontSize:52, filter:"saturate(0.8)" }}>{icon}</div>
@@ -250,27 +1359,59 @@ const FormActions = ({ onCancel, onSave, saveLabel="Save", t }) => (
         <Btn variant="primary" onClick={onSave}>{saveLabel}</Btn>
     </div>
 );
-const InfoBanner = ({ children, icon="ℹ️" }) => (
+const InfoBanner = ({ children, icon="â„¹ï¸" }) => (
     <div style={{ display:"flex", gap:8, background:T.infoBg, border:`1px solid ${T.info}22`, borderRadius:T.rs, padding:"9px 12px", fontSize:12, color:T.info, lineHeight:1.5 }}>
         <span style={{ flexShrink:0 }}>{icon}</span><span>{children}</span>
     </div>
 );
-const PillFilter = ({ value, active, onClick, color, bg }) => (
-    <button onClick={onClick} style={{
-        padding:"6px 14px",
-        borderRadius:999,
-        border:`1.5px solid ${active?(color||T.primary):T.borderSoft}`,
-        background:active?(bg||T.primaryBg):T.surface,
-        color:active?(color||T.primary):T.textSub,
-        cursor:"pointer",
-        fontSize:12,
-        fontWeight:700,
-        fontFamily:"inherit",
-        transition:"all 0.2s ease",
-        whiteSpace:"nowrap",
-        boxShadow:active?"0 2px 4px rgba(0,0,0,0.08)":"none"
-    }}>{value}</button>
-);
+const PillFilter = ({ value, active, onClick, color, bg }) => {
+    const [foc, setFoc] = useState(false);
+    return (
+        <button onClick={onClick} style={{
+            padding:"7px 15px",
+            borderRadius:999,
+            border:`1.5px solid ${foc?(color||T.primary):active?(color||T.primary):T.borderSoft}`,
+            background:active?(bg||T.primaryBg):T.surface,
+            color:active?(color||T.primary):T.textSub,
+            cursor:"pointer",
+            fontSize:12,
+            fontWeight:700,
+            fontFamily:"inherit",
+            transition:`all ${T.transitionFast}`,
+            whiteSpace:"nowrap",
+            outline:"none",
+            boxShadow:foc?`0 0 0 2px ${(color||T.primary)}33`:active?"0 2px 4px rgba(0,0,0,0.08)":"none"
+        }} onFocus={() => setFoc(true)} onBlur={() => setFoc(false)}>{value}</button>
+    );
+};
+
+const BED_SHAPES = [
+    { v:"rect",   label:"Rechthoek", d:<rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"circle", label:"Cirkel",    d:<ellipse cx="12" cy="12" rx="10" ry="8" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"semi_n", label:"Halve â†‘",   d:<path d="M 2 20 A 10 16 0 0 0 22 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"semi_s", label:"Halve â†“",   d:<path d="M 2 4 A 10 16 0 0 1 22 4 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"semi_e", label:"Halve â†’",   d:<path d="M 2 4 A 20 8 0 0 1 2 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
+    { v:"semi_w", label:"Halve â†",   d:<path d="M 22 4 A 20 8 0 0 0 22 20 Z" fill="none" stroke="currentColor" strokeWidth="2"/> },
+];
+function BedShapePicker({ value, onChange }) {
+    return (
+        <div>
+            <div style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase", marginBottom:7 }}>Vorm</div>
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                {BED_SHAPES.map(opt => {
+                    const active = (value||"rect") === opt.v;
+                    return (
+                        <button key={opt.v} title={opt.label} onClick={()=>onChange(opt.v)}
+                            style={{ width:42, height:36, border:`2px solid ${active?T.primary:T.border}`, borderRadius:T.radiusSm, background:active?T.primaryBg:T.surface, cursor:"pointer", color:active?T.primary:T.textMuted, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:2, padding:2 }}>
+                            <svg width="22" height="22" viewBox="0 0 24 24">{opt.d}</svg>
+                            <span style={{ fontSize:8, fontFamily:"inherit", lineHeight:1 }}>{opt.label}</span>
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 const PageShell = ({ children, width = 1180 }) => (
     <div style={{ padding:"32px 0 48px", maxWidth:width, margin:"0 auto", display:"flex", flexDirection:"column", gap:26 }}>
@@ -290,6 +1431,77 @@ const PageHeader = ({ title, subtitle, meta, actions }) => (
         {meta && <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>{meta}</div>}
     </div>
 );
+
+const SCREEN_ROUTES = {
+    dashboard: "#/dashboard",
+    gardens: "#/gardens",
+    editor: "#/editor",
+    fields: "#/fields",
+    plants: "#/plants",
+    tasks: "#/tasks",
+    greenhouses: "#/greenhouses",
+    account: "#/account",
+    settings: "#/settings",
+    dev: "#/dev",
+};
+const SCREEN_NAMES = new Set(Object.keys(SCREEN_ROUTES));
+const getRouteFromHash = () => {
+    if (typeof window === "undefined") return "dashboard";
+    const raw = window.location.hash.replace(/^#\/?/, "");
+    const [path, query = ""] = raw.split("?");
+    const screen = (path || "dashboard").match(/^[a-z-]+/i)?.[0] || "dashboard";
+    return {
+        screen: SCREEN_NAMES.has(screen) ? screen : "dashboard",
+        params: Object.fromEntries(new URLSearchParams(query).entries()),
+    };
+};
+const formatScreenHash = (screen, params = {}) => {
+    const base = SCREEN_ROUTES[screen] || SCREEN_ROUTES.dashboard;
+    const search = new URLSearchParams(
+        Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return search ? `${base}?${search}` : base;
+};
+
+class ScreenErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { error: null };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { error };
+    }
+
+    componentDidCatch(error, info) {
+        console.error("GardenGrid screen crashed:", error, info);
+    }
+
+    render() {
+        if (this.state.error) {
+            return (
+                <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:24, background:T.bg, color:T.text, fontFamily:"DM Sans, sans-serif" }}>
+                    <Card style={{ maxWidth:720, width:"100%", padding:22 }}>
+                        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                            <div style={{ fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif" }}>âš ï¸ Screen crashed</div>
+                            <div style={{ fontSize:13, color:T.textSub, lineHeight:1.6 }}>
+                                The current screen failed to render. This boundary is here so the app does not disappear into a blank page.
+                            </div>
+                            <pre style={{ margin:0, padding:14, background:T.surfaceAlt, borderRadius:T.rs, overflow:"auto", fontSize:12, color:T.danger, whiteSpace:"pre-wrap" }}>
+                                {String(this.state.error?.message || this.state.error)}
+                            </pre>
+                            <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                                <Btn variant="primary" onClick={this.props.onGoDashboard}>Go to dashboard</Btn>
+                                <Btn variant="secondary" onClick={() => { this.setState({ error: null }); this.props.onRetry?.(); }}>Retry screen</Btn>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 const SectionPanel = ({ title, subtitle, action, children, style, accent }) => (
     <Card variant={accent?.variant?"soft":"surface"} style={{
@@ -344,10 +1556,10 @@ const MetaBadge = ({ label, value }) => (
     </Badge>
 );
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // GARDEN EDITOR (SVG with drag/resize/edit)
-// ═══════════════════════════════════════
-function GardenEditor({ garden, fields, structures, zones, plants = [], slots = [], dispatch, lang }) {
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function GardenEditor({ garden, fields, structures, zones, plants = [], slots = [], dispatch, lang, navigate }) {
     const [zoom, setZoom] = useState(1);
     const sc = SCALE * zoom;
     const pad = 44;
@@ -360,15 +1572,26 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
     const [livePos, setLivePos] = useState(null);
     const [editForm, setEditForm] = useState(null);
     const [zoneDraft, setZoneDraft] = useState(null);
-    const [structDraft, setStructDraft] = useState(null);
-    const [structLinkPrompt, setStructLinkPrompt] = useState(null);
     const [pickMenu, setPickMenu] = useState(null);
     const [panelFilter, setPanelFilter] = useState("all");
     const selItem = selId ? (
         selKind === "field" ? fields.find(f => f.id === selId)
         : selKind === "struct" ? structures.find(s => s.id === selId)
-        : zones.find(z => z.id === selId)
+        : selKind === "zone" ? zones.find(z => z.id === selId)
+        : slots.find(s => s.id === selId)
     ) : null;
+    const renameSlot = useCallback((slot) => {
+        const nextName = window.prompt("Rename row", slot.name || slot.label || "");
+        if (!nextName || !nextName.trim()) return;
+        dispatch({
+            type:"UPDATE_SLOT",
+            payload:{
+                ...slot,
+                name: nextName.trim(),
+                label: (slot.label || nextName).trim(),
+            }
+        });
+    }, [dispatch]);
     useEffect(() => {
         if (!selItem) {
             setEditForm(null);
@@ -382,14 +1605,83 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
             });
             return;
         }
-        setEditForm({ name:selItem.name, x:selItem.x, y:selItem.y, width:selItem.width, height:selItem.height, notes:selItem.notes||"", linked_field_id:selItem.linked_field_id||"" });
-    }, [selId, selKind, fields, structures, zones]);
+        if (selKind === "slot") {
+            setEditForm({
+                name: selItem.name || "",
+                label: selItem.label || "",
+                row_count: String(selItem.row_count || 1),
+                spacing_cm: selItem.spacing_cm ? String(selItem.spacing_cm) : "",
+                plant_count: selItem.plant_count ? String(selItem.plant_count) : "",
+                row_length_m: selItem.row_length_m ? String(selItem.row_length_m) : "",
+                orientation: selItem.orientation || "horizontal",
+                notes: selItem.notes || "",
+            });
+            return;
+        }
+        setEditForm({
+            name:selItem.name,
+            x:selItem.x,
+            y:selItem.y,
+            width:selItem.width,
+            height:selItem.height,
+            notes:selItem.notes||"",
+            linked_field_id:selItem.linked_field_id||"",
+            shape: selItem.shape || "rect",
+            species: selItem.species || "",
+            info: selItem.info || "",
+            maintenance_notes: selItem.maintenance_notes || "",
+            prune_interval_weeks: selItem.prune_interval_weeks ? String(selItem.prune_interval_weeks) : "",
+            next_prune_date: selItem.next_prune_date || "",
+        });
+    }, [selId, selKind, fields, structures, zones, slots]);
+
+    // Keyboard shortcuts
+    const allItems = useMemo(() => [
+        ...fields.map(f=>({kind:"field",item:f})),
+        ...structures.map(s=>({kind:"struct",item:s})),
+        ...zones.map(z=>({kind:"zone",item:z})),
+    ], [fields, structures, zones]);
+    useEffect(() => {
+        const onKey = (e) => {
+            // Ignore when typing in an input
+            if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT")) return;
+            if (e.key === "Escape") {
+                setSelId(null); setSelKind(null); setZoneDraft(null); setPickMenu(null);
+            }
+            if ((e.key === "Delete" || e.key === "Backspace") && selId && selKind) {
+                e.preventDefault();
+                if (selKind === "field")  { dispatch({type:"DELETE_FIELD",  payload:selId}); setSelId(null); setSelKind(null); }
+                if (selKind === "struct") { dispatch({type:"DELETE_STRUCT", payload:selId}); setSelId(null); setSelKind(null); }
+                if (selKind === "zone")   { dispatch({type:"DELETE_ZONE",   payload:selId}); setSelId(null); setSelKind(null); }
+            }
+            if (e.key === "Tab" && allItems.length > 0) {
+                e.preventDefault();
+                const idx = allItems.findIndex(h => h.item.id === selId);
+                const next = allItems[(idx + (e.shiftKey ? -1 : 1) + allItems.length) % allItems.length];
+                setSelId(next.item.id); setSelKind(next.kind);
+            }
+            // Arrow keys: nudge selected item by 0.1m (or 0.5m with Shift)
+            if (selId && selKind && selKind !== "zone" && ["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)) {
+                e.preventDefault();
+                const step = e.shiftKey ? 0.5 : 0.1;
+                const dx = e.key==="ArrowLeft" ? -step : e.key==="ArrowRight" ? step : 0;
+                const dy = e.key==="ArrowUp"   ? -step : e.key==="ArrowDown"  ? step : 0;
+                const type = selKind==="field" ? "UPDATE_FIELD" : "UPDATE_STRUCT";
+                const list = selKind==="field" ? fields : structures;
+                const item = list.find(i=>i.id===selId);
+                if (item) dispatch({ type, payload:{ ...item, x:Math.max(0,+(item.x+dx).toFixed(1)), y:Math.max(0,+(item.y+dy).toFixed(1)) } });
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [selId, selKind, allItems, dispatch, fields, structures]);
+
     const getSvgXY = (e) => {
         const r = svgRef.current.getBoundingClientRect();
         return { x:e.clientX-r.left, y:e.clientY-r.top };
     };
     const startDrag = (e, kind, item) => {
-        if (zoneDraft || structDraft || e.button !== 0) return;
+        if (zoneDraft || e.button !== 0) return;
         e.preventDefault();
         e.stopPropagation();
         const { x, y } = getSvgXY(e);
@@ -399,7 +1691,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
         setLivePos({ id:item.id, x:item.x, y:item.y, width:item.width, height:item.height });
     };
     const startResize = (e, kind, item, handle) => {
-        if (zoneDraft || structDraft || e.button !== 0) return;
+        if (zoneDraft || e.button !== 0) return;
         e.preventDefault();
         e.stopPropagation();
         const { x, y } = getSvgXY(e);
@@ -463,18 +1755,18 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
     const pickTargetsAt = useCallback((wx, wy) => {
         const hits = [];
         zones.forEach(z => {
-            if (pointInPolygon(wx, wy, z.points || [])) hits.push({ kind:"zone", item:z, label:`${ZONE_ICONS[z.type] || "🗺️"} ${z.name}` });
+            if (pointInPolygon(wx, wy, z.points || [])) hits.push({ kind:"zone", item:z, label:`${ZONE_ICONS[z.type] || "ðŸ—ºï¸"} ${z.name}` });
         });
         fields.forEach(f => {
             const ef_ = eff(f);
             if (wx >= ef_.x && wx <= ef_.x + ef_.width && wy >= ef_.y && wy <= ef_.y + ef_.height) {
-                hits.push({ kind:"field", item:f, label:`🛏️ ${f.name}` });
+                hits.push({ kind:"field", item:f, label:`ðŸ›ï¸ ${f.name}` });
             }
         });
         structures.forEach(s => {
             const es_ = eff(s);
             if (wx >= es_.x && wx <= es_.x + es_.width && wy >= es_.y && wy <= es_.y + es_.height) {
-                hits.push({ kind:"struct", item:s, label:`${STRUCT_ICONS[s.type] || "🏗️"} ${s.name}` });
+                hits.push({ kind:"struct", item:s, label:`${STRUCT_ICONS[s.type] || "ðŸ—ï¸"} ${s.name}` });
             }
         });
         const unique = new Map();
@@ -486,7 +1778,6 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
     }, [fields, structures, zones, livePos]);
     const handleItemPick = (kind, item, e) => {
         if (zoneDraft) return addZonePoint(e);
-        if (structDraft) return placeStructAt(e);
         e.stopPropagation();
         const { x, y } = getSvgXY(e);
         const wx = (x - pad) / sc;
@@ -502,7 +1793,6 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
     };
     const handleCanvasPick = (e) => {
         if (zoneDraft) return addZonePoint(e);
-        if (structDraft) return placeStructAt(e);
         setPickMenu(null);
         setSelId(null);
         setSelKind(null);
@@ -535,6 +1825,111 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
             return inStruct ? sum + Math.max(1, +p.quantity || 1) : sum;
         }, 0);
     }, [fields, plants, structSlotIndex]);
+    const fieldSlotIndex = useMemo(() => {
+        const index = {};
+        slots.filter(s => s.parent_type === "field").forEach(slot => {
+            (index[slot.parent_id] ||= []).push(slot);
+        });
+        Object.values(index).forEach(list => {
+            list.sort((a, b) => {
+                const ra = (a.type === "bed_row" || a.type === "tunnel_row") ? 0 : 1;
+                const rb = (b.type === "bed_row" || b.type === "tunnel_row") ? 0 : 1;
+                if (ra !== rb) return ra - rb;
+                return (slotBaseLabel(a) || "").localeCompare(slotBaseLabel(b) || "");
+            });
+        });
+        return index;
+    }, [slots]);
+    const structRowIndex = useMemo(() => {
+        const index = {};
+        slots.filter(s => s.parent_type === "struct" && (s.type === "bed_row" || s.type === "tunnel_row")).forEach(slot => {
+            (index[slot.parent_id] ||= []).push(slot);
+        });
+        return index;
+    }, [slots]);
+    const renderRowSlotOverlay = useCallback((rowSlots, fx, fy, fw, fh) => {
+        if (!rowSlots || !rowSlots.length) return null;
+        const padX = Math.max(4, Math.min(10, fw * 0.05));
+        const padY = Math.max(4, Math.min(10, fh * 0.08));
+        const usableX = fx + padX;
+        const usableY = fy + padY;
+        const usableW = Math.max(0, fw - padX * 2);
+        const usableH = Math.max(0, fh - padY * 2);
+        const horizontalSlots = rowSlots.filter(slot => slot.orientation !== "vertical");
+        const verticalSlots = rowSlots.filter(slot => slot.orientation === "vertical");
+        const gap = rowSlots.length > 1 ? Math.max(3, Math.min(8, Math.min(fw, fh) * 0.03)) : 0;
+        return (
+            <g>
+                {horizontalSlots.map((slot, idx) => {
+                    const rowColor = slot.type === "bed_row" ? T.primary : T.accent;
+                    const bandH = Math.max(14, Math.min(24, (usableH - gap * (horizontalSlots.length - 1)) / Math.max(1, horizontalSlots.length)));
+                    const horizontalTop = fy + Math.max(padY, (fh - (horizontalSlots.length * bandH + gap * (horizontalSlots.length - 1))) / 2) + idx * (bandH + gap);
+                    const rows = Math.max(1, Math.floor(Number(slot.row_count) || 1));
+                    const rowGap = rows > 1 ? (bandH - 14) / Math.max(1, rows - 1) : 0;
+                    const selected = selId === slot.id && selKind === "slot";
+                    return (
+                        <g key={slot.id} style={{ cursor:"pointer" }} onClick={e => { e.stopPropagation(); setSelId(slot.id); setSelKind("slot"); setPickMenu(null); }} onDoubleClick={e => { e.stopPropagation(); renameSlot(slot); }}>
+                            <rect x={usableX} y={horizontalTop} width={usableW} height={bandH} rx={3} fill={rowColor + "14"} stroke={selected ? T.accent : rowColor + "9A"} strokeWidth={selected ? 2 : 1} strokeDasharray="3,3" />
+                            <text x={usableX + 5} y={horizontalTop + 10} fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={800} fill={rowColor}>{slotBaseLabel(slot)}</text>
+                            <text x={usableX + usableW - 5} y={horizontalTop + 10} textAnchor="end" fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textMuted}>{rows} rows Â· 0Â°</text>
+                            {Array.from({ length: rows }).map((_, r) => {
+                                const ry = rows === 1 ? horizontalTop + bandH / 2 : horizontalTop + 14 + r * rowGap;
+                                return (
+                                    <line
+                                        key={`${slot.id}-${r}`}
+                                        x1={usableX + 6}
+                                        y1={ry}
+                                        x2={usableX + usableW - 6}
+                                        y2={ry}
+                                        stroke={rowColor}
+                                        strokeWidth={1.4}
+                                        opacity={0.7}
+                                    />
+                                );
+                            })}
+                            {slot.plant_count ? <text x={usableX + usableW - 5} y={horizontalTop + bandH - 4} textAnchor="end" fontSize={7.5} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textSub}>{slot.plant_count} plants</text> : null}
+                        </g>
+                    );
+                })}
+                {verticalSlots.map((slot, idx) => {
+                    const rowColor = slot.type === "bed_row" ? T.primary : T.accent;
+                    const bandW = Math.max(18, Math.min(30, (usableW - gap * (verticalSlots.length - 1)) / Math.max(1, verticalSlots.length)));
+                    const verticalLeft = fx + Math.max(padX, (fw - (verticalSlots.length * bandW + gap * (verticalSlots.length - 1))) / 2) + idx * (bandW + gap);
+                    const rows = Math.max(1, Math.floor(Number(slot.row_count) || 1));
+                    const rowGap = rows > 1 ? (bandW - 14) / Math.max(1, rows - 1) : 0;
+                    const selected = selId === slot.id && selKind === "slot";
+                    return (
+                        <g key={slot.id} style={{ cursor:"pointer" }} onClick={e => { e.stopPropagation(); setSelId(slot.id); setSelKind("slot"); setPickMenu(null); }} onDoubleClick={e => { e.stopPropagation(); renameSlot(slot); }}>
+                            <rect x={verticalLeft} y={usableY} width={bandW} height={usableH} rx={3} fill={rowColor + "14"} stroke={selected ? T.accent : rowColor + "9A"} strokeWidth={selected ? 2 : 1} strokeDasharray="3,3" />
+                            <text x={verticalLeft + 5} y={usableY + 10} fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={800} fill={rowColor}>{slotBaseLabel(slot)}</text>
+                            <text x={verticalLeft + bandW - 5} y={usableY + 10} textAnchor="end" fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textMuted}>{rows} rows Â· 90Â°</text>
+                            {Array.from({ length: rows }).map((_, r) => {
+                                const rx = rows === 1 ? verticalLeft + bandW / 2 : verticalLeft + 14 + r * rowGap;
+                                return (
+                                    <line
+                                        key={`${slot.id}-${r}`}
+                                        x1={rx}
+                                        y1={usableY + 6}
+                                        x2={rx}
+                                        y2={usableY + usableH - 6}
+                                        stroke={rowColor}
+                                        strokeWidth={1.4}
+                                        opacity={0.7}
+                                    />
+                                );
+                            })}
+                            {slot.plant_count ? <text x={verticalLeft + bandW - 5} y={usableY + usableH - 4} textAnchor="end" fontSize={7.5} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textSub}>{slot.plant_count} plants</text> : null}
+                        </g>
+                    );
+                })}
+            </g>
+        );
+    }, [renameSlot, selId, selKind]);
+    const renderBedRowOverlay = useCallback((field, fx, fy, fw, fh) => {
+        const bedSlots = (fieldSlotIndex[field.id] || []).filter(slot => slot.type === "bed_row" || slot.type === "tunnel_row");
+        if (!bedSlots.length) return null;
+        return renderRowSlotOverlay(bedSlots, fx, fy, fw, fh);
+    }, [fieldSlotIndex, renderRowSlotOverlay]);
     const renderHandles = (kind, item) => {
         const {x, y, width, height} = eff(item);
         const fx = pad + x*sc, fy = pad + y*sc, fw = width*sc, fh = height*sc;
@@ -553,73 +1948,12 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
         setSelKind(null);
         setEditForm(null);
     };
-    const placeStructAt = (e) => {
-        if (!structDraft) return;
-        const { x, y } = getSvgXY(e);
-        const cx = clamp((x - pad) / sc, 0, garden.width);
-        const cy = clamp((y - pad) / sc, 0, garden.height);
-        const type = structDraft.type || "greenhouse";
-        const defaults = {
-            greenhouse: { width: 5.5, height: 4.5 },
-            tunnel_greenhouse: { width: 6.5, height: 1.2 },
-            compost_zone: { width: 2.5, height: 2.0 },
-            water_point: { width: 0.8, height: 0.8 },
-            shed: { width: 2.4, height: 2.0 },
-            path: { width: 1.0, height: 4.0 },
-            fence: { width: 0.4, height: 4.0 },
-            animal_enclosure: { width: 4.0, height: 4.0 },
-        }[type] || { width: 4.0, height: 3.0 };
-        const width = defaults.width;
-        const height = defaults.height;
-        const xPos = clamp(cx - width / 2, 0, Math.max(0, garden.width - width));
-        const yPos = clamp(cy - height / 2, 0, Math.max(0, garden.height - height));
-        const candidateField = findFieldAtPoint(fields, cx, cy);
-        const createStruct = (linkedFieldId = "") => {
-            dispatch({
-            type:"ADD_STRUCT",
-            payload:{
-                id: gid(),
-                garden_id: garden.id,
-                name: structDraft.name.trim() || (type === "greenhouse" ? "New Greenhouse" : "New Structure"),
-                type,
-                x: Math.round(xPos * 10) / 10,
-                y: Math.round(yPos * 10) / 10,
-                width,
-                height,
-                notes: structDraft.notes || "",
-                ventilated: false,
-                temperature: "",
-                humidity: "",
-                linked_field_id: linkedFieldId || "",
-            }
-            });
-            setStructDraft(null);
-            setStructLinkPrompt(null);
-        };
-        if (candidateField) {
-            setStructLinkPrompt({
-                field: candidateField,
-                create: createStruct,
-                name: structDraft.name,
-                type,
-            });
-            return;
-        }
-        createStruct("");
-    };
     const beginZoneDraft = () => {
         setZoneDraft({ name:"New Zone", type:"grass", notes:"", points:[] });
         setSelId(null);
         setSelKind(null);
     };
     const cancelZoneDraft = () => setZoneDraft(null);
-    const beginStructDraft = () => {
-        setStructDraft({ name:"New Greenhouse", type:"greenhouse", notes:"" });
-        setSelId(null);
-        setSelKind(null);
-    };
-    const cancelStructDraft = () => setStructDraft(null);
-    const cancelStructLinkPrompt = () => setStructLinkPrompt(null);
     const finishZoneDraft = () => {
         if (!zoneDraft || zoneDraft.points.length < 3) return;
         dispatch({
@@ -641,23 +1975,53 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
             dispatch({ type:"UPDATE_ZONE", payload:{ ...selItem, name:editForm.name, type:editForm.type, notes:editForm.notes } });
             return;
         }
+        if (selKind === "slot") {
+            const next = {
+                ...selItem,
+                name: editForm.name,
+                label: (editForm.label || editForm.name || selItem.label || selItem.name || "").trim(),
+                notes: editForm.notes || "",
+                orientation: editForm.orientation || "horizontal",
+            };
+            if (selItem.type === "tunnel_row" || selItem.type === "bed_row") {
+                next.row_count = Math.max(1, +editForm.row_count || 1);
+                next.spacing_cm = Math.max(0, +editForm.spacing_cm || 0);
+                next.plant_count = Math.max(0, +editForm.plant_count || 0);
+                next.row_length_m = Math.max(0, +editForm.row_length_m || 0);
+            }
+            dispatch({ type:"UPDATE_SLOT", payload: next });
+            return;
+        }
         const x = clamp(+editForm.x, 0, garden.width - 0.1);
         const y = clamp(+editForm.y, 0, garden.height - 0.1);
         const width = clamp(+editForm.width, 0.1, garden.width - x);
         const height = clamp(+editForm.height, 0.1, garden.height - y);
+        const nextStruct = {
+            ...selItem,
+            name:editForm.name,
+            x,
+            y,
+            width,
+            height,
+            notes:editForm.notes,
+            linked_field_id: selKind==="struct" ? editForm.linked_field_id || "" : selItem.linked_field_id || "",
+            ...(selKind === "field" ? { shape: editForm.shape || "rect" } : {}),
+        };
+        if (selKind === "struct" && MAINTENANCE_STRUCT_TYPES.has(selItem.type)) {
+            nextStruct.species = editForm.species || "";
+            nextStruct.info = editForm.info || "";
+            nextStruct.maintenance_notes = editForm.maintenance_notes || "";
+            nextStruct.prune_interval_weeks = Math.max(0, +editForm.prune_interval_weeks || 0);
+            nextStruct.next_prune_date = editForm.next_prune_date || "";
+        }
         dispatch({
             type: selKind==="field" ? "UPDATE_FIELD" : "UPDATE_STRUCT",
-            payload:{
-                ...selItem,
-                name:editForm.name,
-                x,
-                y,
-                width,
-                height,
-                notes:editForm.notes,
-                linked_field_id: selKind==="struct" ? editForm.linked_field_id || "" : selItem.linked_field_id || "",
-            }
+            payload: nextStruct
         });
+    };
+    const openPlantsForSlot = (slotId) => {
+        if (!navigate) return;
+        navigate("plants", { slot: slotId });
     };
     const gridLines = [];
     for (let x = 0; x <= garden.width; x++) {
@@ -705,7 +2069,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         fontWeight={800}
                         style={{ pointerEvents:"none" }}
                     >
-                        {ZONE_ICONS[zone.type] || "🗺️"} {zone.name}
+                        {ZONE_ICONS[zone.type] || "ðŸ—ºï¸"} {zone.name}
                     </text>
                 )}
             </g>
@@ -731,21 +2095,18 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
         <div>
             <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:T.surfaceAlt, borderRadius:`${T.r} ${T.r} 0 0`, borderBottom:`1px solid ${T.border}`, flexWrap:"wrap" }}>
                 <span style={{ fontSize:12, color:T.textSub, flex:"1 1 320px", fontWeight:600 }}>
-                    📐 {garden.width}m × {garden.height}m · <span style={{ color:T.primary }}>Drag</span> to move · <span style={{ color:T.accent }}>Handles</span> to resize · Click to edit
+                    ðŸ“ {garden.width}m Ã— {garden.height}m Â· <span style={{ color:T.primary }}>Drag</span> to move Â· <span style={{ color:T.accent }}>Handles</span> to resize Â· Click to edit
                 </span>
                 <Btn size="sm" variant={zoneDraft ? "danger" : "accent"} onClick={zoneDraft ? cancelZoneDraft : beginZoneDraft}>
                     {zoneDraft ? "Cancel Zone" : "Add Zone"}
                 </Btn>
-                <Btn size="sm" variant={structDraft ? "danger" : "secondary"} onClick={structDraft ? cancelStructDraft : beginStructDraft}>
-                    {structDraft ? "Cancel Place" : "Place Structure"}
-                </Btn>
                 {zoneDraft && <Btn size="sm" variant="primary" onClick={finishZoneDraft} disabled={zoneDraft.points.length < 3}>Finish Zone</Btn>}
-                <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.max(0.35, +(z-0.15).toFixed(2)))}>−</Btn>
+                <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.max(0.35, +(z-0.15).toFixed(2)))}>âˆ’</Btn>
                 <span style={{ fontSize:12, color:T.textSub, minWidth:38, textAlign:"center", fontWeight:700 }}>{Math.round(zoom*100)}%</span>
                 <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.min(2.5, +(z+0.15).toFixed(2)))}>+</Btn>
                 <Btn size="sm" variant="ghost" onClick={() => setZoom(1)}>Reset</Btn>
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) 300px", gap:12, alignItems:"start" }}>
+            <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) 280px", gap:12, alignItems:"start" }}>
                 <div style={{ overflow:"auto", background:"#F2EDE4", minHeight:320, border:`1px solid ${T.border}`, borderTop:"none" }}>
                     <svg ref={svgRef} width={pad*2+gW} height={pad*2+gH} style={{ display:"block", userSelect:"none" }}>
                     <defs>
@@ -774,13 +2135,15 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         const fs = getFontSize(e_.width, e_.height, st.name);
                         const isSel = selId === st.id;
                         const plantCount = countPlantsForStruct(st);
+                        const rowSlots = structRowIndex[st.id] || [];
                         return (
                             <g key={st.id}>
                                 <rect x={sx} y={sy} width={sw} height={sh} fill={STRUCT_FILL[st.type] || "rgba(128,128,128,0.2)"} stroke={isSel ? T.accent : (STRUCT_STROKE[st.type] || "#888")} strokeWidth={isSel ? 2.5 : (isGH ? 2 : 1.2)} strokeDasharray={isGH ? "8,4" : "none"} rx={isGH ? 5 : 3} style={{ cursor:"move" }} onMouseDown={e => startDrag(e, "struct", st)} onClick={e => handleItemPick("struct", st, e)} />
+                                {rowSlots.length > 0 && renderRowSlotOverlay(rowSlots, sx, sy, sw, sh)}
                                 <text x={sx+sw/2} y={sy+sh/2-fs*0.3} textAnchor="middle" fontSize={Math.min(fs+1,15)} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#555"} fontWeight={700} style={{ pointerEvents:"none" }}>{STRUCT_ICONS[st.type]}</text>
                                 {sh > sc*0.6 && <text x={sx+sw/2} y={sy+sh/2+fs*0.9} textAnchor="middle" fontSize={clamp(fs,7,11)} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#555"} fontWeight={600} style={{ pointerEvents:"none" }}>{st.name}</text>}
                                 {sh > sc*1.0 && plantCount > 0 && <text x={sx+sw/2} y={sy+sh/2+fs*2.55} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={T.primary} fontWeight={700} style={{ pointerEvents:"none" }}>{plantCount} plants</text>}
-                                {sh > sc*1.2 && <text x={sx+sw/2} y={sy+sh/2+fs*1.9} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#888"} style={{ pointerEvents:"none" }}>{e_.width}×{e_.height}m</text>}
+                                {sh > sc*1.2 && <text x={sx+sw/2} y={sy+sh/2+fs*1.9} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#888"} style={{ pointerEvents:"none" }}>{e_.width}Ã—{e_.height}m</text>}
                                 {isSel && renderHandles("struct", st)}
                             </g>
                         );
@@ -790,18 +2153,31 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         const fc = FIELD_COLORS[f.type] || T.primary;
                         const fs = getFontSize(e_.width, e_.height, f.name);
                         const isSel = selId === f.id;
+                        const shape = f.shape || "rect";
+                        const rowSlots = (fieldSlotIndex[f.id] || []).filter(slot => slot.type === "bed_row" || slot.type === "tunnel_row");
+                        const sharedSvgProps = { fill:fc+"28", stroke:isSel?T.accent:fc, strokeWidth:isSel?2.5:2, style:{cursor:"move"}, onMouseDown:e=>startDrag(e,"field",f), onClick:e=>handleItemPick("field",f,e) };
+                        // Text center adjusted per shape
+                        const [tx, ty] = shape==="semi_n" ? [fx+fw/2, fy+fh*0.38] : shape==="semi_s" ? [fx+fw/2, fy+fh*0.62] : shape==="semi_e" ? [fx+fw*0.65, fy+fh/2] : shape==="semi_w" ? [fx+fw*0.35, fy+fh/2] : [fx+fw/2, fy+fh/2];
                         return (
                             <g key={f.id}>
-                                <rect x={fx} y={fy} width={fw} height={fh} fill={fc+"28"} stroke={isSel ? T.accent : fc} strokeWidth={isSel ? 2.5 : 2} rx={3} style={{ cursor:"move" }} onMouseDown={e => startDrag(e, "field", f)} onClick={e => handleItemPick("field", f, e)} />
-                                <rect x={fx} y={fy} width={fw} height={Math.min(fh,4)} fill={fc} opacity={0.7} style={{ pointerEvents:"none" }} />
-                                <text x={fx+fw/2} y={fy+fh/2+fs*0.4} textAnchor="middle" fontSize={clamp(fs,7,13)} fontFamily="DM Sans,sans-serif" fill={fc} fontWeight={800} style={{ pointerEvents:"none" }}>{f.name}</text>
-                                {fh > sc*0.8 && <text x={fx+fw/2} y={fy+fh/2+fs*1.5} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={fc+"AA"} style={{ pointerEvents:"none" }}>{e_.width}×{e_.height}m</text>}
+                                {shape==="circle" && <ellipse cx={fx+fw/2} cy={fy+fh/2} rx={fw/2} ry={fh/2} {...sharedSvgProps}/>}
+                                {shape==="semi_n" && <path d={`M ${fx} ${fy+fh} A ${fw/2} ${fh} 0 0 0 ${fx+fw} ${fy+fh} Z`} {...sharedSvgProps}/>}
+                                {shape==="semi_s" && <path d={`M ${fx} ${fy} A ${fw/2} ${fh} 0 0 1 ${fx+fw} ${fy} Z`} {...sharedSvgProps}/>}
+                                {shape==="semi_e" && <path d={`M ${fx} ${fy} A ${fw} ${fh/2} 0 0 1 ${fx} ${fy+fh} Z`} {...sharedSvgProps}/>}
+                                {shape==="semi_w" && <path d={`M ${fx+fw} ${fy} A ${fw} ${fh/2} 0 0 0 ${fx+fw} ${fy+fh} Z`} {...sharedSvgProps}/>}
+                                {(!shape || shape==="rect") && <>
+                                    <rect x={fx} y={fy} width={fw} height={fh} {...sharedSvgProps} rx={3}/>
+                                    <rect x={fx} y={fy} width={fw} height={Math.min(fh,4)} fill={fc} opacity={0.7} style={{pointerEvents:"none"}}/>
+                                </>}
+                                {rowSlots.length > 0 && renderBedRowOverlay(f, fx, fy, fw, fh)}
+                                <text x={tx} y={ty+fs*0.4} textAnchor="middle" fontSize={clamp(fs,7,13)} fontFamily="DM Sans,sans-serif" fill={fc} fontWeight={800} style={{ pointerEvents:"none" }}>{f.name}</text>
+                                {fh > sc*0.8 && <text x={tx} y={ty+fs*1.5} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={fc+"AA"} style={{ pointerEvents:"none" }}>{e_.width}Ã—{e_.height}m</text>}
                                 {isSel && renderHandles("field", f)}
                             </g>
                         );
                     })}
                     <rect x={pad} y={pad} width={gW} height={gH} fill="none" stroke={T.primary} strokeWidth={2.5} rx={3} style={{ pointerEvents:"none" }} />
-                    <text x={pad+gW-6} y={pad+16} textAnchor="end" fontSize={14} fill={T.primary} fontFamily="Fraunces,serif" fontWeight={800}>N↑</text>
+                    <text x={pad+gW-6} y={pad+16} textAnchor="end" fontSize={14} fill={T.primary} fontFamily="Fraunces,serif" fontWeight={800}>Nâ†‘</text>
                     <g transform={`translate(${pad},${pad+gH+16})`}>
                         <rect x={0} y={0} width={sc} height={5} fill={T.primary} opacity={0.4} rx={2} />
                         <text x={sc/2} y={17} textAnchor="middle" fontSize={9} fill={T.textSub} fontFamily="DM Sans,sans-serif">1 metre</text>
@@ -809,65 +2185,175 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                     </svg>
                 </div>
                 <Card style={{ padding:14, position:"sticky", top:12, alignSelf:"start", maxHeight:"calc(100vh - 140px)", overflow:"auto" }}>
-                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, marginBottom:10 }}>
-                        <div>
-                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>Quick panel</div>
-                            <div style={{ fontSize:11, color:T.textMuted }}>{fields.length} beds · {structures.length} structures · {zones.length} zones</div>
+                    {selItem && editForm ? (
+                        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8 }}>
+                                <div>
+                                    <div style={{ fontSize:12, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>Selected</div>
+                                    <div style={{ fontSize:15, fontWeight:900, color:T.text, fontFamily:"Fraunces, serif" }}>{selItem.name}</div>
+                                    <div style={{ fontSize:11, color:T.textMuted }}>{selKind==="zone" ? "Zone" : selKind==="struct" ? "Structure" : "Bed"}</div>
+                                </div>
+                                <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>âœ•</Btn>
+                            </div>
+                            {selKind === "zone" ? (
+                                <div style={{ display:"grid", gap:10 }}>
+                                    <Sel label="Type" value={editForm.type} onChange={v=>setEditForm(f=>({...f,type:v}))} options={ZONE_TYPES.map(z => ({ value:z, label:`${ZONE_ICONS[z]} ${LANG[lang]?.[ZONE_LABEL_K[z]] || LANG.en[ZONE_LABEL_K[z]] || z}` }))} />
+                                    <Input label="Name" value={editForm.name} onChange={e=>setEditForm(f=>({...f,name:e}))} />
+                                    <Textarea label="Notes" value={editForm.notes} onChange={v=>setEditForm(f=>({...f,notes:v}))} rows={2} />
+                                    <div style={{ display:"flex", gap:8 }}>
+                                        <Btn size="sm" variant="primary" onClick={saveEdit}>Save</Btn>
+                                        <Btn size="sm" variant="danger" onClick={() => { if (window.confirm("Delete this zone?")) { dispatch({ type:"DELETE_ZONE", payload:selItem.id }); setSelId(null); setSelKind(null); } }}>Delete</Btn>
+                                    </div>
+                                    <div style={{ fontSize:11, color:T.textMuted }}>Area: {polygonArea(selItem.points||[]).toFixed(1)}mÂ²</div>
+                                </div>
+                            ) : (
+                                <div style={{ display:"grid", gap:10 }}>
+                                    <Input label="Name" value={editForm.name} onChange={e=>setEditForm(f=>({...f,name:e}))} />
+                                    {selKind === "field" && (
+                                        <BedShapePicker value={editForm.shape||"rect"} onChange={v=>setEditForm(f=>({...f,shape:v}))}/>
+                                    )}
+                                    <FormRow cols={2}>
+                                        <Input label="X (m)" value={editForm.x} onChange={e=>setEditForm(f=>({...f,x:e}))} type="number" min="0" step="0.1" />
+                                        <Input label="Y (m)" value={editForm.y} onChange={e=>setEditForm(f=>({...f,y:e}))} type="number" min="0" step="0.1" />
+                                        <Input label="W (m)" value={editForm.width} onChange={e=>setEditForm(f=>({...f,width:e}))} type="number" min="0.1" step="0.1" />
+                                        <Input label="H (m)" value={editForm.height} onChange={e=>setEditForm(f=>({...f,height:e}))} type="number" min="0.1" step="0.1" />
+                                    </FormRow>
+                                    {selKind === "struct" && (
+                                        <Sel
+                                            label="Linked field"
+                                            value={editForm.linked_field_id || ""}
+                                            onChange={v=>setEditForm(f=>({...f, linked_field_id:v}))}
+                                            options={[
+                                                { value:"", label:"No link" },
+                                                ...fields.filter(f=>f.garden_id===selItem.garden_id).map(f=>({ value:f.id, label:f.name })),
+                                            ]}
+                                        />
+                                    )}
+                                    {selKind === "struct" && (
+                                        <div style={{ display:"grid", gap:10 }}>
+                                            <Textarea label="Info" value={editForm.info || ""} onChange={v=>setEditForm(f=>({...f,info:v}))} rows={2} placeholder="Short description shown in details" />
+                                    {MAINTENANCE_STRUCT_TYPES.has(selItem.type) && (
+                                        <>
+                                            <FormRow cols={2}>
+                                                <Input label="Species / type" value={editForm.species || ""} onChange={v=>setEditForm(f=>({...f,species:v}))} placeholder="Beech, yew, privet..." />
+                                                <Input label="Prune interval (weeks)" value={editForm.prune_interval_weeks || ""} onChange={v=>setEditForm(f=>({...f,prune_interval_weeks:v}))} type="number" min="0" max="52" />
+                                                    </FormRow>
+                                                    <Input label="Next prune date" value={editForm.next_prune_date || ""} onChange={v=>setEditForm(f=>({...f,next_prune_date:v}))} type="date" />
+                                                    <Textarea label="Maintenance notes" value={editForm.maintenance_notes || ""} onChange={v=>setEditForm(f=>({...f,maintenance_notes:v}))} rows={2} placeholder="Cut in late spring and after summer growth" />
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                    <Textarea label="Notes" value={editForm.notes} onChange={v=>setEditForm(f=>({...f,notes:v}))} rows={2} />
+                                    {selKind === "field" && (fieldSlotIndex[selItem.id] || []).some(slot => slot.type === "bed_row" || slot.type === "tunnel_row") && (
+                                        <div style={{ display:"grid", gap:8, marginTop:2 }}>
+                                            <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>Plantrijen</div>
+                                            {(fieldSlotIndex[selItem.id] || [])
+                                                .filter(slot => slot.type === "bed_row" || slot.type === "tunnel_row")
+                                                .map(slot => (
+                                                    <div key={slot.id} style={{ padding:10, border:`1px solid ${selId===slot.id&&selKind==="slot"?T.primary:T.border}`, borderRadius:T.rs, background:selId===slot.id&&selKind==="slot"?T.primaryBg:T.surfaceAlt, cursor:"pointer" }} onClick={() => { setSelId(slot.id); setSelKind("slot"); }}>
+                                                        <div style={{ display:"flex", justifyContent:"space-between", gap:8, alignItems:"center", marginBottom:6 }}>
+                                                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{slotBaseLabel(slot)}</div>
+                                                            <div style={{ display:"flex", gap:6, alignItems:"center", flexWrap:"wrap" }}>
+                                                                <Badge color={slot.type === "bed_row" ? T.primary : T.accent} bg={slot.type === "bed_row" ? T.primaryBg : T.accentBg}>
+                                                                    {Math.max(1, Math.floor(Number(slot.row_count) || 1))} rows
+                                                                </Badge>
+                                                                <Badge color={T.textSub} bg={T.surface}>{slot.orientation === "vertical" ? "90Â°" : "0Â°"}</Badge>
+                                                                <Btn
+                                                                    size="xs"
+                                                                    variant="secondary"
+                                                                    onClick={(e) => { e.stopPropagation(); dispatch({ type:"UPDATE_SLOT", payload:{ ...slot, orientation: slot.orientation === "vertical" ? "horizontal" : "vertical" } }); }}
+                                                                >
+                                                                    Rotate 90Â°
+                                                                </Btn>
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ fontSize:11, color:T.textMuted, marginBottom:8 }}>
+                                                            {slot.plant_count ? `${slot.plant_count} plants` : "No plant count set yet"}
+                                                            {slot.spacing_cm ? ` Â· ${slot.spacing_cm} cm spacing` : ""}
+                                                            {slot.row_length_m ? ` Â· ${slot.row_length_m} m` : ""}
+                                                        </div>
+                                                        {renderSlotSeedPlan(slot, { compact: true })}
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    )}
+                                    <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                                        <Btn size="sm" variant="primary" onClick={saveEdit}>Save</Btn>
+                                        <Btn size="sm" variant="danger" onClick={() => {
+                                            if (window.confirm(selKind === "field" ? "Delete this bed?" : "Delete this structure?")) {
+                                                dispatch({type: selKind==="field" ? "DELETE_FIELD" : "DELETE_STRUCT", payload:selItem.id});
+                                                setSelId(null);
+                                                setSelKind(null);
+                                            }
+                                        }}>Delete</Btn>
+                                    </div>
+                                    <div style={{ fontSize:11, color:T.textMuted }}>{selItem.width}m Ã— {selItem.height}m</div>
+                                </div>
+                            )}
                         </div>
-                    </div>
-                    <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:10 }}>
-                        {["all","fields","structs","greenhouses","zones"].map(k => (
-                            <Btn key={k} size="sm" variant={panelFilter===k ? "primary" : "secondary"} onClick={()=>setPanelFilter(k)} style={{ flex:"1 1 110px", justifyContent:"center" }}>
-                                {k === "all" ? "All" : k === "fields" ? "Beds" : k === "structs" ? "Structs" : k === "greenhouses" ? "Greenhouses" : "Zones"}
-                            </Btn>
-                        ))}
-                    </div>
-                    <div style={{ display:"grid", gap:10 }}>
-                        {panelFields.length>0 && (
+                    ) : (
+                        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                             <div>
-                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Beds</div>
-                                <div style={{ display:"grid", gap:6 }}>
-                                    {panelFields.map(f => (
-                                        <button key={f.id} onClick={()=>{ setSelId(f.id); setSelKind("field"); }} style={{ textAlign:"left", border:`1px solid ${selId===f.id&&selKind==="field"?T.primary:T.border}`, background:selId===f.id&&selKind==="field"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
-                                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{f.name}</div>
-                                            <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[FIELD_LABEL_K[f.type]] || f.type} · {f.width}×{f.height}m</div>
-                                        </button>
-                                    ))}
-                                </div>
+                                <div style={{ fontSize:12, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>Context</div>
+                                <div style={{ fontSize:15, fontWeight:900, color:T.text, fontFamily:"Fraunces, serif" }}>Objects</div>
+                                <div style={{ fontSize:11, color:T.textMuted }}>{fields.length} beds Â· {structures.length} structures Â· {zones.length} zones</div>
                             </div>
-                        )}
-                        {panelStructs.length>0 && (
-                            <div>
-                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Structures</div>
-                                <div style={{ display:"grid", gap:6 }}>
-                                    {panelStructs.map(st => (
-                                        <button key={st.id} onClick={()=>{ setSelId(st.id); setSelKind("struct"); }} style={{ textAlign:"left", border:`1px solid ${selId===st.id&&selKind==="struct"?T.accent:T.border}`, background:selId===st.id&&selKind==="struct"?T.accentBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
-                                            <div style={{ display:"flex", justifyContent:"space-between", gap:8, alignItems:"start" }}>
-                                                <div>
-                                                    <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{STRUCT_ICONS[st.type] || "🏗️"} {st.name}</div>
-                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[STRUCT_LABEL_K[st.type]] || st.type} · {st.width}×{st.height}m</div>
-                                                </div>
-                                                {st.linked_field_id && <Badge color={T.accent} bg={T.accentBg}>linked</Badge>}
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
+                            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                                {["all","fields","structs","greenhouses","zones"].map(k => (
+                                    <Btn key={k} size="sm" variant={panelFilter===k ? "primary" : "secondary"} onClick={()=>setPanelFilter(k)} style={{ flex:"1 1 96px", justifyContent:"center" }}>
+                                        {k === "all" ? "All" : k === "fields" ? "Beds" : k === "structs" ? "Structs" : k === "greenhouses" ? "GH" : "Zones"}
+                                    </Btn>
+                                ))}
                             </div>
-                        )}
-                        {panelZones.length>0 && (
-                            <div>
-                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Zones</div>
-                                <div style={{ display:"grid", gap:6 }}>
-                                    {panelZones.map(z => (
-                                        <button key={z.id} onClick={()=>{ setSelId(z.id); setSelKind("zone"); }} style={{ textAlign:"left", border:`1px solid ${selId===z.id&&selKind==="zone"?T.primary:T.border}`, background:selId===z.id&&selKind==="zone"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
-                                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{ZONE_ICONS[z.type] || "🗺️"} {z.name}</div>
-                                            <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type} · {polygonArea(z.points||[]).toFixed(1)}m²</div>
-                                        </button>
-                                    ))}
-                                </div>
+                            <div style={{ display:"grid", gap:10 }}>
+                                {panelFields.length>0 && (
+                                    <div>
+                                        <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Beds</div>
+                                        <div style={{ display:"grid", gap:6 }}>
+                                            {panelFields.map(f => (
+                                                <button key={f.id} onClick={()=>{ setSelId(f.id); setSelKind("field"); }} style={{ textAlign:"left", border:`1px solid ${selId===f.id&&selKind==="field"?T.primary:T.border}`, background:selId===f.id&&selKind==="field"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
+                                                    <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{f.name}</div>
+                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[FIELD_LABEL_K[f.type]] || f.type} Â· {f.width}Ã—{f.height}m</div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {panelStructs.length>0 && (
+                                    <div>
+                                        <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Structures</div>
+                                        <div style={{ display:"grid", gap:6 }}>
+                                            {panelStructs.map(st => (
+                                                <button key={st.id} onClick={()=>{ setSelId(st.id); setSelKind("struct"); }} style={{ textAlign:"left", border:`1px solid ${selId===st.id&&selKind==="struct"?T.accent:T.border}`, background:selId===st.id&&selKind==="struct"?T.accentBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
+                                                    <div style={{ display:"flex", justifyContent:"space-between", gap:8, alignItems:"start" }}>
+                                                        <div>
+                                                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{STRUCT_ICONS[st.type] || "ðŸ—ï¸"} {st.name}</div>
+                                                            <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[STRUCT_LABEL_K[st.type]] || st.type} Â· {st.width}Ã—{st.height}m</div>
+                                                        </div>
+                                                        {st.linked_field_id && <Badge color={T.accent} bg={T.accentBg}>linked</Badge>}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {panelZones.length>0 && (
+                                    <div>
+                                        <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Zones</div>
+                                        <div style={{ display:"grid", gap:6 }}>
+                                            {panelZones.map(z => (
+                                                <button key={z.id} onClick={()=>{ setSelId(z.id); setSelKind("zone"); }} style={{ textAlign:"left", border:`1px solid ${selId===z.id&&selKind==="zone"?T.primary:T.border}`, background:selId===z.id&&selKind==="zone"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
+                                                    <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{ZONE_ICONS[z.type] || "ðŸ—ºï¸"} {z.name}</div>
+                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type} Â· {polygonArea(z.points||[]).toFixed(1)}mÂ²</div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </Card>
             </div>
             {pickMenu && (
@@ -917,39 +2403,15 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                     </div>
                 </div>
             )}
-            {structDraft && (
-                <div style={{ background:T.surfaceAlt, border:`1px solid ${T.border}`, borderTop:"none", borderRadius:`0 0 ${T.r} ${T.r}`, padding:"12px 18px", fontSize:12, color:T.textSub, display:"flex", gap:10, alignItems:"center", flexWrap:"wrap" }}>
-                    <strong style={{ color:T.primary }}>Place structure</strong>
-                    <span>Click on the map to drop a greenhouse or other structure.</span>
-                    <div style={{ marginLeft:"auto", display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
-                        <Sel label="Type" value={structDraft.type} onChange={v=>setStructDraft(d=>({ ...(d||{}), type:v }))} options={STRUCT_TYPES.map(st => ({ value:st, label:`${STRUCT_ICONS[st]} ${LANG[lang]?.[STRUCT_LABEL_K[st]] || st}` }))} />
-                        <Input label="Name" value={structDraft.name} onChange={v=>setStructDraft(d=>({ ...(d||{}), name:v }))} placeholder="Main Greenhouse" />
-                    </div>
-                </div>
-            )}
-            {structLinkPrompt && (
-                <Modal title={`🔗 Link structure to field?`} onClose={cancelStructLinkPrompt} width={520}>
-                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="🔗">
-                            You dropped <strong>{structLinkPrompt.name || "this structure"}</strong> on <strong>{structLinkPrompt.field.name}</strong>.
-                            Link them so the greenhouse/tunnel stays associated with that field?
-                        </InfoBanner>
-                        <div style={{ display:"flex", gap:8, justifyContent:"flex-end", flexWrap:"wrap" }}>
-                            <Btn variant="secondary" onClick={() => structLinkPrompt.create("")}>No link</Btn>
-                            <Btn variant="primary" onClick={() => structLinkPrompt.create(structLinkPrompt.field.id)}>Link to field</Btn>
-                        </div>
-                    </div>
-                </Modal>
-            )}
             {selItem && editForm && (
                 <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderTop:"none", borderRadius:`0 0 ${T.r} ${T.r}`, padding:"14px 18px" }}>
                     <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
-                        <span style={{ fontSize:20 }}>{selKind==="struct" ? (STRUCT_ICONS[selItem.type]||"🏗️") : selKind==="zone" ? (ZONE_ICONS[selItem.type]||"🗺️") : "🛏️"}</span>
+                        <span style={{ fontSize:20 }}>{selKind==="struct" ? (STRUCT_ICONS[selItem.type]||"ðŸ—ï¸") : selKind==="zone" ? (ZONE_ICONS[selItem.type]||"ðŸ—ºï¸") : selKind==="slot" ? "ðŸª´" : "ðŸ›ï¸"}</span>
                         <div style={{ flex:1 }}>
                             <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{selItem.name}</div>
-                            <div style={{ fontSize:11, color:T.textMuted }}>{selKind==="zone" ? "Polygon zone" : "Edit inline or type exact values"}</div>
+                            <div style={{ fontSize:11, color:T.textMuted }}>{selKind==="zone" ? "Polygon zone" : selKind==="slot" ? "Plantrij" : "Edit inline or type exact values"}</div>
                         </div>
-                        <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>✕</Btn>
+                        <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>âœ•</Btn>
                     </div>
                     {selKind === "zone" ? (
                         <>
@@ -964,10 +2426,65 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                 <Textarea label="Notes" value={editForm.notes} onChange={v=>setEditForm(f=>({...f,notes:v}))} rows={2} />
                             </div>
                             <div style={{ marginTop:10, display:"flex", gap:8, alignItems:"center" }}>
-                                <Btn size="sm" variant="primary" onClick={saveEdit}>💾 Save Zone</Btn>
-                                <span style={{ fontSize:11, color:T.textMuted }}>· {selItem.points?.length || 0} points · {polygonArea(selItem.points||[]).toFixed(1)}m²</span>
+                                <Btn size="sm" variant="primary" onClick={saveEdit}>ðŸ’¾ Save Zone</Btn>
+                                <span style={{ fontSize:11, color:T.textMuted }}>Â· {selItem.points?.length || 0} points Â· {polygonArea(selItem.points||[]).toFixed(1)}mÂ²</span>
                                 <div style={{ flex:1 }} />
                                 <Btn size="sm" variant="danger" onClick={() => { if (window.confirm("Delete this zone?")) { dispatch({ type:"DELETE_ZONE", payload:selItem.id }); setSelId(null); setSelKind(null); } }}>Delete Zone</Btn>
+                            </div>
+                        </>
+                    ) : selKind === "slot" ? (
+                        <>
+                            <div style={{ display:"grid", gap:10 }}>
+                                <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap:8, alignItems:"end" }}>
+                                    <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                                        <label style={{ fontSize:10, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>Name</label>
+                                        <input value={editForm.name} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"6px 10px", outline:"none", width:"100%" }} />
+                                    </div>
+                                    <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                                        <label style={{ fontSize:10, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>Label</label>
+                                        <input value={editForm.label} onChange={e=>setEditForm(f=>({...f,label:e.target.value}))} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"6px 10px", outline:"none", width:"100%" }} />
+                                    </div>
+                                </div>
+                                <FormRow cols={4}>
+                                    <Input label="Rows" value={editForm.row_count} onChange={e=>setEditForm(f=>({...f,row_count:e.target.value}))} type="number" min="1" max="24" />
+                                    <Input label="Spacing (cm)" value={editForm.spacing_cm} onChange={e=>setEditForm(f=>({...f,spacing_cm:e.target.value}))} type="number" min="1" max="200" />
+                                    <Input label="Plants" value={editForm.plant_count} onChange={e=>setEditForm(f=>({...f,plant_count:e.target.value}))} type="number" min="0" max="1000" />
+                                    <Sel label="Orientation" value={editForm.orientation || "horizontal"} onChange={v=>setEditForm(f=>({...f,orientation:v}))} options={[{ value:"horizontal", label:"Horizontal" }, { value:"vertical", label:"Vertical (90Â°)" }]} />
+                                </FormRow>
+                                <Input label="Row length (m)" value={editForm.row_length_m} onChange={e=>setEditForm(f=>({...f,row_length_m:e.target.value}))} type="number" min="0.1" max="100" />
+                                <Textarea label="Notes" value={editForm.notes} onChange={v=>setEditForm(f=>({...f,notes:v}))} rows={2} />
+                                <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                                    <Btn size="sm" variant="primary" onClick={saveEdit}>ðŸ’¾ Save</Btn>
+                                    <Btn size="sm" variant="secondary" onClick={() => dispatch({ type:"UPDATE_SLOT", payload:{ ...selItem, orientation: selItem.orientation === "vertical" ? "horizontal" : "vertical" } })}>Rotate 90Â°</Btn>
+                                    <Btn size="sm" variant="ghost" onClick={() => openPlantsForSlot(selItem.id)}>ðŸŒ± Plants</Btn>
+                                    <Btn size="sm" variant="danger" onClick={() => {
+                                        if (window.confirm("Delete this row?")) {
+                                            const childMap = new Map();
+                                            slots.forEach(s => {
+                                                if (!s.parent_id) return;
+                                                const list = childMap.get(s.parent_id) || [];
+                                                list.push(s);
+                                                childMap.set(s.parent_id, list);
+                                            });
+                                            const descendants = [];
+                                            const walk = (id) => {
+                                                (childMap.get(id) || []).forEach(child => {
+                                                    descendants.push(child);
+                                                    walk(child.id);
+                                                });
+                                            };
+                                            walk(selItem.id);
+                                            const slotIds = [selItem.id, ...descendants.map(s => s.id)];
+                                            const plantsToRemove = plants.filter(p => slotIds.includes(p.slot_id)).map(p => p.id);
+                                            plantsToRemove.forEach(id => dispatch({ type:"DELETE_PLANT", payload:id }));
+                                            slotIds.slice().reverse().forEach(id => dispatch({ type:"DELETE_SLOT", payload:id }));
+                                            setSelId(null);
+                                            setSelKind(null);
+                                        }
+                                    }}>Delete Row</Btn>
+                                </div>
+                                <div style={{ fontSize:11, color:T.textMuted }}>{Math.max(1, Math.floor(Number(selItem.row_count) || 1))} rows Â· {selItem.orientation === "vertical" ? "vertical" : "horizontal"}</div>
+                                {renderSlotSeedPlan(selItem, { compact: true })}
                             </div>
                         </>
                     ) : (
@@ -997,9 +2514,24 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                     />
                                 </div>
                             )}
+                            {selKind === "struct" && (
+                                <div style={{ display:"grid", gap:10, marginTop:10 }}>
+                                    <Textarea label="Info" value={editForm.info || ""} onChange={v=>setEditForm(f=>({...f,info:v}))} rows={2} placeholder="Short description shown in details" />
+                                    {MAINTENANCE_STRUCT_TYPES.has(selItem.type) && (
+                                        <>
+                                            <FormRow cols={2}>
+                                                <Input label="Species / type" value={editForm.species || ""} onChange={v=>setEditForm(f=>({...f,species:v}))} placeholder="Beech, yew, privet..." />
+                                                <Input label="Prune interval (weeks)" value={editForm.prune_interval_weeks || ""} onChange={v=>setEditForm(f=>({...f,prune_interval_weeks:v}))} type="number" min="0" max="52" />
+                                            </FormRow>
+                                            <Input label="Next prune date" value={editForm.next_prune_date || ""} onChange={v=>setEditForm(f=>({...f,next_prune_date:v}))} type="date" />
+                                            <Textarea label="Maintenance notes" value={editForm.maintenance_notes || ""} onChange={v=>setEditForm(f=>({...f,maintenance_notes:v}))} rows={2} placeholder="Cut in late spring and after summer growth" />
+                                        </>
+                                    )}
+                                </div>
+                            )}
                             <div style={{ marginTop:10, display:"flex", gap:8, alignItems:"center" }}>
-                                <Btn size="sm" variant="primary" onClick={saveEdit}>💾 Save</Btn>
-                                <span style={{ fontSize:11, color:T.textMuted }}>· {selItem.width}m × {selItem.height}m = {(selItem.width*selItem.height).toFixed(1)}m²</span>
+                                <Btn size="sm" variant="primary" onClick={saveEdit}>ðŸ’¾ Save</Btn>
+                                <span style={{ fontSize:11, color:T.textMuted }}>Â· {selItem.width}m Ã— {selItem.height}m = {(selItem.width*selItem.height).toFixed(1)}mÂ²</span>
                                 <div style={{ flex:1 }} />
                                 {selKind === "field" && <Btn size="sm" variant="danger" onClick={() => { if(window.confirm("Delete this bed?")) { dispatch({type:"DELETE_FIELD",payload:selItem.id}); setSelId(null); } }}>Delete Bed</Btn>}
                                 {selKind === "struct" && <Btn size="sm" variant="danger" onClick={() => { if(window.confirm("Delete this structure?")) { dispatch({type:"DELETE_STRUCT",payload:selItem.id}); setSelId(null); } }}>Delete Structure</Btn>}
@@ -1025,9 +2557,9 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // LOGIN SCREEN
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function LoginScreen({ state, dispatch, onLogin }) {
     const [mode, setMode] = useState("login"); // "login" | "register"
     const [lang, setLang] = useState("nl");
@@ -1036,7 +2568,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [confirmPw, setConfirmPw] = useState("");
-    const [avatar, setAvatar] = useState("🌱");
+    const [avatar, setAvatar] = useState("ðŸŒ±");
     const [color, setColor] = useState(USER_COLORS[0]);
     const [error, setError] = useState("");
     const [shake, setShake] = useState(false);
@@ -1063,7 +2595,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
         onLogin(newUser.id);
     };
 
-    const LANGS = [["en","🇬🇧"],["nl","🇧🇪"],["fr","🇫🇷"],["de","🇩🇪"]];
+    const LANGS = [["en","ðŸ‡¬ðŸ‡§"],["nl","ðŸ‡§ðŸ‡ª"],["fr","ðŸ‡«ðŸ‡·"],["de","ðŸ‡©ðŸ‡ª"]];
 
     return (
         <>
@@ -1078,7 +2610,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
                 <div style={{ width:"100%", maxWidth:420 }}>
                     {/* Logo */}
                     <div style={{ textAlign:"center", marginBottom:32 }}>
-                        <div style={{ fontSize:56, marginBottom:8 }}>🌱</div>
+                        <div style={{ fontSize:56, marginBottom:8 }}>ðŸŒ±</div>
                         <div style={{ fontSize:28, fontWeight:900, color:"#FFF", fontFamily:"Fraunces,serif", letterSpacing:-0.5 }}>MyGarden</div>
                         <div style={{ fontSize:13, color:"rgba(255,255,255,0.65)", marginTop:4 }}>{t("app_subtitle")}</div>
                         {/* Lang picker */}
@@ -1096,7 +2628,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
                         </h2>
                         <p style={{ margin:"0 0 20px", fontSize:13, color:T.textMuted }}>{mode==="login" ? t("login_sub") : t("register_sub")}</p>
 
-                        {error && <div style={{ background:T.dangerBg, border:`1px solid ${T.danger}33`, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger, marginBottom:14 }}>⚠️ {error}</div>}
+                        {error && <div style={{ background:T.dangerBg, border:`1px solid ${T.danger}33`, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger, marginBottom:14 }}>âš ï¸ {error}</div>}
 
                         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                             {mode==="register" && (
@@ -1117,8 +2649,8 @@ function LoginScreen({ state, dispatch, onLogin }) {
                                 </>
                             )}
                             <Input label={t("email")} value={email} onChange={setEmail} type="email" placeholder="naam@example.com" required/>
-                            <Input label={t("password")} value={password} onChange={setPassword} type="password" placeholder="••••••••" required/>
-                            {mode==="register" && <Input label={t("confirm_password")} value={confirmPw} onChange={setConfirmPw} type="password" placeholder="••••••••" required/>}
+                            <Input label={t("password")} value={password} onChange={setPassword} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
+                            {mode==="register" && <Input label={t("confirm_password")} value={confirmPw} onChange={setConfirmPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>}
                         </div>
 
                         <Btn variant="primary" size="lg" style={{ width:"100%", marginTop:18, justifyContent:"center" }} onClick={mode==="login"?handleLogin:handleRegister}>
@@ -1135,7 +2667,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
 
                     {/* Demo hint */}
                     <div style={{ textAlign:"center", marginTop:14, fontSize:12, color:"rgba(255,255,255,0.45)" }}>
-                        Demo accounts: alex@gardengrid.app / garden123 &nbsp;·&nbsp; sam@gardengrid.app / moestuin1
+                        Demo accounts: alex@gardengrid.app / garden123 &nbsp;Â·&nbsp; sam@gardengrid.app / moestuin1
                     </div>
                 </div>
             </div>
@@ -1143,9 +2675,9 @@ function LoginScreen({ state, dispatch, onLogin }) {
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ACCOUNT SCREEN
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function AccountScreen({ state, dispatch, lang, onLogout }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -1192,9 +2724,9 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
     const myGardens = forUser(state.gardens, uid);
     const myPlants  = forUser(state.plants, uid);
     const myTasks   = forUser(state.tasks, uid);
-    const joined    = user.created_at ? new Date(user.created_at).toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"long",year:"numeric"}) : "—";
+    const joined    = user.created_at ? new Date(user.created_at).toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"long",year:"numeric"}) : "â€”";
 
-    const TABS = [["profile","👤",t("edit_profile")],["password","🔑",t("change_password")],["stats","📊",t("your_stats")]];
+    const TABS = [["profile","ðŸ‘¤",t("edit_profile")],["password","ðŸ”‘",t("change_password")],["stats","ðŸ“Š",t("your_stats")]];
 
     return (
         <div style={{ padding:28, maxWidth:600, margin:"0 auto" }}>
@@ -1202,10 +2734,10 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                 <div style={{ width:64, height:64, borderRadius:99, background:user.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, flexShrink:0, boxShadow:T.shMd }}>{user.avatar}</div>
                 <div style={{ flex:1 }}>
                     <h1 style={{ margin:0, fontSize:22, fontWeight:900, fontFamily:"Fraunces,serif", color:T.text }}>{user.name}</h1>
-                    <div style={{ fontSize:13, color:T.textMuted, marginTop:2 }}>{user.email} · {t("joined")} {joined}</div>
+                    <div style={{ fontSize:13, color:T.textMuted, marginTop:2 }}>{user.email} Â· {t("joined")} {joined}</div>
                 </div>
-                {saved && <Badge color={T.success} bg={T.successBg}>✓ {t("account_saved")}</Badge>}
-                <Btn variant="ghost" onClick={onLogout} icon="🚪">{t("logout")}</Btn>
+                {saved && <Badge color={T.success} bg={T.successBg}>âœ“ {t("account_saved")}</Badge>}
+                <Btn variant="ghost" onClick={onLogout} icon="ðŸšª">{t("logout")}</Btn>
             </div>
 
             {/* Tab bar */}
@@ -1221,7 +2753,7 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
             {tab==="profile" && (
                 <Card style={{ padding:22 }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        {profileError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>⚠️ {profileError}</div>}
+                        {profileError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>âš ï¸ {profileError}</div>}
                         <Input label={t("display_name")} value={pName} onChange={setPName} required/>
                         <Input label={t("email")} value={pEmail} onChange={setPEmail} type="email"/>
                         <div>
@@ -1240,11 +2772,11 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                         <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", background:T.surfaceAlt, borderRadius:T.rs }}>
                             <div style={{ width:38, height:38, borderRadius:99, background:pColor, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{pAvatar}</div>
                             <div>
-                                <div style={{ fontWeight:700, color:T.text, fontSize:14 }}>{pName||"…"}</div>
+                                <div style={{ fontWeight:700, color:T.text, fontSize:14 }}>{pName||"â€¦"}</div>
                                 <div style={{ fontSize:11, color:T.textMuted }}>{pEmail||"no email"}</div>
                             </div>
                         </div>
-                        <Btn variant="primary" onClick={saveProfile} icon="💾">{t("save")}</Btn>
+                        <Btn variant="primary" onClick={saveProfile} icon="ðŸ’¾">{t("save")}</Btn>
                     </div>
                 </Card>
             )}
@@ -1253,14 +2785,14 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
             {tab==="password" && (
                 <Card style={{ padding:22 }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        {pwError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>⚠️ {pwError}</div>}
-                        <Input label={t("current_password")} value={curPw} onChange={setCurPw} type="password" placeholder="••••••••" required/>
-                        <Input label={t("new_password")} value={newPw} onChange={setNewPw} type="password" placeholder="••••••••" required/>
-                        <Input label={t("confirm_new")} value={confPw} onChange={setConfPw} type="password" placeholder="••••••••" required/>
+                        {pwError && <div style={{ background:T.dangerBg, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger }}>âš ï¸ {pwError}</div>}
+                        <Input label={t("current_password")} value={curPw} onChange={setCurPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
+                        <Input label={t("new_password")} value={newPw} onChange={setNewPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
+                        <Input label={t("confirm_new")} value={confPw} onChange={setConfPw} type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required/>
                         <div style={{ fontSize:12, color:T.textMuted, padding:"8px 12px", background:T.surfaceAlt, borderRadius:T.rs }}>
-                            🔒 Wachtwoorden worden lokaal opgeslagen in je browser. MyGarden verstuurt geen gegevens naar een server.
+                            ðŸ”’ Wachtwoorden worden lokaal opgeslagen in je browser. MyGarden verstuurt geen gegevens naar een server.
                         </div>
-                        <Btn variant="primary" onClick={savePassword} icon="🔑">{t("change_password")}</Btn>
+                        <Btn variant="primary" onClick={savePassword} icon="ðŸ”‘">{t("change_password")}</Btn>
                     </div>
                 </Card>
             )}
@@ -1269,21 +2801,21 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
             {tab==="stats" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-                        <StatCard icon="🌿" label={t("gardens")} value={myGardens.length} color={T.primary}/>
-                        <StatCard icon="🌱" label={t("plant_varieties")} value={myPlants.length} color="#388E3C"/>            <StatCard icon="✅" label={t("tasks_pending")} value={myTasks.filter(t2=>t2.status==="pending").length} color={T.warning}/>
-                        <StatCard icon="🧺" label={t("ready_to_harvest")} value={myPlants.filter(p=>p.status==="harvestable").length} color={T.accent}/>
+                        <StatCard icon="ðŸŒ¿" label={t("gardens")} value={myGardens.length} color={T.primary}/>
+                        <StatCard icon="ðŸŒ±" label={t("plant_varieties")} value={myPlants.length} color="#388E3C"/>            <StatCard icon="âœ…" label={t("tasks_pending")} value={myTasks.filter(t2=>t2.status==="pending").length} color={T.warning}/>
+                        <StatCard icon="ðŸ§º" label={t("ready_to_harvest")} value={myPlants.filter(p=>p.status==="harvestable").length} color={T.accent}/>
                     </div>
                     <Card style={{ padding:16 }}>
                         <div style={{ fontSize:12, color:T.textMuted, display:"flex", flexDirection:"column", gap:6 }}>
-                            <div>📅 {t("joined")}: <strong style={{color:T.text}}>{joined}</strong></div>
-                            <div>🌱 Total plants in garden: <strong style={{color:T.text}}>{myPlants.reduce((s,p)=>s+(+p.quantity||0),0)}</strong></div>
-                            <div>🛏️ Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}m²</strong></div>
-                            <div>✓ Tasks completed: <strong style={{color:T.success}}>{myTasks.filter(t2=>t2.status==="done").length}</strong></div>
+                            <div>ðŸ“… {t("joined")}: <strong style={{color:T.text}}>{joined}</strong></div>
+                            <div>ðŸŒ± Total plants in garden: <strong style={{color:T.text}}>{myPlants.reduce((s,p)=>s+(+p.quantity||0),0)}</strong></div>
+                            <div>ðŸ›ï¸ Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}mÂ²</strong></div>
+                            <div>âœ“ Tasks completed: <strong style={{color:T.success}}>{myTasks.filter(t2=>t2.status==="done").length}</strong></div>
                         </div>
                     </Card>
                     {/* Danger zone */}
                     <Card style={{ padding:16, border:`1px solid ${T.danger}44` }}>
-                        <div style={{ fontSize:13, fontWeight:700, color:T.danger, marginBottom:8 }}>⚠️ {t("danger_zone")}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:T.danger, marginBottom:8 }}>âš ï¸ {t("danger_zone")}</div>
                         <div style={{ fontSize:12, color:T.textSub, marginBottom:12 }}>{t("delete_account_confirm")}</div>
                         <Btn variant="danger" onClick={() => {
                             if (window.confirm(t("delete_account_confirm"))) {
@@ -1300,40 +2832,40 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SIDEBAR
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollapsed, state, dispatch, lang, onLogout }) {
     const t = useT(lang);
     const uid = state.activeUserId;
     const activeUser = state.users.find(u => u.id === uid);
     const NAV = [
-        { id:"dashboard",   icon:"🏡", key:"nav_dashboard" },
-        { id:"gardens",     icon:"🌿", key:"nav_gardens" },
-        { id:"editor",      icon:"📐", key:"nav_editor" },
-        { id:"fields",      icon:"🛏️",  key:"nav_fields" },
-        { id:"plants",      icon:"🌱", key:"nav_plants" },
-        { id:"tasks",       icon:"✅", key:"nav_tasks" },
-        { id:"greenhouses", icon:"🏡", key:"nav_greenhouses" },
-        { id:"account",     icon:"👤", key:"account" },
-        { id:"settings",    icon:"⚙️", key:"nav_settings" },
-        ...(activeUser?.is_dev ? [{ id:"dev", icon:"⚡", key:"dev" }] : []),
+        { id:"dashboard",   icon:"ðŸ¡", key:"nav_dashboard" },
+        { id:"gardens",     icon:"ðŸŒ¿", key:"nav_gardens" },
+        { id:"editor",      icon:"ðŸ“", key:"nav_editor" },
+        { id:"fields",      icon:"ðŸ›ï¸",  key:"nav_fields" },
+        { id:"plants",      icon:"ðŸŒ±", key:"nav_plants" },
+        { id:"tasks",       icon:"âœ…", key:"nav_tasks" },
+        { id:"greenhouses", icon:"ðŸ¡", key:"nav_greenhouses" },
+        { id:"account",     icon:"ðŸ‘¤", key:"account" },
+        { id:"settings",    icon:"âš™ï¸", key:"nav_settings" },
+        ...(activeUser?.is_dev ? [{ id:"dev", icon:"âš¡", key:"dev" }] : []),
     ];
     return (
         <nav style={{ width:collapsed?64:220, flexShrink:0, background:`linear-gradient(175deg,#1E4A08 0%,#2B5C10 60%,#3D7A1A 100%)`, display:"flex", flexDirection:"column", height:"100vh", position:"sticky", top:0, transition:"width 0.2s", overflow:"hidden", zIndex:10 }}>
-            {/* User header — click to go to Account */}
+            {/* User header â€” click to go to Account */}
             <div onClick={() => setScreen("account")} style={{ padding:collapsed?"14px 8px":"14px 14px 12px", borderBottom:"1px solid rgba(255,255,255,0.1)", cursor:"pointer", transition:"background 0.15s" }}
                  onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.07)"}
                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                    <div style={{ width:34, height:34, borderRadius:99, background:activeUser?.color||T.primary, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0, border:"2px solid rgba(255,255,255,0.3)" }}>{activeUser?.avatar||"🌱"}</div>
+                    <div style={{ width:34, height:34, borderRadius:99, background:activeUser?.color||T.primary, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0, border:"2px solid rgba(255,255,255,0.3)" }}>{activeUser?.avatar||"ðŸŒ±"}</div>
                     {!collapsed && (
                         <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ fontSize:13, fontWeight:800, color:"#FFF", fontFamily:"Fraunces,serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{activeUser?.name||"Account"}</div>
-                            <div style={{ fontSize:9, color:"rgba(255,255,255,0.45)", marginTop:1 }}>MyGarden · {t("app_subtitle")}</div>
+                            <div style={{ fontSize:9, color:"rgba(255,255,255,0.45)", marginTop:1 }}>MyGarden Â· {t("app_subtitle")}</div>
                         </div>
                     )}
-                    {!collapsed && <span style={{ color:"rgba(255,255,255,0.4)", fontSize:11 }}>→</span>}
+                    {!collapsed && <span style={{ color:"rgba(255,255,255,0.4)", fontSize:11 }}>â†’</span>}
                 </div>
             </div>
             {/* Nav */}
@@ -1358,20 +2890,20 @@ function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollapsed, sta
                         style={{ display:"flex", alignItems:"center", gap:8, padding:collapsed?"10px":"8px 11px", width:"100%", justifyContent:collapsed?"center":"flex-start", background:"rgba(255,255,255,0.07)", border:"none", borderRadius:T.rs, cursor:"pointer", color:"rgba(255,255,255,0.55)", fontSize:12, fontFamily:"inherit", fontWeight:500, transition:"all 0.15s" }}
                         onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.14)"}
                         onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,0.07)"}>
-                    <span style={{ fontSize:16 }}>🚪</span>
+                    <span style={{ fontSize:16 }}>ðŸšª</span>
                     {!collapsed && <span>{t("logout")}</span>}
                 </button>
                 <button onClick={() => setCollapsed(c=>!c)} style={{ display:"flex", alignItems:"center", justifyContent:"center", width:"100%", padding:"7px", background:"rgba(255,255,255,0.06)", border:"none", borderRadius:T.rs, cursor:"pointer", color:"rgba(255,255,255,0.4)", fontSize:11, fontFamily:"inherit" }}>
-                    {collapsed?"→":"← Collapse"}
+                    {collapsed?"â†’":"â† Collapse"}
                 </button>
             </div>
         </nav>
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: DASHBOARD
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function DashboardScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -1403,7 +2935,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     const instructionMeta = [
         <MetaBadge key="gardens" value={gardens.length} label={t("gardens")} />,
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
-        <MetaBadge key="area" value={`${totalArea}m²`} label={t("total_area")} />,
+        <MetaBadge key="area" value={`${totalArea}mÂ²`} label={t("total_area")} />,
         <MetaBadge key="tasks" value={pending.length} label={t("tasks_pending")} />,
     ];
     const quickActions = [
@@ -1424,12 +2956,12 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         return (
             <ListRow
                 key={task.id}
-                icon={TASK_ICONS[task.type] || "📋"}
+                icon={TASK_ICONS[task.type] || "ðŸ“‹"}
                 title={task.title}
-                meta={metaParts.join(" · ")}
+                meta={metaParts.join(" Â· ")}
                 status={{ label: t(TASK_STATUS_K[task.status]) || task.status, color: statusCfg.color, bg: statusCfg.bg }}
                 actions={[
-                    <Btn key="done" size="xs" variant="success" onClick={() => dispatch({ type: "UPDATE_TASK", payload: { ...task, status: "done" } })}>✓ Done</Btn>
+                    <Btn key="done" size="xs" variant="success" onClick={() => dispatch({ type: "UPDATE_TASK", payload: { ...task, status: "done" } })}>âœ“ Done</Btn>
                 ]}
                 hint={task.notes}
             />
@@ -1441,11 +2973,11 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         return (
             <ListRow
                 key={plant.id}
-                icon={CAT_ICONS[plant.category] || "🌿"}
+                icon={CAT_ICONS[plant.category] || "ðŸŒ¿"}
                 title={`${plant.name}${plant.variety ? ` (${plant.variety})` : ""}`}
-                meta={`${fmtDate(plant.harvest_date, lang)} · ${bed?.name || struct?.name || t("unassigned")}`}
+                meta={`${fmtDate(plant.harvest_date, lang)} Â· ${bed?.name || struct?.name || t("unassigned")}`}
                 hint={plant.quantity ? `${plant.quantity} pcs` : undefined}
-                actionSlot={<Badge color={T.textSub} bg={T.surfaceAlt}>{plant.quantity || 1}×</Badge>}
+                actionSlot={<Badge color={T.textSub} bg={T.surfaceAlt}>{plant.quantity || 1}Ã—</Badge>}
             />
         );
     };
@@ -1460,17 +2992,17 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         const nextTask = gardenTasks.filter(t2 => t2.status !== "done" && t2.due_date).sort((a, b) => new Date(a.due_date) - new Date(b.due_date))[0];
         const lastTask = gardenTasks.sort((a, b) => new Date(b.due_date || 0) - new Date(a.due_date || 0))[0];
         const activityLabel = nextTask
-            ? `Next: ${fmtDate(nextTask.due_date, lang)} · ${nextTask.title}`
+            ? `Next: ${fmtDate(nextTask.due_date, lang)} Â· ${nextTask.title}`
             : lastTask
-                ? `Last: ${fmtDate(lastTask.due_date, lang)} · ${lastTask.title}`
-                : `Created ${garden.created_at ? new Date(garden.created_at).toLocaleDateString() : "—"}`;
+                ? `Last: ${fmtDate(lastTask.due_date, lang)} Â· ${lastTask.title}`
+                : `Created ${garden.created_at ? new Date(garden.created_at).toLocaleDateString() : "â€”"}`;
         const isGreenhouse = garden.type?.toLowerCase().includes("greenhouse");
         return (
             <div key={garden.id} style={{ background:T.surface, border:`1px solid ${T.borderSoft}`, borderRadius:T.radiusLg, padding:16, boxShadow:"0 2px 6px rgba(0,0,0,0.06)", minHeight:190, display:"flex", flexDirection:"column", gap:10 }}>
                 <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:10 }}>
                     <div>
                         <div style={{ fontSize:15, fontWeight:800, color:T.text }}>{garden.name}</div>
-                        <div style={{ fontSize:11, color:T.textMuted }}>{garden.width}×{garden.height}m · {garden.type}</div>
+                        <div style={{ fontSize:11, color:T.textMuted }}>{garden.width}Ã—{garden.height}m Â· {garden.type}</div>
                     </div>
                     <Badge color={isGreenhouse?T.accent:T.primary} bg={isGreenhouse?T.accentBg:T.primaryBg}>{garden.type}</Badge>
                 </div>
@@ -1490,19 +3022,19 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     };
     const suggestionItems = [
         {
-            icon: "🧺",
+            icon: "ðŸ§º",
             label: nextHarvest ? `${t("harvest")} ${nextHarvest.name}` : "Review harvest",
             helper: nextHarvest ? `Due ${fmtDate(nextHarvest.harvest_date, lang)}` : "No harvest scheduled soon",
             onClick: () => navigate("plants"),
         },
         {
-            icon: "🪴",
+            icon: "ðŸª´",
             label: emptyBeds.length ? `${emptyBeds.length} empty beds` : "All beds planted",
             helper: emptyBeds.length ? "Fill them with quick greens" : "Great job keeping beds full",
             onClick: () => navigate("fields"),
         },
         {
-            icon: "🌡️",
+            icon: "ðŸŒ¡ï¸",
             label: greenhouseCount ? `${greenhouseCount} greenhouse spots` : "Add a greenhouse",
             helper: greenhouseCount ? "Check ventilation logs" : "Create a protected structure",
             onClick: () => navigate("greenhouses"),
@@ -1511,22 +3043,22 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     return (
         <PageShell width={1180}>
             <PageHeader
-                title={`${t("good_morning")} 🌤️`}
+                title={`${t("good_morning")} ðŸŒ¤ï¸`}
                 subtitle={todayLabel}
                 meta={instructionMeta}
                 actions={quickActions}
             />
             <PanelGroup>
-                <StatCard icon="🌿" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
-                <StatCard icon="🛏️" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m² ${t("total_area")}`} onClick={() => navigate("fields")} />
-                <StatCard icon="🌱" label={t("plant_varieties")} value={plants.length} color="#388E3C" sub={`${plants.reduce((sum, p) => sum + (+p.quantity || 0), 0)} plants`} onClick={() => navigate("plants")} />
-                <StatCard icon="✅" label={t("tasks_pending")} value={pending.length} color={overdue.length > 0 ? T.danger : T.warning} sub={overdue.length > 0 ? `${overdue.length} ${t("overdue_badge")}` : t("all_on_track")} onClick={() => navigate("tasks")} />
+                <StatCard icon="ðŸŒ¿" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
+                <StatCard icon="ðŸ›ï¸" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}mÂ² ${t("total_area")}`} onClick={() => navigate("fields")} />
+                <StatCard icon="ðŸŒ±" label={t("plant_varieties")} value={plants.length} color="#388E3C" sub={`${plants.reduce((sum, p) => sum + (+p.quantity || 0), 0)} plants`} onClick={() => navigate("plants")} />
+                <StatCard icon="âœ…" label={t("tasks_pending")} value={pending.length} color={overdue.length > 0 ? T.danger : T.warning} sub={overdue.length > 0 ? `${overdue.length} ${t("overdue_badge")}` : t("all_on_track")} onClick={() => navigate("tasks")} />
                 {harvestable.length > 0 && (
-                    <StatCard icon="🧺" label={t("ready_to_harvest")} value={harvestable.length} color={T.accent} sub={t("harvestable_badge")} onClick={() => navigate("plants")} />
+                    <StatCard icon="ðŸ§º" label={t("ready_to_harvest")} value={harvestable.length} color={T.accent} sub={t("harvestable_badge")} onClick={() => navigate("plants")} />
                 )}
             </PanelGroup>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 16 }}>
-                <SectionPanel title={`📅 ${t("today")}`} subtitle={`${todayTasks.length} ${t("tasks_pending").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
+                <SectionPanel title={`ðŸ“… ${t("today")}`} subtitle={`${todayTasks.length} ${t("tasks_pending").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
                     {todayTasks.length ? todayTasks.map(renderTaskRow) : (
                         <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>No tasks scheduled for today. Add a quick task or pick from your to-do list.</div>
                     )}
@@ -1550,7 +3082,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                         </div>
                     ) : (
                         <div style={{ padding: "24px 0" }}>
-                            <EmptyState icon="🌱" title={t("no_gardens")} subtitle="Create a garden to unlock these insights." action={<Btn variant="primary" onClick={() => navigate("gardens")} icon="+">{t("new_garden")}</Btn>} />
+                            <EmptyState icon="ðŸŒ±" title={t("no_gardens")} subtitle="Create a garden to unlock these insights." action={<Btn variant="primary" onClick={() => navigate("gardens")} icon="+">{t("new_garden")}</Btn>} />
                         </div>
                     )}
                 </SectionPanel>
@@ -1565,9 +3097,9 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         </PageShell>
     );
 }
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: GARDENS
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function GardensScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -1586,19 +3118,19 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
     const totalArea = fields.reduce((sum, field) => sum + ((+field.width || 0) * (+field.height || 0)), 0).toFixed(1);
     const metaBadges = [
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
-        <MetaBadge key="area" value={`${totalArea}m²`} label={t("total_area")} />,
+        <MetaBadge key="area" value={`${totalArea}mÂ²`} label={t("total_area")} />,
     ];
     return (
         <PageShell width={1040}>
             <PageHeader
-                title={`🌿 ${t("nav_gardens")}`}
+                title={`ðŸŒ¿ ${t("nav_gardens")}`}
                 subtitle={`${gardens.length} ${t("gardens").toLowerCase()}`}
                 meta={metaBadges}
                 actions={[<Btn key="new" icon="+" variant="primary" onClick={()=>setShow(true)}>{t("new_garden")}</Btn>]}
             />
             {gardens.length===0 ? (
                 <SectionPanel title={t("nav_gardens")} subtitle="Start by creating your first garden" action={<Btn size="sm" icon="+" variant="primary" onClick={()=>setShow(true)}>{t("create_garden")}</Btn>}>
-                    <EmptyState icon="🌱" title={t("no_gardens")} subtitle="Create your first kitchen garden and start planning." />
+                    <EmptyState icon="ðŸŒ±" title={t("no_gardens")} subtitle="Create your first kitchen garden and start planning." />
                 </SectionPanel>
             ) : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
@@ -1613,7 +3145,7 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
                                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:8 }}>
                                     <div>
                                         <div style={{ fontSize:17, fontWeight:900, color:T.text }}>{g.name}</div>
-                                        <div style={{ fontSize:12, color:T.textMuted }}>{g.width}m × {g.height}m · {(g.width * g.height).toFixed(1)}m² total</div>
+                                        <div style={{ fontSize:12, color:T.textMuted }}>{g.width}m Ã— {g.height}m Â· {(g.width * g.height).toFixed(1)}mÂ² total</div>
                                     </div>
                                     <Badge color={T.primary} bg={T.primaryBg}>{g.type}</Badge>
                                 </div>
@@ -1626,7 +3158,7 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
                                     <Badge color={T.textSub} bg={T.surfaceAlt}>{gPlants.length} plants</Badge>
                                 </div>
                                 <div style={{ fontSize:12, color:T.textMuted }}>
-                                    {lastTask ? `Next task: ${fmtDate(lastTask.due_date, lang)} · ${lastTask.title}` : "No task activity yet."}
+                                    {lastTask ? `Next task: ${fmtDate(lastTask.due_date, lang)} Â· ${lastTask.title}` : "No task activity yet."}
                                 </div>
                                 <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginTop:"auto" }}>
                                     <Btn size="sm" variant="primary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:g.id}); navigate("editor"); }}>{t("open_editor")}</Btn>
@@ -1640,7 +3172,7 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
                 </div>
             )}
             {show && (
-                <Modal title={`🌿 ${t("create_garden")}`} onClose={()=>setShow(false)}>
+                <Modal title={`ðŸŒ¿ ${t("create_garden")}`} onClose={()=>setShow(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Backyard Kitchen Garden" required/>
                         <FormRow cols={3}>
@@ -1658,274 +3190,76 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: GARDEN EDITOR
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function EditorScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
-    const uid = state.activeUserId;
     const garden = state.gardens.find(g=>g.id===state.activeGardenId);
-    const [activeMode, setActiveMode] = useState("select");
-    const [panelView, setPanelView] = useState("all");
-    const modeLabels = {
-        select: "Select",
-        add_bed: t("add_bed"),
-        add_structure: t("add_structure"),
-        add_zone: "Add zone",
-        move_resize: "Move / Resize"
-    };
-    const modeTips = {
-        select: "Pick beds, structures or zones to nudge them around.",
-        add_bed: "Drag out a new bed directly on the canvas.",
-        add_structure: "Drop a greenhouse or compost area and link it.",
-        add_zone: "Trace a freeform zone with at least three points.",
-        move_resize: "Use handles to pinch / widen an existing item."
-    };
     const [showField, setShowField] = useState(false);
     const [showStruct, setShowStruct] = useState(false);
-    const ef = { name:"", type:"raised_bed", x:"", y:"", width:"", height:"", notes:"" };
-    const es = { name:"", type:"greenhouse", x:"", y:"", width:"", height:"", notes:"", linked_field_id:"" };
+    const ef = { name:"", type:"raised_bed", shape:"rect", x:"", y:"", width:"", height:"", notes:"" };
+    const es = { name:"", type:"greenhouse", x:"", y:"", width:"", height:"", notes:"", linked_field_id:"", species:"", info:"", maintenance_notes:"", prune_interval_weeks:"", next_prune_date:"" };
     const [ff, setFf] = useState(ef); const [sf, setSf] = useState(es);
     const setF = k=>v=>setFf(f=>({...f,[k]:v}));
     const setS = k=>v=>setSf(f=>({...f,[k]:v}));
-    if (!garden) return <div style={{ padding:28 }}><EmptyState icon="🗺️" title="No garden selected" subtitle="Select a garden first." action={<Btn onClick={()=>navigate("gardens")} variant="primary">{t("nav_gardens")}</Btn>}/></div>;
+    if (!garden) return <div style={{ padding:28 }}><EmptyState icon="ðŸ—ºï¸" title="No garden selected" subtitle="Select a garden first." action={<Btn onClick={()=>navigate("gardens")} variant="primary">{t("nav_gardens")}</Btn>}/></div>;
     const gFields   = state.fields.filter(f=>f.garden_id===garden.id);
     const gStructs  = state.structures.filter(s=>s.garden_id===garden.id);
     const gZones    = state.zones.filter(z=>z.garden_id===garden.id);
-    const panelTabs = [
-        { id:"all", label:"Alles", count: gFields.length + gStructs.length + gZones.length },
-        { id:"beds", label:"Bedden", count: gFields.length },
-        { id:"structures", label:"Structuren", count: gStructs.length },
-        { id:"greenhouses", label:"Kassen", count: gStructs.filter(s => GH_TYPES.includes(s.type)).length },
-        { id:"zones", label:"Zones", count: gZones.length },
-    ];
-    const mapFieldItem = (field) => {
-        const color = FIELD_COLORS[field.type] || T.primary;
-        const area = ((+field.width || 0) * (+field.height || 0)).toFixed(1);
-        const label = LANG[lang]?.[FIELD_LABEL_K[field.type]] || field.type;
-        return {
-            id: field.id,
-            icon: "🛏️",
-            title: field.name,
-            meta: `${field.width}×${field.height}m · ${area}m²`,
-            hint: `Pos (${field.x}m, ${field.y}m)`,
-            status: { label, color, bg: `${color}22` },
-        };
-    };
-    const mapStructItem = (struct) => {
-        const color = STRUCT_STROKE[struct.type] || T.primary;
-        const bg = STRUCT_FILL[struct.type] || T.surfaceAlt;
-        const label = t(STRUCT_LABEL_K[struct.type]) || struct.type;
-        return {
-            id: struct.id,
-            icon: STRUCT_ICONS[struct.type] || "🏡",
-            title: struct.name,
-            meta: `${struct.width}×${struct.height}m`,
-            hint: struct.notes,
-            status: { label, color, bg },
-        };
-    };
-    const mapZoneItem = (zone) => {
-        const color = ZONE_STROKE[zone.type] || T.textMuted;
-        const bg = ZONE_FILL[zone.type] || T.surfaceAlt;
-        const label = zone.name || LANG[lang]?.[ZONE_LABEL_K[zone.type]] || zone.type;
-        return {
-            id: zone.id,
-            icon: ZONE_ICONS[zone.type] || "🗺️",
-            title: label,
-            meta: `${(zone.points?.length || 0)} pts`,
-            hint: zone.notes,
-            status: { label, color, bg },
-        };
-    };
-    const getFieldItems = () => gFields
-        .slice()
-        .sort((a,b) => (b.width*b.height) - (a.width*a.height))
-        .map(mapFieldItem)
-        .slice(0,3);
-    const getStructItems = (onlyGh=false) => {
-        const source = onlyGh ? gStructs.filter(s => GH_TYPES.includes(s.type)) : gStructs;
-        return source
-            .slice()
-            .sort((a,b) => (b.width*b.height) - (a.width*a.height))
-            .map(mapStructItem)
-            .slice(0,3);
-    };
-    const getZoneItems = () => gZones
-        .slice()
-        .map(mapZoneItem)
-        .slice(0,3);
-    const getPanelItems = () => {
-        switch(panelView) {
-            case "beds": return getFieldItems();
-            case "structures": return getStructItems();
-            case "greenhouses": return getStructItems(true);
-            case "zones": return getZoneItems();
-            default: return [...getFieldItems(), ...getStructItems(), ...getZoneItems()].slice(0,5);
-        }
-    };
-    const panelItems = getPanelItems();
+    const posHint = `Garden is ${garden.width}m Ã— ${garden.height}m. Position from top-left (0, 0).`;
     const addField  = () => { if (!ff.name||!ff.x||!ff.y||!ff.width||!ff.height) return; dispatch({type:"ADD_FIELD",payload:{id:gid(),garden_id:garden.id,...ff,x:+ff.x,y:+ff.y,width:+ff.width,height:+ff.height}}); setShowField(false); setFf(ef); };
-    const addStruct = () => { if (!sf.name||!sf.x||!sf.y||!sf.width||!sf.height) return; dispatch({type:"ADD_STRUCT",payload:{id:gid(),garden_id:garden.id,...sf,x:+sf.x,y:+sf.y,width:+sf.width,height:+sf.height,ventilated:false,temperature:"",humidity:"",linked_field_id:sf.linked_field_id||""}}); setShowStruct(false); setSf(es); };
-    const posHint = `Garden is ${garden.width}m × ${garden.height}m. Position from top-left (0, 0).`;
+    const addStruct = () => {
+        if (!sf.name||!sf.x||!sf.y||!sf.width||!sf.height) return;
+        const payload = {
+            id:gid(),
+            garden_id:garden.id,
+            ...sf,
+            x:+sf.x,
+            y:+sf.y,
+            width:+sf.width,
+            height:+sf.height,
+            ventilated:false,
+            temperature:"",
+            humidity:"",
+            linked_field_id:sf.linked_field_id||"",
+        };
+        if (MAINTENANCE_STRUCT_TYPES.has(sf.type)) {
+            payload.species = sf.species || "";
+            payload.info = sf.info || "";
+            payload.maintenance_notes = sf.maintenance_notes || "";
+            payload.prune_interval_weeks = Math.max(0, +sf.prune_interval_weeks || 0);
+            payload.next_prune_date = sf.next_prune_date || "";
+        }
+        dispatch({type:"ADD_STRUCT",payload});
+        setShowStruct(false);
+        setSf(es);
+    };
     return (
-        <PageShell width={1220}>
+        <PageShell width={1320}>
             <PageHeader
                 title={garden.name}
-                subtitle={`${garden.width}m × ${garden.height}m · ${gFields.length} beds · ${gStructs.length} structures · ${gZones.length} zones`}
+                subtitle={`${garden.width}m Ã— ${garden.height}m Â· ${gFields.length} beds Â· ${gStructs.length} structures Â· ${gZones.length} zones`}
                 meta={[
-                    <MetaBadge key="size" value={`${garden.width}×${garden.height}m`} label="Size" />,
+                    <MetaBadge key="size" value={`${garden.width}Ã—${garden.height}m`} label="Size" />,
                     <MetaBadge key="beds" value={gFields.length} label={t("nav_fields")} />,
                     <MetaBadge key="structures" value={gStructs.length} label={t("nav_greenhouses")} />,
                 ]}
                 actions={[
-                    <Btn key="struct" size="sm" variant="secondary" onClick={()=>setShowStruct(true)} icon="🏡">{t("add_structure")}</Btn>,
-                    <Btn key="bed" size="sm" variant="primary" onClick={()=>setShowField(true)} icon="🛏️">{t("add_bed")}</Btn>
+                    <Btn key="struct" size="sm" variant="secondary" onClick={()=>setShowStruct(true)} icon="ðŸ¡">{t("add_structure")}</Btn>,
+                    <Btn key="bed" size="sm" variant="primary" onClick={()=>setShowField(true)} icon="ðŸ›ï¸">{t("add_bed")}</Btn>
                 ]}
             />
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 360px", gap:18 }}>
-                <div>
-                    <Card style={{ padding:12 }}>
-                        <GardenEditor garden={garden} fields={gFields} structures={gStructs} zones={gZones} plants={forUser(state.plants, uid)} slots={forUser(state.slots||[], uid)} dispatch={dispatch} lang={lang}/>
-                    </Card>
-                </div>
-                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                    <SectionPanel title="Editor modes" subtitle="Choose your current focus">
-                        <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:8 }}>
-                            {Object.keys(modeLabels).map(key => (
-                                <Btn
-                                    key={key}
-                                    variant={activeMode===key?"primary":"secondary"}
-                                    size="xs"
-                                    onClick={()=>setActiveMode(key)}
-                                >{modeLabels[key]}</Btn>
-                            ))}
-                        </div>
-                        <div style={{ fontSize:12, color:T.textMuted }}>{modeTips[activeMode]}</div>
-                    </SectionPanel>
-                    <SectionPanel title="Canvas overzicht" subtitle="Snelle inventaris" action={<Badge color={T.textSub} bg={T.surfaceAlt}>{panelTabs.find(tab=>tab.id===panelView)?.count||0} items</Badge>}>
-                        <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:10 }}>
-                            {panelTabs.map(tab => (
-                                <Btn key={tab.id} size="xs" variant={panelView===tab.id?"primary":"ghost"} onClick={()=>setPanelView(tab.id)}>
-                                    {tab.label} <span style={{ fontWeight:700 }}>{tab.count}</span>
-                                </Btn>
-                            ))}
-                        </div>
-                        {panelItems.length ? (
-                            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                                {panelItems.map(item => (
-                                    <ListRow
-                                        key={item.id}
-                                        icon={item.icon}
-                                        title={item.title}
-                                        meta={item.meta}
-                                        status={item.status}
-                                        hint={item.hint}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div style={{ fontSize:12, color:T.textMuted }}>No items found for this selection. Create a new bed, structure or zone to see it appear here.</div>
-                        )}
-                    </SectionPanel>
-                    <SectionPanel title="Garden summary" subtitle="Quick insights for this plot">
-                        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                            <ListRow
-                                icon="🛏️"
-                                title={`${gFields.length} beds`}
-                                meta={`${gFields.reduce((sum,f)=>sum + (+f.width * +f.height || 0), 0).toFixed(1)}m² planned`}
-                                hint="Arrange beds to match rotations"
-                            />
-                            <ListRow
-                                icon="🏡"
-                                title={`${gStructs.length} structures`}
-                                meta={`${gStructs.reduce((sum,s)=>sum + (s.width * s.height), 0).toFixed(1)}m² shelter`}
-                                hint={`${gStructs.filter(s=>GH_TYPES.includes(s.type)).length} greenhouse or tunnel`}
-                            />
-                            <ListRow
-                                icon="🗺️"
-                                title={`${gZones.length} zones`}
-                                meta={`Capture paths, borders, shade`}
-                                hint="Draw to layer special areas"
-                            />
-                        </div>
-                    </SectionPanel>
-                    {gStructs.length>0 && (
-                        <SectionPanel title="Structuren" subtitle={`${gStructs.length} op deze tuin`} action={<Btn size="sm" variant="ghost" onClick={()=>navigate("greenhouses")}>{t("nav_greenhouses")}</Btn>}>
-                            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                                {gStructs.map(st => {
-                                    const linked = gFields.find(f=>f.id===st.linked_field_id);
-                                    const plantSum = gPlants.filter(p=>p.struct_id===st.id).reduce((sum,p)=>sum + Math.max(1, +p.quantity || 1), 0);
-                                    return (
-                                        <ListRow
-                                            key={st.id}
-                                            icon={STRUCT_ICONS[st.type]||"🏗️"}
-                                            title={st.name}
-                                            meta={`${st.width}×${st.height}m · ${LANG[lang]?.[STRUCT_LABEL_K[st.type]] || st.type}`}
-                                            hint={plantSum ? `${plantSum} plants inside` : "No plants yet"}
-                                            status={linked ? { label: `Linked to ${linked.name}`, color:T.primary, bg:T.primaryBg } : undefined}
-                                            actions={[
-                                                <Btn key="focus" size="xs" variant="secondary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:garden.id}); navigate("greenhouses"); }}>Focus</Btn>,
-                                                <Btn key="delete" size="xs" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_struct"))) dispatch({type:"DELETE_STRUCT",payload:st.id}); }}>Delete</Btn>
-                                            ]}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        </SectionPanel>
-                    )}
-                    {gZones.length>0 && (
-                        <SectionPanel title="Zones" subtitle={`${gZones.length} zones`} accent={{ border:T.border, titleColor:T.text, subColor:T.textMuted }}>
-                            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                                {gZones.map(z => (
-                                    <ListRow
-                                        key={z.id}
-                                        icon={ZONE_ICONS[z.type]||"🗺️"}
-                                        title={z.name}
-                                        meta={`${(polygonArea(z.points||[])).toFixed(1)}m² · ${LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type}`}
-                                        hint={z.notes}
-                                        actions={[
-                                            <Btn key="open" size="xs" variant="secondary" onClick={()=>navigate("editor")}>Open</Btn>,
-                                            <Btn key="delete" size="xs" variant="ghost" onClick={()=>{ if(window.confirm("Delete this zone?")) dispatch({type:"DELETE_ZONE",payload:z.id}); }}>Delete</Btn>
-                                        ]}
-                                    />
-                                ))}
-                            </div>
-                        </SectionPanel>
-                    )}
-                    <SectionPanel title="Editor hints" subtitle="Hover over a field to see dimensions">
-                        <div style={{ fontSize:12, color:T.textMuted, lineHeight:1.6 }}>
-                            Use the canvas to drag, resize and link beds, structures and zones. Selected items show details in the bottom panel for quick edits.
-                        </div>
-                    </SectionPanel>
-                </div>
-            </div>
-            {gFields.length>0 && (
-                <SectionPanel title={`🛏️ ${t("nav_fields")}`} subtitle={`${gFields.length} beds`}>
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:12 }}>
-                        {gFields.map(f => {
-                            const fc=FIELD_COLORS[f.type]||T.primary;
-                            return (
-                                <div key={f.id} style={{ background:T.surface, border:`1px solid ${T.border}`, borderLeft:`4px solid ${fc}`, borderRadius:T.rs, padding:12 }}>
-                                    <div style={{ fontWeight:700, fontSize:13, color:T.text }}>{f.name}</div>
-                                    <div style={{ fontSize:11, color:T.textMuted, marginTop:2 }}>{LANG[lang]?.[FIELD_LABEL_K[f.type]]||f.type} · {f.width}m × {f.height}m</div>
-                                    {f.notes && <div style={{ fontSize:11, color:T.textSub, marginTop:4 }}>{f.notes}</div>}
-                                    <div style={{ marginTop:8, display:"flex", gap:6 }}>
-                                        <Btn size="sm" variant="secondary" onClick={()=>navigate("fields")}>Details</Btn>
-                                        <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_bed"))) dispatch({type:"DELETE_FIELD",payload:f.id}); }}>✕</Btn>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </SectionPanel>
-            )}
+            <Card style={{ padding:12 }}>
+                <GardenEditor garden={garden} fields={gFields} structures={gStructs} zones={gZones} plants={forUser(state.plants, state.activeUserId)} slots={forUser(state.slots||[], state.activeUserId)} dispatch={dispatch} lang={lang} navigate={navigate}/>
+            </Card>
             {showField && (
-                <Modal title={`🛏️ ${t("add_bed")}`} onClose={()=>setShowField(false)}>
+                <Modal title={`ðŸ›ï¸ ${t("add_bed")}`} onClose={()=>setShowField(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={ff.name} onChange={setF("name")} placeholder="e.g. Tomato Raised Bed" required/>
                         <Sel label={t("type")} value={ff.type} onChange={setF("type")} options={FIELD_TYPES.map(ft=>({value:ft,label:LANG[lang]?.[FIELD_LABEL_K[ft]]||ft}))}/>
-                        <InfoBanner icon="📐">{posHint}</InfoBanner>
+                        <BedShapePicker value={ff.shape||"rect"} onChange={setF("shape")}/>
+                        <InfoBanner icon="ðŸ“">{posHint}</InfoBanner>
                         <FormRow><Input label="X (m)" value={ff.x} onChange={setF("x")} type="number" step="0.1" min="0" required/><Input label="Y (m)" value={ff.y} onChange={setF("y")} type="number" step="0.1" min="0" required/><Input label={`${t("width")} (m)`} value={ff.width} onChange={setF("width")} type="number" step="0.1" min="0.1" required/><Input label={`${t("height")} (m)`} value={ff.height} onChange={setF("height")} type="number" step="0.1" min="0.1" required/></FormRow>
                         <Textarea label={t("notes")} value={ff.notes} onChange={setF("notes")} rows={2}/>
                         <FormActions onCancel={()=>{ setShowField(false); setFf(ef); }} onSave={addField} saveLabel={t("add_bed")} t={t}/>
@@ -1933,12 +3267,23 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {showStruct && (
-                <Modal title={`🏡 ${t("add_structure")}`} onClose={()=>setShowStruct(false)}>
+                <Modal title={`ðŸ¡ ${t("add_structure")}`} onClose={()=>setShowStruct(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={sf.name} onChange={setS("name")} placeholder="e.g. Main Greenhouse" required/>
                         <Sel label={t("type")} value={sf.type} onChange={setS("type")} options={STRUCT_TYPES.map(st=>({value:st,label:`${STRUCT_ICONS[st]} ${LANG[lang]?.[STRUCT_LABEL_K[st]]||st}`}))}/>
                         <Sel label="Linked field" value={sf.linked_field_id || ""} onChange={setS("linked_field_id")} options={[{ value:"", label:"No link" }, ...gFields.map(f=>({ value:f.id, label:f.name }))]} />
-                        <InfoBanner icon="📐">{posHint}</InfoBanner>
+                        <Textarea label="Info" value={sf.info} onChange={setS("info")} rows={2} placeholder="Short description shown in details" />
+                        {MAINTENANCE_STRUCT_TYPES.has(sf.type) && (
+                            <>
+                                <FormRow cols={2}>
+                                    <Input label="Species / type" value={sf.species} onChange={setS("species")} placeholder="Beech, yew, privet..." />
+                                    <Input label="Prune interval (weeks)" value={sf.prune_interval_weeks} onChange={setS("prune_interval_weeks")} type="number" min="0" max="52" placeholder="20" />
+                                </FormRow>
+                                <Input label="Next prune date" value={sf.next_prune_date} onChange={setS("next_prune_date")} type="date" />
+                                <Textarea label="Maintenance notes" value={sf.maintenance_notes} onChange={setS("maintenance_notes")} rows={2} placeholder="Cut in late spring and after summer growth" />
+                            </>
+                        )}
+                        <InfoBanner icon="ðŸ“">{posHint}</InfoBanner>
                         <FormRow><Input label="X (m)" value={sf.x} onChange={setS("x")} type="number" step="0.1" min="0" required/><Input label="Y (m)" value={sf.y} onChange={setS("y")} type="number" step="0.1" min="0" required/><Input label={`${t("width")} (m)`} value={sf.width} onChange={setS("width")} type="number" step="0.1" min="0.1" required/><Input label={`${t("height")} (m)`} value={sf.height} onChange={setS("height")} type="number" step="0.1" min="0.1" required/></FormRow>
                         <Textarea label={t("notes")} value={sf.notes} onChange={setS("notes")} rows={2}/>
                         <FormActions onCancel={()=>{ setShowStruct(false); setSf(es); }} onSave={addStruct} saveLabel={t("add_structure")} t={t}/>
@@ -1949,17 +3294,18 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: BEDS & FIELDS
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function FieldsScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
     const gardens = forUser(state.gardens, uid);
-    const plants  = forUser(state.plants, uid);
+    const allPlants = forUser(state.plants, uid);
     const structures = forUser(state.structures, uid);
     const tasks = forUser(state.tasks, uid);
-    const slots   = forUser(state.slots||[], uid).filter(s => s.parent_type==="field");
+    const allSlots = forUser(state.slots||[], uid);
+    const slots   = allSlots.filter(s => s.parent_type==="field");
     const [filterGarden, setFilterGarden] = useState(state.activeGardenId||"all");
     const [show, setShow] = useState(false);
     const [showSlot, setShowSlot] = useState(false);
@@ -1967,8 +3313,8 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
     const [editSlot, setEditSlot] = useState(null);
     const [editSlotForm, setEditSlotForm] = useState(null);
     const [gardenSel, setGardenSel] = useState(state.activeGardenId||gardens[0]?.id||"");
-    const ef = { name:"", type:"raised_bed", x:"", y:"", width:"", height:"", notes:"" };
-    const esl = { name:"", label:"", type:"bed_row", row_count:"1", spacing_cm:"", plant_count:"", row_length_m:"", notes:"" };
+    const ef = { name:"", type:"raised_bed", shape:"rect", x:"", y:"", width:"", height:"", notes:"" };
+    const esl = { name:"", label:"", type:"bed_row", row_count:"1", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" };
     const [form, setForm] = useState(ef);
     const [slotForm, setSlotForm] = useState(esl);
     const set = k=>v=>setForm(f=>({...f,[k]:v}));
@@ -1985,7 +3331,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
     const openSlotModal = (field) => {
         const count = slots.filter(s => s.parent_id===field.id).length + 1;
         setSlotField(field);
-        setSlotForm({ name:`${field.name} Row ${count}`, label:`R${count}`, type:"bed_row", row_count:"1", spacing_cm:"", plant_count:"", row_length_m:"", notes:"" });
+        setSlotForm({ name:`${field.name} Row ${count}`, label:`R${count}`, type:"bed_row", row_count:"1", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" });
         setShowSlot(true);
     };
     const createSlot = () => {
@@ -2002,6 +3348,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                 spacing_cm: slotForm.type==="bed_row" ? (+slotForm.spacing_cm || 0) : undefined,
                 plant_count: slotForm.type==="bed_row" ? (+slotForm.plant_count || 0) : undefined,
                 row_length_m: slotForm.type==="bed_row" ? (+slotForm.row_length_m || 0) : undefined,
+                orientation: slotForm.type==="bed_row" ? (slotForm.orientation || "horizontal") : undefined,
                 label:(slotForm.label||slotForm.name).trim(),
             }
         });
@@ -2018,6 +3365,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
             spacing_cm: slot.spacing_cm ? String(slot.spacing_cm) : "",
             plant_count: slot.plant_count ? String(slot.plant_count) : "",
             row_length_m: slot.row_length_m ? String(slot.row_length_m) : "",
+            orientation: slot.orientation || "horizontal",
             notes: slot.notes || "",
         });
     };
@@ -2056,6 +3404,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
             next.spacing_cm = Math.max(0, +editSlotForm.spacing_cm || 0);
             next.plant_count = Math.max(0, +editSlotForm.plant_count || 0);
             next.row_length_m = Math.max(0, +editSlotForm.row_length_m || 0);
+            next.orientation = editSlotForm.orientation || "horizontal";
         }
         dispatch({ type:"UPDATE_SLOT", payload: next });
         setEditSlot(null);
@@ -2064,11 +3413,11 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
     return (
         <PageShell width={1120}>
             <PageHeader
-                title={`🛏️ ${t("nav_fields")}`}
-                subtitle={`${display.length} ${t("beds_total")} · ${displayArea}m² planned`}
+                title={`ðŸ›ï¸ ${t("nav_fields")}`}
+                subtitle={`${display.length} ${t("beds_total")} Â· ${displayArea}mÂ² planned`}
                 meta={[
                     <MetaBadge key="beds" value={display.length} label={t("beds_fields")} />,
-                    <MetaBadge key="area" value={`${displayArea}m²`} label={t("total_area")} />
+                    <MetaBadge key="area" value={`${displayArea}mÂ²`} label={t("total_area")} />
                 ]}
                 actions={[<Btn key="add" variant="primary" icon="+" onClick={()=>setShow(true)}>{t("add_bed")}</Btn>]}
             />
@@ -2078,20 +3427,20 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                     <Badge color={T.textSub} bg={T.surfaceAlt}>{display.length} beds</Badge>
                 </div>
                 <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                    <Btn size="sm" variant="secondary" icon="🗺️" onClick={()=>navigate("editor")} title="Open editor">Editor</Btn>
+                    <Btn size="sm" variant="secondary" icon="ðŸ—ºï¸" onClick={()=>navigate("editor")} title="Open editor">Editor</Btn>
                     <Btn size="sm" variant="secondary" onClick={()=>navigate("gardens")} title="Go to gardens">Gardens</Btn>
                 </div>
             </div>
 
             {display.length===0 ? (
-                <SectionPanel title={`🛏️ ${t("nav_fields")}`} subtitle={t("no_beds")} action={<Btn size="sm" variant="primary" onClick={()=>setShow(true)}>{t("add_bed")}</Btn>}>
-                    <EmptyState icon="🛏️" title={t("no_beds")} subtitle="Add beds or fields to start planning." />
+                <SectionPanel title={`ðŸ›ï¸ ${t("nav_fields")}`} subtitle={t("no_beds")} action={<Btn size="sm" variant="primary" onClick={()=>setShow(true)}>{t("add_bed")}</Btn>}>
+                    <EmptyState icon="ðŸ›ï¸" title={t("no_beds")} subtitle="Add beds or fields to start planning." />
                 </SectionPanel>
             ) : (
                 <SectionPanel title="Bed overzicht" subtitle="Compacte status per bed" style={{ padding:0 }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:12, padding:18 }}>
                         {display.map(f => {
-                            const fp = plants.filter(p=>p.field_id===f.id);
+                            const fp = allPlants.filter(p=>p.field_id===f.id);
                             const fs = slots.filter(s=>s.parent_id===f.id);
                             const fc = FIELD_COLORS[f.type] || T.primary;
                             const slotCount = fs.length;
@@ -2099,14 +3448,14 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                             const typeLabel = LANG[lang]?.[FIELD_LABEL_K[f.type]] || f.type;
                             const nextTask = tasks.filter(t => t.field_id === f.id && t.status !== "done" && t.due_date)
                                 .sort((a, b) => (a.due_date||"").localeCompare(b.due_date||""))[0];
-                            const nextLabel = nextTask ? `Next: ${fmtDate(nextTask.due_date, lang)} · ${nextTask.title}` : "No upcoming tasks";
+                            const nextLabel = nextTask ? `Next: ${fmtDate(nextTask.due_date, lang)} Â· ${nextTask.title}` : "No upcoming tasks";
                             return (
                                 <ListRow
                                     key={f.id}
-                                    icon="🛏️"
+                                    icon="ðŸ›ï¸"
                                     title={f.name}
-                                    meta={`${f.width}m × ${f.height}m · ${typeLabel}`}
-                                    hint={`Area ${(f.width*f.height).toFixed(1)}m² · Pos (${f.x}m, ${f.y}m) · ${nextLabel}`}
+                                    meta={`${f.width}m Ã— ${f.height}m Â· ${typeLabel}`}
+                                    hint={`Area ${(f.width*f.height).toFixed(1)}mÂ² Â· Pos (${f.x}m, ${f.y}m) Â· ${nextLabel}`}
                                     status={{ label:typeLabel, color:fc, bg:fc+"22" }}
                                     actionSlot={<div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                                         <Badge color={T.textSub} bg={T.surfaceAlt}>{slotCount} slots</Badge>
@@ -2115,7 +3464,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                                     actions={[
                                         <Btn key="slot" size="xs" variant="secondary" onClick={()=>openSlotModal(f)}>+ Row</Btn>,
                                         <Btn key="map" size="xs" variant="secondary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:f.garden_id}); navigate("editor"); }}>Map</Btn>,
-                                        <Btn key="del" size="xs" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_bed"))) dispatch({type:"DELETE_FIELD",payload:f.id}); }}>✕</Btn>,
+                                        <Btn key="del" size="xs" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_bed"))) dispatch({type:"DELETE_FIELD",payload:f.id}); }}>âœ•</Btn>,
                                     ]}
                                 />
                             );
@@ -2125,12 +3474,13 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
             )}
 
             {show && (
-                <Modal title={`🛏️ ${t("add_bed")}`} onClose={()=>setShow(false)}>
+                <Modal title={`ðŸ›ï¸ ${t("add_bed")}`} onClose={()=>setShow(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         {gardens.length>1 && <Sel label={t("gardens")} value={gardenSel} onChange={setGardenSel} options={gardens.map(g=>({value:g.id,label:g.name}))} required/>}
                         <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Tomato Raised Bed" required/>
                         <Sel label={t("type")} value={form.type} onChange={set("type")} options={FIELD_TYPES.map(ft=>({value:ft,label:LANG[lang]?.[FIELD_LABEL_K[ft]]||ft}))}/>
-                        {garden && <InfoBanner icon="📐">Garden is {garden.width}m × {garden.height}m. Position from top-left (0, 0).</InfoBanner>}
+                        <BedShapePicker value={form.shape||"rect"} onChange={set("shape")}/>
+                        {garden && <InfoBanner icon="ðŸ“">Garden is {garden.width}m Ã— {garden.height}m. Position from top-left (0, 0).</InfoBanner>}
                         <FormRow><Input label="X (m)" value={form.x} onChange={set("x")} type="number" step="0.1" min="0" required/><Input label="Y (m)" value={form.y} onChange={set("y")} type="number" step="0.1" min="0" required/><Input label={`${t("width")} (m)`} value={form.width} onChange={set("width")} type="number" step="0.1" min="0.1" required/><Input label={`${t("height")} (m)`} value={form.height} onChange={set("height")} type="number" step="0.1" min="0.1" required/></FormRow>
                         <Textarea label={t("notes")} value={form.notes} onChange={set("notes")} rows={2}/>
                         <FormActions onCancel={()=>{ setShow(false); setForm(ef); }} onSave={create} saveLabel={t("add_bed")} t={t}/>
@@ -2138,19 +3488,20 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {showSlot && slotField && (
-                <Modal title={`🪴 Add Row In ${slotField.name}`} onClose={()=>{ setShowSlot(false); setSlotField(null); setSlotForm(esl); }}>
+                <Modal title={`ðŸª´ Add Row In ${slotField.name}`} onClose={()=>{ setShowSlot(false); setSlotField(null); setSlotForm(esl); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="🪴">Rows are internal locations inside a bed. Existing plants without a row stay valid.</InfoBanner>
+                        <InfoBanner icon="ðŸª´">Rows are internal locations inside a bed. Existing plants without a row stay valid.</InfoBanner>
                         <FormRow cols={2}>
                             <Input label="Name" value={slotForm.name} onChange={setSlot("name")} placeholder="e.g. North Row" required/>
                             <Input label="Label" value={slotForm.label} onChange={setSlot("label")} placeholder="R1" required/>
                         </FormRow>
                         <Sel label="Type" value={slotForm.type} onChange={setSlot("type")} options={[{ value:"bed_row", label:"Row" }, { value:"bed_section", label:"Section" }]}/>
                         {(slotForm.type==="bed_row") && (
-                            <FormRow cols={3}>
+                            <FormRow cols={4}>
                                 <Input label="Rows" value={slotForm.row_count} onChange={setSlot("row_count")} type="number" min="1" max="24" placeholder="4"/>
                                 <Input label="Spacing (cm)" value={slotForm.spacing_cm} onChange={setSlot("spacing_cm")} type="number" min="1" max="200" placeholder="13"/>
                                 <Input label="Plants" value={slotForm.plant_count} onChange={setSlot("plant_count")} type="number" min="1" max="1000" placeholder="80"/>
+                                <Sel label="Orientation" value={slotForm.orientation || "horizontal"} onChange={setSlot("orientation")} options={[{ value:"horizontal", label:"Horizontal" }, { value:"vertical", label:"Vertical (90Â°)" }]} />
                             </FormRow>
                         )}
                         {(slotForm.type==="bed_row") && (
@@ -2165,9 +3516,9 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {editSlot && editSlotForm && (
-                <Modal title={`✏️ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
+                <Modal title={`âœï¸ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="ℹ️">Existing rows can be adjusted here. The preview updates from row count, spacing and plant count.</InfoBanner>
+                        <InfoBanner icon="â„¹ï¸">Existing rows can be adjusted here. The preview updates from row count, spacing and plant count.</InfoBanner>
                         <FormRow cols={2}>
                             <Input label="Name" value={editSlotForm.name} onChange={v=>setEditSlotForm(f=>({...f,name:v}))} required/>
                             <Input label="Label" value={editSlotForm.label} onChange={v=>setEditSlotForm(f=>({...f,label:v}))} required/>
@@ -2175,10 +3526,11 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                         <Input label="Type" value={slotTypeLabel(editSlot, t)} disabled/>
                         {(editSlot.type === "tunnel_row" || editSlot.type === "bed_row") && (
                             <>
-                                <FormRow cols={3}>
+                                <FormRow cols={4}>
                                     <Input label="Rows" value={editSlotForm.row_count} onChange={v=>setEditSlotForm(f=>({...f,row_count:v}))} type="number" min="1" max="24"/>
                                     <Input label="Spacing (cm)" value={editSlotForm.spacing_cm} onChange={v=>setEditSlotForm(f=>({...f,spacing_cm:v}))} type="number" min="1" max="200"/>
                                     <Input label="Plants" value={editSlotForm.plant_count} onChange={v=>setEditSlotForm(f=>({...f,plant_count:v}))} type="number" min="0" max="1000"/>
+                                    <Sel label="Orientation" value={editSlotForm.orientation || "horizontal"} onChange={v=>setEditSlotForm(f=>({...f,orientation:v}))} options={[{ value:"horizontal", label:"Horizontal" }, { value:"vertical", label:"Vertical (90Â°)" }]} />
                                 </FormRow>
                                 <Input label="Row length (m)" value={editSlotForm.row_length_m} onChange={v=>setEditSlotForm(f=>({...f,row_length_m:v}))} type="number" min="0.1" max="100"/>
                                 {renderSlotSeedPlan({ ...editSlot, ...editSlotForm, row_count: editSlotForm.row_count, spacing_cm: editSlotForm.spacing_cm, plant_count: editSlotForm.plant_count, row_length_m: editSlotForm.row_length_m })}
@@ -2201,311 +3553,192 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                     </div>
                 </Modal>
             )}
-            {editSlot && editSlotForm && (
-                <Modal title={`✏️ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
-                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="ℹ️">Existing bed rows can be adjusted here. The preview reflects row count, spacing and plant count.</InfoBanner>
-                        <FormRow cols={2}>
-                            <Input label="Name" value={editSlotForm.name} onChange={v=>setEditSlotForm(f=>({...f,name:v}))} required/>
-                            <Input label="Label" value={editSlotForm.label} onChange={v=>setEditSlotForm(f=>({...f,label:v}))} required/>
-                        </FormRow>
-                        <Input label="Type" value={slotTypeLabel(editSlot, t)} disabled/>
-                        {editSlot.type === "bed_row" && (
-                            <>
-                                <FormRow cols={3}>
-                                    <Input label="Rows" value={editSlotForm.row_count} onChange={v=>setEditSlotForm(f=>({...f,row_count:v}))} type="number" min="1" max="24"/>
-                                    <Input label="Spacing (cm)" value={editSlotForm.spacing_cm} onChange={v=>setEditSlotForm(f=>({...f,spacing_cm:v}))} type="number" min="1" max="200"/>
-                                    <Input label="Plants" value={editSlotForm.plant_count} onChange={v=>setEditSlotForm(f=>({...f,plant_count:v}))} type="number" min="0" max="1000"/>
-                                </FormRow>
-                                <Input label="Row length (m)" value={editSlotForm.row_length_m} onChange={v=>setEditSlotForm(f=>({...f,row_length_m:v}))} type="number" min="0.1" max="100"/>
-                                {renderSlotSeedPlan({ ...editSlot, ...editSlotForm, row_count: editSlotForm.row_count, spacing_cm: editSlotForm.spacing_cm, plant_count: editSlotForm.plant_count, row_length_m: editSlotForm.row_length_m })}
-                            </>
-                        )}
-                        <Textarea label={t("notes")} value={editSlotForm.notes} onChange={v=>setEditSlotForm(f=>({...f,notes:v}))} rows={2}/>
-                        <FormActions onCancel={()=>{ setEditSlot(null); setEditSlotForm(null); }} onSave={saveEditSlot} saveLabel={t("save")} t={t}/>
-                    </div>
-                </Modal>
-            )}
         </PageShell>
     );
 }
-
-// ═══════════════════════════════════════
-// MODAL: QUICK ADD PLANT
-// ═══════════════════════════════════════
-function QuickAddPlantModal({ onClose, gardens, fields, lang, dispatch, uid }) {
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// QUICK ADD PLANT MODAL
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispatch, uid }) {
     const t = useT(lang);
-    const [search, setSearch] = useState("");
-    const [selectedLib, setSelectedLib] = useState(null);
-    const [stage, setStage] = useState("zaailing");
+    const [query, setQuery] = useState("");
+    const [libEntry, setLibEntry] = useState(null);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [stage, setStage] = useState("jonge_plant");
     const [quantity, setQuantity] = useState("1");
     const [showLocation, setShowLocation] = useState(false);
+    const [placementType, setPlacementType] = useState("field");
     const [gardenId, setGardenId] = useState(gardens[0]?.id || "");
     const [fieldId, setFieldId] = useState("");
-    const [harvestDate, setHarvestDate] = useState("");
+    const [structId, setStructId] = useState("");
+    const inputRef = useRef(null);
 
-    const searchResults = search.trim()
-        ? PLANT_LIB.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 6)
+    const hits = query.length >= 1
+        ? PLANT_LIB.filter(p =>
+            p.name.toLowerCase().includes(query.toLowerCase()) ||
+            p.varieties.some(v => v.toLowerCase().includes(query.toLowerCase()))
+          ).slice(0, 6)
         : [];
 
-    const selectPlant = (lib) => {
-        setSelectedLib(lib);
-        setSearch("");
-        // Auto-calculate harvest date
-        const today = new Date();
-        const daysLeft = stage === "zaailing" ? lib.days_to_harvest
-                       : stage === "jonge_plant" ? Math.round(lib.days_to_harvest * 0.6)
-                       : Math.round(lib.days_to_harvest * 0.2);
-        const harvest = new Date(today.getTime() + daysLeft * 86400000).toISOString().slice(0, 10);
-        setHarvestDate(harvest);
+    const selectEntry = (entry) => {
+        setLibEntry(entry);
+        setQuery(entry.name);
+        setShowDropdown(false);
     };
 
-    const handleStageChange = (newStage) => {
-        setStage(newStage);
-        if (selectedLib) {
-            const today = new Date();
-            const daysLeft = newStage === "zaailing" ? selectedLib.days_to_harvest
-                           : newStage === "jonge_plant" ? Math.round(selectedLib.days_to_harvest * 0.6)
-                           : Math.round(selectedLib.days_to_harvest * 0.2);
-            const harvest = new Date(today.getTime() + daysLeft * 86400000).toISOString().slice(0, 10);
-            setHarvestDate(harvest);
-        }
-    };
+    const harvestDate = useMemo(() => {
+        if (!libEntry?.days_to_harvest) return "";
+        const days = stage === "zaailing"
+            ? libEntry.days_to_harvest
+            : stage === "jonge_plant"
+            ? Math.round(libEntry.days_to_harvest * 0.6)
+            : Math.round(libEntry.days_to_harvest * 0.2);
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        return d.toISOString().slice(0, 10);
+    }, [libEntry, stage]);
 
-    const handleSave = () => {
-        if (!selectedLib || !quantity) return;
+    const statusMap = { zaailing:"sown", jonge_plant:"planted", volwassen:"growing" };
+    const today = new Date().toISOString().slice(0, 10);
 
-        const today = new Date().toISOString().slice(0, 10);
-        const statusMap = { zaailing: "sown", jonge_plant: "planted", volwassen: "growing" };
-        const sowDate = stage === "zaailing" ? today : "";
-        const plantDateVal = stage === "zaailing" ? "" : today;
-
-        const payload = {
-            id: gid(),
-            user_id: uid,
-            name: selectedLib.name,
-            variety: selectedLib.varieties[0] || "",
-            category: selectedLib.category,
-            status: statusMap[stage],
-            quantity: Math.max(1, parseInt(quantity) || 1),
-            sow_date: sowDate,
-            plant_date: plantDateVal,
-            harvest_date: harvestDate,
-            garden_id: gardenId,
-            field_id: gardenId && fieldId ? fieldId : "",
-            struct_id: "",
-            slot_id: "",
-            notes: ""
-        };
-
-        dispatch({ type: "ADD_PLANT", payload });
+    const save = () => {
+        const name = libEntry?.name || query.trim();
+        if (!name) return;
+        dispatch({
+            type: "ADD_PLANT",
+            payload: {
+                id: gid(),
+                user_id: uid,
+                name,
+                variety: libEntry?.varieties[0] || "",
+                category: libEntry?.category || "Vegetable",
+                status: statusMap[stage],
+                quantity: Math.max(1, parseInt(quantity) || 1),
+                garden_id: gardenId || "",
+                field_id: placementType === "field" ? fieldId || "" : "",
+                struct_id: placementType === "struct" ? structId || "" : "",
+                sow_date: stage === "zaailing" ? today : "",
+                plant_date: stage !== "zaailing" ? today : "",
+                harvest_date: harvestDate,
+                notes: "",
+            }
+        });
         onClose();
     };
 
-    const gardenFields = gardenId ? fields.filter(f => f.garden_id === gardenId) : [];
-    const harvestDateObj = harvestDate ? new Date(harvestDate + "T00:00:00") : null;
-    const harvestLabel = harvestDateObj
-        ? harvestDateObj.toLocaleDateString(LOCALE_MAP[lang] || "en-GB", { day: "numeric", month: "short", year: "numeric" })
-        : "";
+    const bedOptions = fields
+        .filter(f => f.garden_id === gardenId)
+        .map(f => ({ value: f.id, label: f.name }));
+    const structOptions = structures
+        .filter(s => s.garden_id === gardenId && GH_TYPES.includes(s.type))
+        .map(s => ({ value: s.id, label: s.name }));
+    const targetLabel = placementType === "struct" ? "Serre" : "Bed";
+    const targetOptions = placementType === "struct" ? structOptions : bedOptions;
+
+    const stages = [
+        { id:"zaailing",    label:"ðŸŒ° Zaailing",     hint:"Net gezaaid" },
+        { id:"jonge_plant", label:"ðŸŒ¿ Jonge plant",  hint:"Al een beetje gegroeid" },
+        { id:"volwassen",   label:"ðŸŒ³ Volwassen",    hint:"Bijna oogstbaar" },
+    ];
 
     return (
-        <Modal title="🌱 Plant toevoegen" onClose={onClose} width={500}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {/* Search & Autocomplete */}
-                <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>Plant</div>
-                    <div style={{ position: "relative" }}>
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            placeholder="Zoek plant..."
-                            style={{
-                                width: "100%",
-                                fontFamily: "inherit",
-                                fontSize: 13,
-                                color: T.text,
-                                background: T.surface,
-                                border: `1.5px solid ${T.border}`,
-                                borderRadius: T.radiusLg,
-                                padding: "10px 14px",
-                                outline: "none",
-                                boxSizing: "border-box"
-                            }}
-                        />
-                        {searchResults.length > 0 && (
-                            <div style={{
-                                position: "absolute",
-                                top: "100%",
-                                left: 0,
-                                right: 0,
-                                background: T.surface,
-                                border: `1px solid ${T.border}`,
-                                borderTop: "none",
-                                borderRadius: `0 0 ${T.radiusLg} ${T.radiusLg}`,
-                                zIndex: 10,
-                                maxHeight: 200,
-                                overflowY: "auto"
-                            }}>
-                                {searchResults.map(lib => (
-                                    <div
-                                        key={lib.name}
-                                        onClick={() => selectPlant(lib)}
-                                        style={{
-                                            padding: "10px 14px",
-                                            cursor: "pointer",
-                                            borderBottom: `1px solid ${T.borderSoft}`,
-                                            fontSize: 13,
-                                            color: T.text,
-                                            transition: "background 0.15s"
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.background = T.surfaceAlt}
-                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                    >
-                                        {lib.name}
+        <Modal title="ðŸŒ± Plant toevoegen" onClose={onClose} width={480}>
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+                {/* Search */}
+                <div style={{ position:"relative" }}>
+                    <label style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase", display:"block", marginBottom:4 }}>Plant</label>
+                    <input
+                        ref={inputRef}
+                        value={query}
+                        onChange={e => { setQuery(e.target.value); setLibEntry(null); setShowDropdown(true); }}
+                        onFocus={() => query && setShowDropdown(true)}
+                        placeholder="Zoek op naamâ€¦ bijv. Tomaat, Basilicum"
+                        autoFocus
+                        style={{ width:"100%", fontFamily:"inherit", fontSize:14, color:T.text, background:T.surface, border:`1.5px solid ${T.borderSoft}`, borderRadius:T.radiusMd, padding:"10px 14px", outline:"none", boxSizing:"border-box" }}
+                    />
+                    {showDropdown && hits.length > 0 && (
+                        <div style={{ position:"absolute", top:"100%", left:0, right:0, background:T.surface, border:`1.5px solid ${T.borderSoft}`, borderRadius:T.radiusMd, boxShadow:T.shMd, zIndex:10, overflow:"hidden", marginTop:4 }}>
+                            {hits.map(h => (
+                                <button key={h.name} onClick={() => selectEntry(h)} style={{ display:"flex", alignItems:"center", gap:10, width:"100%", padding:"10px 14px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, color:T.text, textAlign:"left", borderBottom:`1px solid ${T.borderLight}` }}
+                                    onMouseEnter={e => e.currentTarget.style.background = T.surfaceSoft}
+                                    onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                                    <span style={{ fontSize:18 }}>{CAT_ICONS[h.category] || "ðŸŒ¿"}</span>
+                                    <div>
+                                        <div style={{ fontWeight:700 }}>{h.name}</div>
+                                        <div style={{ fontSize:11, color:T.textMuted }}>{h.category}{h.varieties.length ? ` Â· ${h.varieties[0]}` : ""}</div>
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Stage */}
+                <div>
+                    <label style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase", display:"block", marginBottom:8 }}>Groeifase</label>
+                    <div style={{ display:"flex", gap:8 }}>
+                        {stages.map(s => (
+                            <button key={s.id} onClick={() => setStage(s.id)} style={{ flex:1, padding:"10px 8px", borderRadius:T.radiusMd, border:`1.5px solid ${stage===s.id ? T.primary : T.borderSoft}`, background:stage===s.id ? T.primaryBg : T.surface, color:stage===s.id ? T.primary : T.textSub, cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:700, transition:`all ${T.transitionFast}`, outline:"none", textAlign:"center" }}>
+                                <div>{s.label}</div>
+                                <div style={{ fontWeight:400, fontSize:10, marginTop:2, opacity:0.8 }}>{s.hint}</div>
+                            </button>
+                        ))}
                     </div>
                 </div>
 
-                {selectedLib && (
-                    <>
-                        {/* Stage Selector */}
-                        <div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>Groeifase</div>
-                            <div style={{ display: "flex", gap: 6 }}>
-                                <PillFilter value="🌰 Zaailing" active={stage === "zaailing"} onClick={() => handleStageChange("zaailing")} color={T.primary} bg={stage === "zaailing" ? T.primaryBg : T.surfaceAlt} />
-                                <PillFilter value="🌿 Jonge plant" active={stage === "jonge_plant"} onClick={() => handleStageChange("jonge_plant")} color={T.primary} bg={stage === "jonge_plant" ? T.primaryBg : T.surfaceAlt} />
-                                <PillFilter value="🌳 Volwassen" active={stage === "volwassen"} onClick={() => handleStageChange("volwassen")} color={T.primary} bg={stage === "volwassen" ? T.primaryBg : T.surfaceAlt} />
-                            </div>
-                        </div>
-
-                        {/* Harvest Date Preview */}
-                        {harvestLabel && (
-                            <div style={{
-                                background: T.infoBg,
-                                color: T.info,
-                                border: `1px solid ${T.info}`,
-                                borderRadius: T.rs,
-                                padding: "10px 12px",
-                                fontSize: 12
-                            }}>
-                                📅 Geschatte oogst: <strong>{harvestLabel}</strong>
-                            </div>
-                        )}
-
-                        {/* Quantity */}
-                        <div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>Aantal</div>
-                            <input
-                                type="number"
-                                value={quantity}
-                                onChange={e => setQuantity(e.target.value)}
-                                min="1"
-                                style={{
-                                    width: "100%",
-                                    fontFamily: "inherit",
-                                    fontSize: 13,
-                                    color: T.text,
-                                    background: T.surface,
-                                    border: `1.5px solid ${T.border}`,
-                                    borderRadius: T.radiusLg,
-                                    padding: "10px 14px",
-                                    outline: "none",
-                                    boxSizing: "border-box"
-                                }}
-                            />
-                        </div>
-
-                        {/* Location Toggle */}
-                        <div>
-                            <button
-                                onClick={() => setShowLocation(!showLocation)}
-                                style={{
-                                    background: "none",
-                                    border: "none",
-                                    color: T.primary,
-                                    cursor: "pointer",
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    padding: 0,
-                                    fontFamily: "inherit"
-                                }}
-                            >
-                                {showLocation ? "− Locatie verwijderen" : "+ Locatie toewijzen"}
-                            </button>
-
-                            {showLocation && (
-                                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
-                                    <div>
-                                        <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>Tuin</div>
-                                        <select
-                                            value={gardenId}
-                                            onChange={e => { setGardenId(e.target.value); setFieldId(""); }}
-                                            style={{
-                                                width: "100%",
-                                                fontFamily: "inherit",
-                                                fontSize: 13,
-                                                color: T.text,
-                                                background: T.surface,
-                                                border: `1.5px solid ${T.border}`,
-                                                borderRadius: T.radiusLg,
-                                                padding: "10px 14px",
-                                                outline: "none",
-                                                boxSizing: "border-box"
-                                            }}
-                                        >
-                                            <option value="">-- Selecteer --</option>
-                                            {gardens.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-                                        </select>
-                                    </div>
-
-                                    {gardenFields.length > 0 && (
-                                        <div>
-                                            <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, marginBottom: 6, letterSpacing: 0.5, textTransform: "uppercase" }}>Bed / Veld</div>
-                                            <select
-                                                value={fieldId}
-                                                onChange={e => setFieldId(e.target.value)}
-                                                style={{
-                                                    width: "100%",
-                                                    fontFamily: "inherit",
-                                                    fontSize: 13,
-                                                    color: T.text,
-                                                    background: T.surface,
-                                                    border: `1.5px solid ${T.border}`,
-                                                    borderRadius: T.radiusLg,
-                                                    padding: "10px 14px",
-                                                    outline: "none",
-                                                    boxSizing: "border-box"
-                                                }}
-                                            >
-                                                <option value="">-- Selecteer --</option>
-                                                {gardenFields.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-                                            </select>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Actions */}
-                        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                            <Btn variant="primary" onClick={handleSave}>Toevoegen</Btn>
-                            <Btn variant="secondary" onClick={onClose}>Annuleren</Btn>
-                        </div>
-                    </>
+                {/* Harvest preview */}
+                {harvestDate && (
+                    <InfoBanner icon="ðŸ—“ï¸">
+                        Geschatte oogst: <strong>{new Date(harvestDate + "T00:00:00").toLocaleDateString(lang === "nl" ? "nl-BE" : "en-GB", { day:"numeric", month:"long", year:"numeric" })}</strong>
+                    </InfoBanner>
                 )}
+
+                {/* Quantity */}
+                <Input label="Aantal" value={quantity} onChange={setQuantity} type="number" min="1" max="999" />
+
+                {/* Location (collapsible) */}
+                {!showLocation ? (
+                    <button
+                        onClick={() => setShowLocation(true)}
+                        style={{ background:"none", border:`1.5px dashed ${T.borderSoft}`, borderRadius:T.radiusMd, padding:"10px 14px", cursor:"pointer", fontFamily:"inherit", fontSize:13, color:T.textMuted, textAlign:"left", transition:`all ${T.transitionFast}` }}
+                        onMouseEnter={e => e.currentTarget.style.borderColor = T.primary}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = T.borderSoft}
+                    >
+                        + Locatie toewijzen (optioneel)
+                    </button>
+                ) : (
+                    <div style={{ display:"flex", flexDirection:"column", gap:10, background:T.surfaceSoft, borderRadius:T.radiusMd, padding:"12px 14px", border:`1px solid ${T.borderMuted}` }}>
+                        <Sel label="Tuin" value={gardenId} onChange={v => { setGardenId(v); setFieldId(""); setStructId(""); }}
+                            options={gardens.map(g => ({ value:g.id, label:g.name }))} />
+                        <Sel
+                            label="Locatie type"
+                            value={placementType}
+                            onChange={v => { setPlacementType(v); setFieldId(""); setStructId(""); }}
+                            options={[
+                                { value:"field", label:"Bed" },
+                                { value:"struct", label:"Serre" },
+                            ]}
+                        />
+                        {targetOptions.length > 0 && (
+                            <Sel
+                                label={targetLabel}
+                                value={placementType === "struct" ? structId : fieldId}
+                                onChange={placementType === "struct" ? setStructId : setFieldId}
+                                options={[{ value:"", label:`- Kies een ${targetLabel.toLowerCase()} -` }, ...targetOptions]}
+                            />
+                        )}
+                    </div>
+                )}
+                <FormActions onCancel={onClose} onSave={save} saveLabel="Toevoegen ✓" t={t} />
             </div>
         </Modal>
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: PLANTS
-// ═══════════════════════════════════════
-function PlantsScreen({ state, dispatch, lang }) {
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
     const t = useT(lang);
     const uid = state.activeUserId;
     const gardens = forUser(state.gardens, uid);
@@ -2523,6 +3756,8 @@ function PlantsScreen({ state, dispatch, lang }) {
     const [search, setSearch] = useState("");
     const [libSearch, setLibSearch] = useState("");
     const [libCat, setLibCat] = useState("all");
+    const slotFilterId = routeParams.slot || "";
+    const slotFilter = slotFilterId ? slots.find(s => s.id === slotFilterId) : null;
     const ep = { name:"", variety:"", category:"Vegetable", status:"planned", quantity:"1", garden_id:gardens[0]?.id||"", placement_type:"field", field_id:"", struct_id:"", slot_id:"", row_count:"", sow_spacing_cm:"", row_plant_count:"", row_length_m:"", sow_date:"", plant_date:"", harvest_date:"", notes:"" };
     const [form, setForm] = useState(ep);
     const set = k=>v=>setForm(f=>({...f,[k]:v}));
@@ -2543,6 +3778,7 @@ function PlantsScreen({ state, dispatch, lang }) {
     const filtered = plants.filter(p => {
         if (fStatus!=="all"&&p.status!==fStatus) return false;
         if (fCat!=="all"&&p.category!==fCat) return false;
+        if (slotFilterId && p.slot_id !== slotFilterId) return false;
         if (search&&!p.name.toLowerCase().includes(search.toLowerCase())&&!(p.variety||"").toLowerCase().includes(search.toLowerCase())) return false;
         return true;
     });
@@ -2629,8 +3865,8 @@ function PlantsScreen({ state, dispatch, lang }) {
     return (
         <PageShell width={1100}>
             <PageHeader
-                title={`🌱 ${t("nav_plants")}`}
-                subtitle={`${filtered.length}/${plants.length} plants`}
+                title={`ðŸŒ± ${t("nav_plants")}`}
+                subtitle={slotFilter ? `${filtered.length}/${plants.length} plants Â· ${slotDisplayLabel(slotFilter, slots)}` : `${filtered.length}/${plants.length} plants`}
                 meta={[
                     <MetaBadge key="gardens" value={gardens.length} label={t("gardens")} />,
                     <MetaBadge key="fields" value={fields.length} label={t("beds_fields")} />
@@ -2641,8 +3877,14 @@ function PlantsScreen({ state, dispatch, lang }) {
                 ]}
             />
             <Card variant="muted" style={{ padding:18, display:"flex", flexDirection:"column", gap:14, marginBottom:20, boxShadow:"0 1px 6px rgba(0,0,0,0.05)" }}>
+                {slotFilter && (
+                    <InfoBanner icon="ðŸª´">
+                        Filtering plants in {slotDisplayLabel(slotFilter, slots)}.
+                        <Btn size="xs" variant="ghost" onClick={() => navigate && navigate("plants")}>Clear filter</Btn>
+                    </InfoBanner>
+                )}
                 <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
-                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`🔍 ${t("search")}`} style={{ flex:1, minWidth:220, fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.radiusLg, padding:"10px 14px", outline:"none" }}/>
+                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`ðŸ” ${t("search")}`} style={{ flex:1, minWidth:220, fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.radiusLg, padding:"10px 14px", outline:"none" }}/>
                     <span style={{ fontSize:12, color:T.textMuted }}>{filtered.length} / {plants.length} plants</span>
                 </div>
                 <div>
@@ -2661,7 +3903,7 @@ function PlantsScreen({ state, dispatch, lang }) {
                 </div>
             </Card>
             {filtered.length===0 ? (
-                <EmptyState icon="🌱" title={plants.length===0?t("no_plants"):"No plants match filters"} action={plants.length===0?<Btn onClick={()=>setShowQuick(true)} icon="+" variant="primary">{t("add_plant")}</Btn>:<Btn onClick={()=>{ setFStatus("all"); setFCat("all"); setSearch(""); }}>Clear Filters</Btn>}/>
+                <EmptyState icon="ðŸŒ±" title={plants.length===0?t("no_plants"):"No plants match filters"} action={plants.length===0?<Btn onClick={()=>setShow(true)} icon="+" variant="primary">{t("add_plant")}</Btn>:<Btn onClick={()=>{ setFStatus("all"); setFCat("all"); setSearch(""); }}>Clear Filters</Btn>}/>
             ) : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))", gap:14 }}>
                     {filtered.map(p => {
@@ -2674,13 +3916,13 @@ function PlantsScreen({ state, dispatch, lang }) {
                             <Card key={p.id} style={{ padding:16 }}>
                                 <div style={{ display:"flex", alignItems:"start", justifyContent:"space-between", marginBottom:10 }}>
                                     <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-                                        <div style={{ fontSize:28, lineHeight:1 }}>{CAT_ICONS[p.category]||"🌿"}</div>
-                                        <div><div style={{ fontSize:15, fontWeight:800, color:T.text, lineHeight:1.2 }}>{p.name}</div><div style={{ fontSize:11, color:T.textMuted, marginTop:2 }}>{p.variety||"—"}</div></div>
+                                        <div style={{ fontSize:28, lineHeight:1 }}>{CAT_ICONS[p.category]||"ðŸŒ¿"}</div>
+                                        <div><div style={{ fontSize:15, fontWeight:800, color:T.text, lineHeight:1.2 }}>{p.name}</div><div style={{ fontSize:11, color:T.textMuted, marginTop:2 }}>{p.variety||"â€”"}</div></div>
                                     </div>
                                     <Badge color={sc_.color} bg={sc_.bg}>{sc_l}</Badge>
                                 </div>
                                 <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:10 }}>
-                                    <Badge color={T.textSub} bg={T.surfaceAlt}>×{p.quantity}</Badge>
+                                    <Badge color={T.textSub} bg={T.surfaceAlt}>Ã—{p.quantity}</Badge>
                                     <Badge color={T.textSub} bg={T.surfaceAlt}>{p.category}</Badge>
                                     {bed && <Badge color={T.primary} bg={T.primaryBg}>{bed.name}</Badge>}
                                     {greenhouse && <Badge color={STRUCT_STROKE[greenhouse.type]||T.info} bg={STRUCT_FILL[greenhouse.type]||T.infoBg}>{greenhouse.name}</Badge>}
@@ -2688,25 +3930,25 @@ function PlantsScreen({ state, dispatch, lang }) {
                                 </div>
                                 {slot && ["bed_row","tunnel_row"].includes(slot.type) && (p.sow_spacing_cm || p.row_plant_count || p.row_length_m) && (
                                     <div style={{ fontSize:11, color:T.textMuted, marginBottom:8, display:"flex", gap:8, flexWrap:"wrap" }}>
-                                        {p.row_count && <span>🧵 {p.row_count} rows</span>}
-                                        {p.sow_spacing_cm && <span>↔ {p.sow_spacing_cm} cm</span>}
-                                        {p.row_plant_count && <span>🌱 {p.row_plant_count} plants</span>}
-                                        {p.row_length_m && <span>📏 {p.row_length_m} m</span>}
+                                        {p.row_count && <span>ðŸ§µ {p.row_count} rows</span>}
+                                        {p.sow_spacing_cm && <span>â†” {p.sow_spacing_cm} cm</span>}
+                                        {p.row_plant_count && <span>ðŸŒ± {p.row_plant_count} plants</span>}
+                                        {p.row_length_m && <span>ðŸ“ {p.row_length_m} m</span>}
                                     </div>
                                 )}
                                 {(p.sow_date||p.plant_date||p.harvest_date) && (
                                     <div style={{ fontSize:11, color:T.textMuted, marginBottom:8, display:"flex", gap:8, flexWrap:"wrap" }}>
-                                        {p.sow_date && <span>🌱 {fmtDate(p.sow_date,lang)}</span>}
-                                        {p.plant_date && <span>🌿 {fmtDate(p.plant_date,lang)}</span>}
-                                        {p.harvest_date && <span>🧺 {fmtDate(p.harvest_date,lang)}</span>}
+                                        {p.sow_date && <span>ðŸŒ± {fmtDate(p.sow_date,lang)}</span>}
+                                        {p.plant_date && <span>ðŸŒ¿ {fmtDate(p.plant_date,lang)}</span>}
+                                        {p.harvest_date && <span>ðŸ§º {fmtDate(p.harvest_date,lang)}</span>}
                                     </div>
                                 )}
                                 {p.notes && <div style={{ fontSize:12, color:T.textSub, marginBottom:10, lineHeight:1.5, borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>{p.notes}</div>}
                                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                                     <Btn size="sm" variant="secondary" onClick={()=>openEdit(p)}>{t("edit")}</Btn>
-                                    {(p.status==="growing"||p.status==="harvestable") && <Btn size="sm" variant="accent" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"harvested"}})}>✓ {t("harvest")}</Btn>}
+                                    {(p.status==="growing"||p.status==="harvestable") && <Btn size="sm" variant="accent" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"harvested"}})}>âœ“ {t("harvest")}</Btn>}
                                     {p.status==="planned" && <Btn size="sm" variant="success" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"sown",sow_date:p.sow_date||new Date().toISOString().slice(0,10)}})}>{t("mark_sown")}</Btn>}
-                                    <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_plant"))) dispatch({type:"DELETE_PLANT",payload:p.id}); }}>✕</Btn>
+                                    <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_plant"))) dispatch({type:"DELETE_PLANT",payload:p.id}); }}>âœ•</Btn>
                                 </div>
                             </Card>
                         );
@@ -2715,7 +3957,7 @@ function PlantsScreen({ state, dispatch, lang }) {
             )}
             {/* Add / Edit modal */}
             {show && (
-                <Modal title={editing?`✏️ Edit Plant`:`🌱 ${t("add_plant")}`} onClose={close}>
+                <Modal title={editing?`âœï¸ Edit Plant`:`ðŸŒ± ${t("add_plant")}`} onClose={close}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <FormRow>
                             <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Tomato" required/>
@@ -2743,8 +3985,8 @@ function PlantsScreen({ state, dispatch, lang }) {
                             <Input label="Row length (m)" value={form.row_length_m} onChange={set("row_length_m")} type="number" min="0.1" max="100" placeholder="8.4" />
                         )}
                         {selectedSlotIsRow && quantityValue > 1 && rowCountValue > 1 && (
-                            <InfoBanner icon="🌱">
-                                This can be saved as a row plan: {rowCountValue} rows × {rowPlantValue} plants in {slotDisplayLabel(selectedSlot, slots)}.
+                            <InfoBanner icon="ðŸŒ±">
+                                This can be saved as a row plan: {rowCountValue} rows Ã— {rowPlantValue} plants in {slotDisplayLabel(selectedSlot, slots)}.
                             </InfoBanner>
                         )}
                         <FormRow cols={3}>
@@ -2762,7 +4004,7 @@ function PlantsScreen({ state, dispatch, lang }) {
                 <Modal title={t("library_title")} onClose={()=>setShowLib(false)} width={780}>
                     <p style={{ margin:"0 0 14px", fontSize:13, color:T.textMuted }}>{t("library_sub")}</p>
                     <div style={{ display:"flex", gap:8, marginBottom:14, alignItems:"center", flexWrap:"wrap" }}>
-                        <input value={libSearch} onChange={e=>setLibSearch(e.target.value)} placeholder={`🔍 ${t("search")}`} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"7px 12px", outline:"none", minWidth:180 }}/>
+                        <input value={libSearch} onChange={e=>setLibSearch(e.target.value)} placeholder={`ðŸ” ${t("search")}`} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"7px 12px", outline:"none", minWidth:180 }}/>
                         <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
                             <PillFilter value={t("all")} active={libCat==="all"} onClick={()=>setLibCat("all")}/>
                             {CATEGORIES.map(c => <PillFilter key={c} value={`${CAT_ICONS[c]}`} active={libCat===c} onClick={()=>setLibCat(c)} title={c}/>)}
@@ -2775,7 +4017,7 @@ function PlantsScreen({ state, dispatch, lang }) {
                                  onMouseEnter={e=>{ e.currentTarget.style.borderColor=T.primary; e.currentTarget.style.background=T.primaryBg; }}
                                  onMouseLeave={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.background=T.surface; }}>
                                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
-                                    <span style={{ fontSize:22 }}>{CAT_ICONS[p.category]||"🌿"}</span>
+                                    <span style={{ fontSize:22 }}>{CAT_ICONS[p.category]||"ðŸŒ¿"}</span>
                                     <div>
                                         <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{p.name}</div>
                                         <div style={{ fontSize:10, color:T.textMuted }}>{p.category}</div>
@@ -2790,11 +4032,22 @@ function PlantsScreen({ state, dispatch, lang }) {
                     </div>
                 </Modal>
             )}
+            {showQuick && (
+                <QuickAddPlantModal
+                    onClose={() => setShowQuick(false)}
+                    gardens={gardens}
+                    fields={fields}
+                    structures={structures}
+                    lang={lang}
+                    dispatch={dispatch}
+                    uid={state.activeUserId}
+                />
+            )}
             {bulkPrompt && (
-                <Modal title="🌱 Save as row plan?" onClose={()=>setBulkPrompt(null)} width={520}>
+                <Modal title="ðŸŒ± Save as row plan?" onClose={()=>setBulkPrompt(null)} width={520}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="🧭">
-                            {bulkPrompt.quantity} plants in {bulkPrompt.slotName} can be stored as a row plan: {bulkPrompt.rowCount} rows × {bulkPrompt.rowPlantCount} plants.
+                        <InfoBanner icon="ðŸ§­">
+                            {bulkPrompt.quantity} plants in {bulkPrompt.slotName} can be stored as a row plan: {bulkPrompt.rowCount} rows Ã— {bulkPrompt.rowPlantCount} plants.
                         </InfoBanner>
                         <div style={{ fontSize:13, color:T.textSub, lineHeight:1.5 }}>
                             Keep it as one plant card, or save the row structure so the tunnel preview and counts stay readable.
@@ -2820,12 +4073,13 @@ const LinkedHint = (task, fields, structures) => {
     if (field) parts.push(field.name);
     if (struct) parts.push(struct.name);
     if (task.notes) parts.push(task.notes);
-    return parts.length ? parts.join(" · ") : undefined;
+    return parts.length ? parts.join(" Â· ") : undefined;
 };
+const isMaintenanceTask = (task) => String(task.id || "").startsWith("maint_") || (task.linked_type === "struct" && ["pruning","repair","cleaning"].includes(task.type));
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: TASKS
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function TasksScreen({ state, dispatch, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -2843,7 +4097,8 @@ function TasksScreen({ state, dispatch, lang }) {
     const set = k=>v=>setForm(f=>({...f,[k]:v}));
     const display = tasks.filter(t2 => {
         if (fStatus!=="all"&&t2.status!==fStatus) return false;
-        if (fType!=="all"&&t2.type!==fType) return false;
+        if (fType==="maintenance" && !isMaintenanceTask(t2)) return false;
+        if (fType!=="all" && fType!=="maintenance"&&t2.type!==fType) return false;
         return true;
     }).sort((a,b) => {
         if (a.status==="done"&&b.status!=="done") return 1;
@@ -2870,7 +4125,7 @@ function TasksScreen({ state, dispatch, lang }) {
     return (
         <PageShell width={960}>
             <PageHeader
-                title={`✅ ${t("nav_tasks")}`}
+                title={`âœ… ${t("nav_tasks")}`}
                 subtitle={`${done}/${tasks.length} complete`}
                 meta={[
                     <MetaBadge key="open" value={tasks.length - done} label="Open" />,
@@ -2894,27 +4149,28 @@ function TasksScreen({ state, dispatch, lang }) {
                 {Object.entries(TASK_STATUS_K).map(([k,lk]) => <PillFilter key={k} value={t(lk)||k} active={fStatus===k} onClick={()=>setFStatus(k)} color={TASK_STATUS_C[k]?.color} bg={TASK_STATUS_C[k]?.bg}/>)}
                 <span style={{ width:1, background:T.border, margin:"0 4px" }}/>
                 <PillFilter value="All Types" active={fType==="all"} onClick={()=>setFType("all")}/>
+                <PillFilter value={t("maintenance")} active={fType==="maintenance"} onClick={()=>setFType("maintenance")}/>
                 {TASK_TYPES.map(ty => <PillFilter key={ty} value={`${TASK_ICONS[ty]} ${ty}`} active={fType===ty} onClick={()=>setFType(ty)}/>)}
             </div>
-            {display.length===0 ? <EmptyState icon="✅" title={t("no_tasks")} action={<Btn onClick={()=>setShow(true)} icon="+" variant="primary">{t("add_task")}</Btn>}/> : (
+            {display.length===0 ? <EmptyState icon="âœ…" title={t("no_tasks")} action={<Btn onClick={()=>setShow(true)} icon="+" variant="primary">{t("add_task")}</Btn>}/> : (
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                     {display.map(task => {
                         const od=isOverdue(task.due_date,task.status);
                         const sc_=TASK_STATUS_C[task.status]||TASK_STATUS_C.pending;
                         const sc_l=t(TASK_STATUS_K[task.status])||task.status;
-                        const meta = `${od&&task.status!=="done"?`${t("overdue")} · `:""}${fmtDate(task.due_date,lang)} · ${task.type}`;
+                        const meta = `${od&&task.status!=="done"?`${t("overdue")} Â· `:""}${fmtDate(task.due_date,lang)} Â· ${task.type}`;
                         const toggleLabel = task.status==="done"?t("tasks_pending"):"Complete";
                         return (
                             <ListRow
                                 key={task.id}
-                                icon={TASK_ICONS[task.type]||"📋"}
+                                icon={TASK_ICONS[task.type]||"ðŸ“‹"}
                                 title={task.title}
                                 meta={meta}
                                 status={{ label: sc_l, color: sc_.color, bg: sc_.bg }}
                                 hint={LinkedHint(task, fields, structures, lang)}
                                 actions={[
                                     <Btn key="toggle" size="xs" variant={task.status==="done"?"secondary":"success"} onClick={()=>dispatch({type:"UPDATE_TASK",payload:{...task,status:task.status==="done"?"pending":"done"}})}>{task.status==="done"?"Reopen":"Done"}</Btn>,
-                                    <Btn key="delete" size="xs" variant="ghost" onClick={()=>{ if(window.confirm("Delete task?")) dispatch({type:"DELETE_TASK",payload:task.id}); }}>✕</Btn>
+                                    <Btn key="delete" size="xs" variant="ghost" onClick={()=>{ if(window.confirm("Delete task?")) dispatch({type:"DELETE_TASK",payload:task.id}); }}>âœ•</Btn>
                                 ]}
                             />
                         );
@@ -2922,7 +4178,7 @@ function TasksScreen({ state, dispatch, lang }) {
                 </div>
             )}
             {show && (
-                <Modal title={`📋 ${t("add_task")}`} onClose={()=>{ setShow(false); setForm(ef); }}>
+                <Modal title={`ðŸ“‹ ${t("add_task")}`} onClose={()=>{ setShow(false); setForm(ef); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={form.title} onChange={set("title")} placeholder="e.g. Water the tomatoes" required/>
                         <FormRow>
@@ -2939,14 +4195,13 @@ function TasksScreen({ state, dispatch, lang }) {
                     </div>
                 </Modal>
             )}
-            {showQuick && <QuickAddPlantModal onClose={() => setShowQuick(false)} gardens={gardens} fields={fields} lang={lang} dispatch={dispatch} uid={uid} />}
         </PageShell>
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: GREENHOUSES
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function GreenhouseScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -2964,7 +4219,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
     const [editSlotForm, setEditSlotForm] = useState(null);
     const [tempVal, setTempVal] = useState("");
     const [humVal, setHumVal]   = useState("");
-    const [slotForm, setSlotForm] = useState({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", notes:"" });
+    const [slotForm, setSlotForm] = useState({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" });
     const greenhousePlantsCount = allPlants.filter(p => p.struct_id || p.slot_id).reduce((sum, p) => sum + Math.max(1, +p.quantity || 1), 0);
     const totalSlots = structSlots.length;
     const ventilatedCount = structures.filter(s => s.ventilated).length;
@@ -2988,6 +4243,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
             spacing_cm: slot.spacing_cm ? String(slot.spacing_cm) : "",
             plant_count: slot.plant_count ? String(slot.plant_count) : "",
             row_length_m: slot.row_length_m ? String(slot.row_length_m) : "",
+            orientation: slot.orientation || "horizontal",
             notes: slot.notes || "",
         });
     };
@@ -3008,6 +4264,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
             next.spacing_cm = Math.max(0, +editSlotForm.spacing_cm || 0);
             next.plant_count = Math.max(0, +editSlotForm.plant_count || 0);
             next.row_length_m = Math.max(0, +editSlotForm.row_length_m || 0);
+            next.orientation = editSlotForm.orientation || "horizontal";
         }
         dispatch({ type:"UPDATE_SLOT", payload: next });
         setEditSlot(null);
@@ -3028,6 +4285,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
             spacing_cm:"",
             plant_count:"",
             row_length_m:"",
+            orientation:"horizontal",
             notes:"",
         });
         setShowSlot(true);
@@ -3054,6 +4312,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
             extra.spacing_cm = +slotForm.spacing_cm || 0;
             extra.plant_count = +slotForm.plant_count || 0;
             extra.row_length_m = +slotForm.row_length_m || 0;
+            extra.orientation = slotForm.orientation || "horizontal";
         }
         dispatch({ type:"ADD_SLOT", payload:{ id:slotForm.type==="greenhouse_tray" ? trayId : gid(), ...common, ...extra } });
         if (slotForm.type === "greenhouse_tray") {
@@ -3080,12 +4339,12 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
         }
         setShowSlot(false);
         setSlotStruct(null);
-        setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", notes:"" });
+        setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" });
     };
     return (
         <PageShell width={1040}>
             <PageHeader
-                title={`🏡 ${t("greenhouses")}`}
+                title={`ðŸ¡ ${t("greenhouses")}`}
                 subtitle={`${structures.length} structures across ${gardens.length} gardens`}
                 meta={[
                     <MetaBadge key="gardens" value={gardens.length} label={t("gardens")} />,
@@ -3094,14 +4353,14 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 actions={[<Btn key="editor" variant="secondary" onClick={()=>navigate("editor")}>{t("nav_editor")}</Btn>]}
             />
             <PanelGroup>
-                <StatCard icon="🏡" label="Structures" value={structures.length} color={T.primary} sub={`${gardens.length} gardens`} />
-                <StatCard icon="🫙" label="Slots" value={totalSlots} color="#558B2F" sub="Trays / Rows / Pots" />
-                <StatCard icon="🌱" label="GH Plants" value={greenhousePlantsCount} color="#388E3C" sub="Inside structures" />
-                <StatCard icon="🌬️" label="Ventilated" value={`${ventilatedCount}/${structures.length}`} color={ventilatedCount===structures.length?T.success:T.warning} sub="vents open" />
+                <StatCard icon="ðŸ¡" label="Structures" value={structures.length} color={T.primary} sub={`${gardens.length} gardens`} />
+                <StatCard icon="ðŸ«™" label="Slots" value={totalSlots} color="#558B2F" sub="Trays / Rows / Pots" />
+                <StatCard icon="ðŸŒ±" label="GH Plants" value={greenhousePlantsCount} color="#388E3C" sub="Inside structures" />
+                <StatCard icon="ðŸŒ¬ï¸" label="Ventilated" value={`${ventilatedCount}/${structures.length}`} color={ventilatedCount===structures.length?T.success:T.warning} sub="vents open" />
             </PanelGroup>
             {structures.length===0 ? (
                 <SectionPanel title={t("greenhouses")} subtitle={t("no_greenhouses")} action={<Btn size="sm" variant="primary" onClick={()=>navigate("editor")}>{t("nav_editor")}</Btn>}>
-                    <EmptyState icon="🏡" title={t("no_greenhouses")} subtitle={t("no_gh_sub")} />
+                    <EmptyState icon="ðŸ¡" title={t("no_greenhouses")} subtitle={t("no_gh_sub")} />
                 </SectionPanel>
             ) : (
                 <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
@@ -3130,16 +4389,16 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                     <div style={{ padding:"16px 20px" }}>
                                         <div style={{ display:"flex", alignItems:"flex-start", gap:14, marginBottom:16 }}>
                                         <div style={{ width:52, height:52, borderRadius:T.r, background:STRUCT_FILL[st.type]||"rgba(0,131,143,0.15)", border:`2px solid ${stroke}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>
-                                            {isTunnel?"⛺":"🏡"}
+                                            {isTunnel?"â›º":"ðŸ¡"}
                                         </div>
                                         <div style={{ flex:1 }}>
                                             <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
                                                 <h2 style={{ margin:0, fontSize:18, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>{st.name}</h2>
                                                 <Badge color={stroke} bg={stroke+"20"}>{t(STRUCT_LABEL_K[st.type])||st.type}</Badge>
                                                 {garden && <Badge color={T.textSub} bg={T.surfaceAlt}>{garden.name}</Badge>}
-                                                {linkedField && <Badge color={T.accent} bg={T.accentBg}>🔗 {linkedField.name}</Badge>}
+                                                {linkedField && <Badge color={T.accent} bg={T.accentBg}>ðŸ”— {linkedField.name}</Badge>}
                                             </div>
-                                            <div style={{ fontSize:12, color:T.textMuted, marginTop:4 }}>{st.width}m × {st.height}m = {(st.width*st.height).toFixed(1)}m² · Position ({st.x}m, {st.y}m)</div>
+                                            <div style={{ fontSize:12, color:T.textMuted, marginTop:4 }}>{st.width}m Ã— {st.height}m = {(st.width*st.height).toFixed(1)}mÂ² Â· Position ({st.x}m, {st.y}m)</div>
                                             {st.notes && <div style={{ fontSize:12, color:T.textSub, marginTop:4, lineHeight:1.5 }}>{st.notes}</div>}
                                         </div>
                                         {/* Ventilation toggle */}
@@ -3155,29 +4414,29 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                         {/* Climate row */}
                                         <div style={{ display:"flex", gap:10, marginBottom:16, flexWrap:"wrap" }}>
                                             <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs, flex:1, minWidth:180 }}>
-                                            <span style={{ fontSize:18 }}>🌡️</span>
+                                            <span style={{ fontSize:18 }}>ðŸŒ¡ï¸</span>
                                             <div style={{ flex:1 }}>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>{t("temp")}</div>
-                                                <div style={{ fontSize:14, fontWeight:700, color:T.text }}>{st.temperature||"—"}</div>
+                                                <div style={{ fontSize:14, fontWeight:700, color:T.text }}>{st.temperature||"â€”"}</div>
                                             </div>
                                             <Btn size="sm" variant="ghost" onClick={()=>setEditGh(st)}>Edit</Btn>
                                         </div>
                                         <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs, flex:1, minWidth:180 }}>
-                                            <span style={{ fontSize:18 }}>💧</span>
+                                            <span style={{ fontSize:18 }}>ðŸ’§</span>
                                             <div style={{ flex:1 }}>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>{t("humidity")}</div>
-                                                <div style={{ fontSize:14, fontWeight:700, color:T.text }}>{st.humidity ? `${st.humidity}%` : "—"}</div>
+                                                <div style={{ fontSize:14, fontWeight:700, color:T.text }}>{st.humidity ? `${st.humidity}%` : "â€”"}</div>
                                             </div>
                                         </div>
                                         <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs }}>
-                                            <span style={{ fontSize:18 }}>🛏️</span>
+                                            <span style={{ fontSize:18 }}>ðŸ›ï¸</span>
                                             <div>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>{t("inside_beds")}</div>
                                                 <div style={{ fontSize:14, fontWeight:700, color:T.primary }}>{insideBeds.length}</div>
                                             </div>
                                         </div>
                                         <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs }}>
-                                            <span style={{ fontSize:18 }}>🫙</span>
+                                            <span style={{ fontSize:18 }}>ðŸ«™</span>
                                             <div>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>Pots / Trays / Rows</div>
                                             <div style={{ fontSize:14, fontWeight:700, color:T.primary }}>{structDirectSlots.length}</div>
@@ -3186,7 +4445,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                 </div>
                                     {structDirectSlots.length>0 && (
                                         <div style={{ marginBottom:12 }}>
-                                            <div style={{ fontSize:12, fontWeight:700, color:T.textSub, marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>🫙 Pots, Trays & Rows</div>
+                                            <div style={{ fontSize:12, fontWeight:700, color:T.textSub, marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>ðŸ«™ Pots, Trays & Rows</div>
                                             <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                                                 {structDirectSlots.map(slot => {
                                                     const slotPlants = allPlants.filter(p => p.slot_id===slot.id);
@@ -3198,10 +4457,21 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             <div style={{ display:"flex", alignItems:"start", justifyContent:"space-between", gap:8 }}>
                                                                 <div>
                                                                     <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{slotDisplayLabel(slot, allSlots)}</div>
-                                                                    <div style={{ fontSize:11, color:T.textMuted }}>{slotTypeLabel(slot, t)}{isTray && slot.rows && slot.cols ? ` · ${slot.rows}×${slot.cols}` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.spacing_cm ? ` · ${slot.spacing_cm}cm spacing` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.plant_count ? ` · ${slot.plant_count} plants` : ""}</div>
+                                                                    <div style={{ fontSize:11, color:T.textMuted }}>{slotTypeLabel(slot, t)}{isTray && slot.rows && slot.cols ? ` Â· ${slot.rows}Ã—${slot.cols}` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.spacing_cm ? ` Â· ${slot.spacing_cm}cm spacing` : ""}{(slot.type==="tunnel_row"||slot.type==="bed_row") && slot.plant_count ? ` Â· ${slot.plant_count} plants` : ""}</div>
                                                                     <div style={{ fontSize:11, color:T.textSub, marginTop:2 }}>{slotPlantQty} plant{slotPlantQty!==1?"s":""}</div>
                                                                 </div>
-                                                                <Btn size="sm" variant="ghost" onClick={()=>openEditSlot(slot)}>Edit</Btn>
+                                                                <div style={{ display:"flex", gap:6, flexWrap:"wrap", justifyContent:"flex-end" }}>
+                                                                    {(slot.type==="tunnel_row" || slot.type==="bed_row") && (
+                                                                        <Btn
+                                                                            size="sm"
+                                                                            variant="secondary"
+                                                                            onClick={() => dispatch({ type:"UPDATE_SLOT", payload:{ ...slot, orientation: slot.orientation === "vertical" ? "horizontal" : "vertical" } })}
+                                                                        >
+                                                                            Rotate 90Â°
+                                                                        </Btn>
+                                                                    )}
+                                                                    <Btn size="sm" variant="ghost" onClick={()=>openEditSlot(slot)}>Edit</Btn>
+                                                                </div>
                                                             </div>
                                                             {isTray && trayCellsForSlot.length>0 && (
                                                                 <div style={{ marginTop:8, display:"grid", gridTemplateColumns:`repeat(${slot.cols || 6}, minmax(0, 1fr))`, gap:4 }}>
@@ -3219,7 +4489,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             {(slot.type==="tunnel_row"||slot.type==="bed_row") && renderSlotSeedPlan(slot)}
                                                             {slotPlants.length>0 && (
                                                                 <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:5 }}>
-                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name} ×{Math.max(1, +p.quantity || 1)}</Badge>)}
+                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"ðŸŒ¿"} {p.name} Ã—{Math.max(1, +p.quantity || 1)}</Badge>)}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -3231,7 +4501,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                     {/* Inside beds */}
                                     {insideBeds.length>0 && (
                                         <div style={{ marginBottom:12 }}>
-                                            <div style={{ fontSize:12, fontWeight:700, color:T.textSub, marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>🛏️ {t("inside_beds")}</div>
+                                            <div style={{ fontSize:12, fontWeight:700, color:T.textSub, marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>ðŸ›ï¸ {t("inside_beds")}</div>
                                             <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                                                 {insideBeds.map(bed => {
                                                     const fc=FIELD_COLORS[bed.type]||T.primary;
@@ -3239,10 +4509,10 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                     return (
                                                         <div key={bed.id} style={{ padding:"8px 12px", background:fc+"12", border:`1.5px solid ${fc}`, borderRadius:T.rs, minWidth:160 }}>
                                                             <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{bed.name}</div>
-                                                            <div style={{ fontSize:11, color:T.textMuted }}>{bed.width}m × {bed.height}m · {LANG[lang]?.[FIELD_LABEL_K[bed.type]]||bed.type}</div>
+                                                            <div style={{ fontSize:11, color:T.textMuted }}>{bed.width}m Ã— {bed.height}m Â· {LANG[lang]?.[FIELD_LABEL_K[bed.type]]||bed.type}</div>
                                                             {bp.length>0 && (
                                                                 <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:5 }}>
-                                                                    {bp.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name}</Badge>)}
+                                                                    {bp.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"ðŸŒ¿"} {p.name}</Badge>)}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -3254,7 +4524,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                     {/* Inside plants summary */}
                                     {allGreenhousePlants.length>0 && (
                                         <div>
-                                            <div style={{ fontSize:12, fontWeight:700, color:T.textSub, marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>🌱 {t("inside_plants")} ({greenhousePlantQty})</div>
+                                            <div style={{ fontSize:12, fontWeight:700, color:T.textSub, marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>ðŸŒ± {t("inside_plants")} ({greenhousePlantQty})</div>
                                             <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                                                 {allGreenhousePlants.map(p => {
                                                     const sc_=STATUS_CFG[p.status]||STATUS_CFG.planned;
@@ -3262,10 +4532,10 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                     const slot=allSlots.find(s => s.id===p.slot_id);
                                                     return (
                                                         <div key={p.id} style={{ padding:"6px 10px", background:T.surface, border:`1px solid ${T.border}`, borderRadius:T.rs, display:"flex", alignItems:"center", gap:6 }}>
-                                                            <span style={{ fontSize:16 }}>{CAT_ICONS[p.category]||"🌿"}</span>
+                                                            <span style={{ fontSize:16 }}>{CAT_ICONS[p.category]||"ðŸŒ¿"}</span>
                                                             <div>
                                                                 <div style={{ fontSize:12, fontWeight:700, color:T.text }}>{p.name}</div>
-                                                                <div style={{ fontSize:10, color:T.textMuted }}>{p.variety} · ×{Math.max(1, +p.quantity || 1)}{slot ? ` · ${slot.name}` : ""}{p.row_count ? ` · ${p.row_count} rows` : ""}{p.row_plant_count ? ` · ${p.row_plant_count}/row` : ""}</div>
+                                                                <div style={{ fontSize:10, color:T.textMuted }}>{p.variety} Â· Ã—{Math.max(1, +p.quantity || 1)}{slot ? ` Â· ${slot.name}` : ""}{p.row_count ? ` Â· ${p.row_count} rows` : ""}{p.row_plant_count ? ` Â· ${p.row_plant_count}/row` : ""}</div>
                                                             </div>
                                                             <Badge color={sc_.color} bg={sc_.bg} style={{fontSize:9}}>{sc_l}</Badge>
                                                         </div>
@@ -3281,13 +4551,13 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                     )}
                                     {/* Actions */}
                                     <div style={{ display:"flex", gap:8, marginTop:14, flexWrap:"wrap" }}>
-                                        <Btn size="sm" variant="secondary" onClick={()=>openSlotModal(st)}>🫙 Add {isTunnel ? "Row" : "Pot / Tray / Row"}</Btn>
-                                        <Btn size="sm" variant="primary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:st.garden_id}); navigate("editor"); }}>📐 {t("nav_editor")}</Btn>
+                                        <Btn size="sm" variant="secondary" onClick={()=>openSlotModal(st)}>ðŸ«™ Add {isTunnel ? "Row" : "Pot / Tray / Row"}</Btn>
+                                        <Btn size="sm" variant="primary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:st.garden_id}); navigate("editor"); }}>ðŸ“ {t("nav_editor")}</Btn>
                                         <Btn size="sm" variant={st.ventilated?"ghost":"success"} onClick={()=>toggleVent(st)}>
-                                            {st.ventilated ? `🔒 ${t("close_vents")}` : `🌬️ ${t("ventilate")}`}
+                                            {st.ventilated ? `ðŸ”’ ${t("close_vents")}` : `ðŸŒ¬ï¸ ${t("ventilate")}`}
                                         </Btn>
-                                        <Btn size="sm" variant="secondary" onClick={()=>setEditGh(st)}>🌡️ Log Climate</Btn>
-                                        <Btn size="sm" variant="danger" onClick={()=>{ if(window.confirm(t("delete_struct"))) dispatch({type:"DELETE_STRUCT",payload:st.id}); }}>✕ {t("delete")}</Btn>
+                                        <Btn size="sm" variant="secondary" onClick={()=>setEditGh(st)}>ðŸŒ¡ï¸ Log Climate</Btn>
+                                        <Btn size="sm" variant="danger" onClick={()=>{ if(window.confirm(t("delete_struct"))) dispatch({type:"DELETE_STRUCT",payload:st.id}); }}>âœ• {t("delete")}</Btn>
                                     </div>
                                 </div>
                             </Card>
@@ -3296,9 +4566,9 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 </div>
             )}
             {showSlot && slotStruct && (
-            <Modal title={`🫙 Add ${slotStruct.type==="tunnel_greenhouse" ? "Row" : "Pot"} In ${slotStruct.name}`} onClose={()=>{ setShowSlot(false); setSlotStruct(null); setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", notes:"" }); }}>
+            <Modal title={`ðŸ«™ Add ${slotStruct.type==="tunnel_greenhouse" ? "Row" : "Pot"} In ${slotStruct.name}`} onClose={()=>{ setShowSlot(false); setSlotStruct(null); setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" }); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="🫙">
+                        <InfoBanner icon="ðŸ«™">
                             {slotStruct.type==="tunnel_greenhouse"
                                 ? "Tunnel layouts work best as rows. Add row counts, spacing and plants per row."
                                 : "Pots, trays, tables and rows are optional internal locations inside a greenhouse."}
@@ -3324,23 +4594,24 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                         )}
                         {(slotStruct.type==="tunnel_greenhouse" || slotForm.type==="tunnel_row" || slotForm.type==="bed_row") && (
                             <>
-                                <FormRow cols={3}>
+                                <FormRow cols={4}>
                                     <Input label="Rows" value={slotForm.row_count} onChange={v=>setSlotForm(f=>({...f,row_count:v}))} type="number" min="1" max="24" placeholder="4"/>
                                     <Input label="Spacing (cm)" value={slotForm.spacing_cm} onChange={v=>setSlotForm(f=>({...f,spacing_cm:v}))} type="number" min="1" max="200" placeholder="35"/>
                                     <Input label="Plants" value={slotForm.plant_count} onChange={v=>setSlotForm(f=>({...f,plant_count:v}))} type="number" min="1" max="1000" placeholder="24"/>
+                                    <Sel label="Orientation" value={slotForm.orientation || "horizontal"} onChange={v=>setSlotForm(f=>({...f,orientation:v}))} options={[{ value:"horizontal", label:"Horizontal" }, { value:"vertical", label:"Vertical (90Â°)" }]} />
                                 </FormRow>
                                 <Input label="Row length (m)" value={slotForm.row_length_m} onChange={v=>setSlotForm(f=>({...f,row_length_m:v}))} type="number" min="0.1" max="100" placeholder="8.4"/>
                             </>
                         )}
                         <Textarea label={t("notes")} value={slotForm.notes} onChange={v=>setSlotForm(f=>({...f,notes:v}))} rows={2}/>
-                        <FormActions onCancel={()=>{ setShowSlot(false); setSlotStruct(null); setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", notes:"" }); }} onSave={createSlot} saveLabel="Add Pot" t={t}/>
+                        <FormActions onCancel={()=>{ setShowSlot(false); setSlotStruct(null); setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" }); }} onSave={createSlot} saveLabel="Add Pot" t={t}/>
                     </div>
                 </Modal>
             )}
             {editSlot && editSlotForm && (
-                <Modal title={`✏️ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
+                <Modal title={`âœï¸ Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="ℹ️">This edits an existing slot. Row count and spacing control the scale preview only for row-based slots.</InfoBanner>
+                        <InfoBanner icon="â„¹ï¸">This edits an existing slot. Row count and spacing control the scale preview only for row-based slots.</InfoBanner>
                         <FormRow cols={2}>
                             <Input label="Name" value={editSlotForm.name} onChange={v=>setEditSlotForm(f=>({...f,name:v}))} required/>
                             <Input label="Label" value={editSlotForm.label} onChange={v=>setEditSlotForm(f=>({...f,label:v}))} required/>
@@ -3354,10 +4625,11 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                         )}
                         {(editSlot.type === "tunnel_row" || editSlot.type === "bed_row") && (
                             <>
-                                <FormRow cols={3}>
+                                <FormRow cols={4}>
                                     <Input label="Rows" value={editSlotForm.row_count} onChange={v=>setEditSlotForm(f=>({...f,row_count:v}))} type="number" min="1" max="24"/>
                                     <Input label="Spacing (cm)" value={editSlotForm.spacing_cm} onChange={v=>setEditSlotForm(f=>({...f,spacing_cm:v}))} type="number" min="1" max="200"/>
                                     <Input label="Plants" value={editSlotForm.plant_count} onChange={v=>setEditSlotForm(f=>({...f,plant_count:v}))} type="number" min="0" max="1000"/>
+                                    <Sel label="Orientation" value={editSlotForm.orientation || "horizontal"} onChange={v=>setEditSlotForm(f=>({...f,orientation:v}))} options={[{ value:"horizontal", label:"Horizontal" }, { value:"vertical", label:"Vertical (90Â°)" }]} />
                                 </FormRow>
                                 <Input label="Row length (m)" value={editSlotForm.row_length_m} onChange={v=>setEditSlotForm(f=>({...f,row_length_m:v}))} type="number" min="0.1" max="100"/>
                                 {renderSlotSeedPlan({ ...editSlot, ...editSlotForm, row_count: editSlotForm.row_count, spacing_cm: editSlotForm.spacing_cm, plant_count: editSlotForm.plant_count, row_length_m: editSlotForm.row_length_m })}
@@ -3369,10 +4641,10 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {editGh && (
-                <Modal title={`🌡️ Climate Log — ${editGh.name}`} onClose={()=>setEditGh(null)} width={400}>
+                <Modal title={`ðŸŒ¡ï¸ Climate Log â€” ${editGh.name}`} onClose={()=>setEditGh(null)} width={400}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <Input label={`🌡️ ${t("temp")} (e.g. 22°C)`} value={tempVal} onChange={setTempVal} placeholder="22°C"/>
-                        <Input label={`💧 ${t("humidity")} (0-100%)`} value={humVal} onChange={setHumVal} type="number" min="0" max="100" placeholder="65"/>
+                        <Input label={`ðŸŒ¡ï¸ ${t("temp")} (e.g. 22Â°C)`} value={tempVal} onChange={setTempVal} placeholder="22Â°C"/>
+                        <Input label={`ðŸ’§ ${t("humidity")} (0-100%)`} value={humVal} onChange={setHumVal} type="number" min="0" max="100" placeholder="65"/>
                         <FormActions onCancel={()=>setEditGh(null)} onSave={saveGhMeta} saveLabel={t("save")} t={t}/>
                     </div>
                 </Modal>
@@ -3381,9 +4653,9 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SCREEN: SETTINGS
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function SettingsScreen({ state, dispatch, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
@@ -3450,13 +4722,13 @@ function SettingsScreen({ state, dispatch, lang }) {
             }
         });
     };
-    const LANGS = [["en","🇬🇧","English"],["nl","🇧🇪","Nederlands"],["fr","🇫🇷","Français"],["de","🇩🇪","Deutsch"]];
+    const LANGS = [["en","ðŸ‡¬ðŸ‡§","English"],["nl","ðŸ‡§ðŸ‡ª","Nederlands"],["fr","ðŸ‡«ðŸ‡·","FranÃ§ais"],["de","ðŸ‡©ðŸ‡ª","Deutsch"]];
     return (
         <div style={{ padding:28, maxWidth:640, margin:"0 auto" }}>
-            <h1 style={{ margin:"0 0 24px", fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>⚙️ {t("nav_settings")}</h1>
+            <h1 style={{ margin:"0 0 24px", fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>âš™ï¸ {t("nav_settings")}</h1>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>🌍 {t("language")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>ðŸŒ {t("language")}</h2>
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:8 }}>
                     {LANGS.map(([code,flag,name]) => (
@@ -3464,26 +4736,26 @@ function SettingsScreen({ state, dispatch, lang }) {
                             <input type="radio" name="lang" checked={lang===code} onChange={()=>dispatch({type:"SET_SETTING",payload:{lang:code}})} style={{ accentColor:T.primary }}/>
                             <span style={{ fontSize:18 }}>{flag}</span>
                             <span style={{ fontSize:13, fontWeight:700, color:lang===code?T.primary:T.text, flex:1 }}>{name}</span>
-                            <Badge color={lang===code?T.success:T.textMuted} bg={lang===code?T.successBg:T.surfaceAlt}>{lang===code?"Active":"✓"}</Badge>
+                            <Badge color={lang===code?T.success:T.textMuted} bg={lang===code?T.successBg:T.surfaceAlt}>{lang===code?"Active":"âœ“"}</Badge>
                         </label>
                     ))}
                 </div>
             </Card>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>👥 {t("your_profile")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>ðŸ‘¥ {t("your_profile")}</h2>
                 </div>
                 <div style={{ padding:18 }}>
                     <div style={{ display:"flex", gap:14, alignItems:"center", marginBottom:16 }}>
-                        <div style={{ width:52, height:52, borderRadius:99, background:activeUser?.color||T.primary, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>{activeUser?.avatar||"🌱"}</div>
-                        <div><div style={{ fontSize:16, fontWeight:800, color:T.text }}>{activeUser?.name||"User"}</div><div style={{ fontSize:12, color:T.textMuted }}>{forUser(state.gardens,uid).length} gardens · {forUser(state.plants,uid).length} plants · {forUser(state.tasks,uid).filter(t2=>t2.status==="pending").length} pending tasks</div></div>
+                        <div style={{ width:52, height:52, borderRadius:99, background:activeUser?.color||T.primary, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>{activeUser?.avatar||"ðŸŒ±"}</div>
+                        <div><div style={{ fontSize:16, fontWeight:800, color:T.text }}>{activeUser?.name||"User"}</div><div style={{ fontSize:12, color:T.textMuted }}>{forUser(state.gardens,uid).length} gardens Â· {forUser(state.plants,uid).length} plants Â· {forUser(state.tasks,uid).filter(t2=>t2.status==="pending").length} pending tasks</div></div>
                     </div>
                     <div style={{ fontSize:13, color:T.textSub }}>Manage profiles using the user switcher in the sidebar header.</div>
                 </div>
             </Card>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>🌦️ Weather & Storm Alerts</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>ðŸŒ¦ï¸ Weather & Storm Alerts</h2>
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:14 }}>
                     <FormRow cols={2}>
@@ -3514,11 +4786,11 @@ function SettingsScreen({ state, dispatch, lang }) {
                                 <div>
                                     <div style={{ fontSize:12, color:T.textMuted }}>Current weather</div>
                                     <div style={{ fontSize:18, fontWeight:800, color:T.text }}>
-                                        {weather.current.temperature_2m}°C · {WEATHER_CODE_LABELS[weather.current.weather_code] || `Code ${weather.current.weather_code}`}
+                                        {weather.current.temperature_2m}Â°C Â· {WEATHER_CODE_LABELS[weather.current.weather_code] || `Code ${weather.current.weather_code}`}
                                     </div>
                                 </div>
                                 <div style={{ fontSize:12, color:T.textSub }}>
-                                    Wind {weather.current.wind_speed_10m} km/h · Gusts {weather.current.wind_gusts_10m} km/h
+                                    Wind {weather.current.wind_speed_10m} km/h Â· Gusts {weather.current.wind_gusts_10m} km/h
                                 </div>
                             </div>
                             <div style={{ fontSize:12, color:weather.storm?.active ? T.danger : T.success }}>
@@ -3532,29 +4804,29 @@ function SettingsScreen({ state, dispatch, lang }) {
             </Card>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>💾 {t("data_mgmt")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>ðŸ’¾ {t("data_mgmt")}</h2>
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:12 }}>
                     <div style={{ fontSize:13, color:T.textSub, lineHeight:1.6, background:T.surfaceAlt, borderRadius:T.rs, padding:12 }}>
-                        🔒 Your garden data is now stored securely on the server in MySQL so it stays available across devices and sessions.
+                        ðŸ”’ Your garden data is now stored securely on the server in MySQL so it stays available across devices and sessions.
                     </div>
                     <div style={{ display:"flex", gap:8 }}>
-                        <Btn variant="secondary" onClick={exportData} icon="📤">{t("export_backup")}</Btn>
-                        <Btn variant="danger" onClick={resetData} icon="🗑️">{t("reset_all")}</Btn>
+                        <Btn variant="secondary" onClick={exportData} icon="ðŸ“¤">{t("export_backup")}</Btn>
+                        <Btn variant="danger" onClick={resetData} icon="ðŸ—‘ï¸">{t("reset_all")}</Btn>
                     </div>
                     <div style={{ fontSize:11, color:T.textMuted }}>
-                        {state.users.length} profiles · {state.gardens.length} gardens · {state.fields.length} beds · {state.plants.length} plants · {state.tasks.length} tasks
+                        {state.users.length} profiles Â· {state.gardens.length} gardens Â· {state.fields.length} beds Â· {state.plants.length} plants Â· {state.tasks.length} tasks
                     </div>
                 </div>
             </Card>
             <Card>
                 <div style={{ padding:24, textAlign:"center" }}>
-                    <div style={{ fontSize:48, marginBottom:10 }}>🌱</div>
+                    <div style={{ fontSize:48, marginBottom:10 }}>ðŸŒ±</div>
                     <div style={{ fontSize:20, fontWeight:900, color:T.text, fontFamily:"Fraunces, serif" }}>MyGarden</div>
                     <div style={{ fontSize:12, color:T.textMuted, marginTop:4, lineHeight:1.7 }}>
-                        v2.0.0 · {t("app_subtitle")}<br/>
-                        Multi-user · 4 languages · 60+ plant library<br/>
-                        Greenhouse tracking · Offline-first
+                        v2.0.0 Â· {t("app_subtitle")}<br/>
+                        Multi-user Â· 4 languages Â· 60+ plant library<br/>
+                        Greenhouse tracking Â· Offline-first
                     </div>
                     <div style={{ marginTop:14, display:"flex", justifyContent:"center", gap:8, flexWrap:"wrap" }}>
                         {["Multi-user","EN/NL/FR/DE","Plant Library","Greenhouse Tracker","Drag & Resize Editor"].map(f=><Badge key={f} color={T.primary} bg={T.primaryBg}>{f}</Badge>)}
@@ -3565,123 +4837,398 @@ function SettingsScreen({ state, dispatch, lang }) {
     );
 }
 
-// ═══════════════════════════════════════
-// SCREEN: DEV
-// ═══════════════════════════════════════
-function DevScreen() {
-    const t = useT("en");
-    const [count, setCount] = useState(5);
-    const [category, setCategory] = useState("vegetable");
-    const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState(null);
-    const [plants, setPlants] = useState([]);
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SCREEN: DEV (Ollama plant generator)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const DEV_CATEGORIES = ["Vegetable","Leafy Green","Herb","Fruit","Legume","Root","Flower"];
 
-    const generatePlants = async () => {
-        setLoading(true);
-        setStatus({ type: "loading", msg: `Generating ${count} plants... (CPU-only server, may take 1-3 minutes)` });
+// â”€â”€ shared AI fetch helper â”€â”€
+async function callAI(prompt) {
+    const res = await fetch("/api/ai.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Server error");
+    return data;
+}
+
+// â”€â”€ reusable error / result blocks â”€â”€
+function DevError({ msg }) {
+    if (!msg) return null;
+    return (
+        <div style={{ background:"#FEE2E2", border:"1px solid #FCA5A5", borderRadius:T.radiusMd, padding:"12px 16px", color:"#991B1B", fontSize:13, marginBottom:16 }}>
+            âŒ {msg}
+        </div>
+    );
+}
+function AiResult({ children, model }) {
+    return (
+        <Card style={{ padding:20, marginTop:16 }}>
+            {model && <div style={{ fontSize:11, color:T.textMuted, marginBottom:10, display:"flex", alignItems:"center", gap:6 }}><span style={{ background:T.primaryBg, color:T.primary, borderRadius:99, padding:"2px 8px", fontWeight:700 }}>{model}</span></div>}
+            {children}
+        </Card>
+    );
+}
+
+// â”€â”€ Tab 1: Plant Library Generator â”€â”€
+function DevPlantGenerator() {
+    const [category, setCategory] = useState("Vegetable");
+    const [count, setCount]       = useState(5);
+    const [loading, setLoading]   = useState(false);
+    const [result, setResult]     = useState(null);
+    const [error, setError]       = useState(null);
+
+    async function handleGenerate() {
+        setLoading(true); setResult(null); setError(null);
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 330000);
-
             const res = await fetch("/api/generate-plants.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ count: parseInt(count), category }),
-                signal: controller.signal
+                body: JSON.stringify({ count, category }),
             });
-            clearTimeout(timeoutId);
-
             const data = await res.json();
-            if (data.error) {
-                setStatus({ type: "error", msg: data.error });
-            } else {
-                setStatus({ type: "success", msg: `Saved ${data.saved} plants!` });
-                setPlants(data.plants || []);
-            }
-        } catch (e) {
-            if (e.name === "AbortError") {
-                setStatus({ type: "error", msg: "Request timed out - Ollama is taking too long" });
-            } else {
-                setStatus({ type: "error", msg: e.message });
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+            if (!res.ok) throw new Error(data.error || "Server error");
+            setResult(data);
+        } catch (e) { setError(e.message); }
+        finally { setLoading(false); }
+    }
 
     return (
-        <div style={{ padding: 28, maxWidth: 900, margin: "0 auto" }}>
-            <h1 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 900, fontFamily: "Fraunces, serif", color: T.text }}>⚡ Dev Panel</h1>
-            <p style={{ margin: "0 0 24px", fontSize: 12, color: T.textSub }}>Generate plants using Ollama + Gemma4</p>
-
-            <Card style={{ marginBottom: 16 }}>
-                <div style={{ padding: "14px 18px 12px", borderBottom: `1px solid ${T.border}` }}>
-                    <h2 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: T.text, fontFamily: "Fraunces, serif" }}>🌱 Plant Generator</h2>
+        <>
+            <div style={{ fontSize:13, color:T.textMuted, marginBottom:20 }}>
+                Genereert nieuwe planten via Ollama en slaat ze op in de plantendatabase.
+            </div>
+            <Card style={{ padding:24, marginBottom:4 }}>
+                <div style={{ display:"flex", gap:16, flexWrap:"wrap", alignItems:"flex-end" }}>
+                    <div style={{ flex:1, minWidth:160 }}>
+                        <Sel label="Categorie" value={category} onChange={v=>setCategory(v)} options={DEV_CATEGORIES}/>
+                    </div>
+                    <div style={{ width:110 }}>
+                        <Input label="Aantal" type="number" value={count} min={1} max={20} onChange={e=>setCount(Number(e.target.value))}/>
+                    </div>
+                    <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:160, height:38 }}>
+                        {loading ? "â³ Genereren..." : "âš¡ Genereer"}
+                    </Btn>
                 </div>
-                <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14 }}>
-                    <FormRow cols={2}>
-                        <Input label="Count" value={count} onChange={c => setCount(Math.min(50, Math.max(1, parseInt(c) || 1)))} type="number" min="1" max="50" />
-                        <Sel label="Category" value={category} onChange={setCategory} options={[
-                            { label: "Vegetable", value: "vegetable" },
-                            { label: "Fruit", value: "fruit" },
-                            { label: "Herb", value: "herb" },
-                            { label: "Flower", value: "flower" },
-                            { label: "Grass", value: "grass" },
-                            { label: "Tree", value: "tree" },
-                            { label: "Shrub", value: "shrub" },
-                            { label: "Groundcover", value: "groundcover" },
-                        ]} />
-                    </FormRow>
-                    <Btn variant="primary" onClick={generatePlants} disabled={loading}>{loading ? "Generating..." : "Generate Plants"}</Btn>
-                    {status && (
-                        <div style={{
-                            padding: "12px 16px",
-                            borderRadius: T.rs,
-                            background: status.type === "success" ? T.successBg : status.type === "error" ? T.dangerBg : T.infoBg,
-                            color: status.type === "success" ? T.success : status.type === "error" ? T.danger : T.info,
-                            fontSize: 13
-                        }}>
-                            {status.msg}
+            </Card>
+            <DevError msg={error}/>
+            {result && (
+                <AiResult model={result.model}>
+                    <div style={{ fontWeight:700, marginBottom:12, color:T.primary }}>
+                        âœ… {result.saved ?? 0} planten opgeslagen
+                    </div>
+                    {Array.isArray(result.plants) && result.plants.map((p, i) => (
+                        <div key={i} style={{ padding:"8px 0", borderBottom: i < result.plants.length-1 ? `1px solid ${T.border}` : "none", fontSize:13 }}>
+                            <span style={{ fontWeight:600 }}>{p.name}</span>
+                            {p.description ? <span style={{ color:T.textMuted, marginLeft:8 }}>{p.description}</span> : null}
+                            {p.days_to_maturity ? <span style={{ color:T.textMuted, marginLeft:8 }}>ðŸ—“ {p.days_to_maturity}d</span> : null}
+                        </div>
+                    ))}
+                </AiResult>
+            )}
+        </>
+    );
+}
+
+// â”€â”€ Tab 2: Tuinadviseur â”€â”€
+function DevGardenAdvisor({ state }) {
+    const uid = state.activeUserId;
+    const myPlants  = forUser(state.plants, uid);
+    const myGardens = forUser(state.gardens, uid);
+    const [focus, setFocus] = useState("algemeen");
+    const [loading, setLoading] = useState(false);
+    const [result, setResult]   = useState(null);
+    const [error, setError]     = useState(null);
+    const FOCI = [
+        { v:"algemeen",    label:"ðŸŒ¿ Algemeen" },
+        { v:"bemesting",   label:"ðŸŒ± Bemesting" },
+        { v:"ongedierte",  label:"ðŸ› Plagen & ziekten" },
+        { v:"seizoen",     label:"ðŸ“… Seizoensadvies" },
+        { v:"watergeven",  label:"ðŸ’§ Water" },
+    ];
+
+    async function handleAdvise() {
+        setLoading(true); setResult(null); setError(null);
+        const plantNames = myPlants.slice(0,25).map(p => `${p.name}${p.quantity>1?" (x"+p.quantity+")":""}`).join(", ") || "geen planten nog";
+        const gardenDesc = myGardens.length > 0 ? myGardens.map(g=>g.name).join(", ") : "1 tuin";
+        const prompt = `Je bent een ervaren Belgische tuinadviseur. Mijn tuin (${gardenDesc}) bevat momenteel deze planten: ${plantNames}.
+
+Geef me 5 concrete, praktische tips gefocust op: ${focus}.
+Wees specifiek over mijn planten waar relevant. Geen algemene flauwekul.
+Antwoord in het Nederlands. Gebruik een genummerde lijst.`;
+        try {
+            const data = await callAI(prompt);
+            setResult(data);
+        } catch(e) { setError(e.message); }
+        finally { setLoading(false); }
+    }
+
+    return (
+        <>
+            <div style={{ fontSize:13, color:T.textMuted, marginBottom:20 }}>
+                AI analyseert jouw tuin ({myPlants.length} planten) en geeft gepersonaliseerd advies.
+            </div>
+            <Card style={{ padding:24, marginBottom:4 }}>
+                <div style={{ marginBottom:14 }}>
+                    <div style={{ fontSize:11, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase", marginBottom:8 }}>Focus</div>
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                        {FOCI.map(f => (
+                            <PillFilter key={f.v} value={f.label} active={focus===f.v} onClick={()=>setFocus(f.v)}/>
+                        ))}
+                    </div>
+                </div>
+                <Btn variant="primary" onClick={handleAdvise} disabled={loading || myPlants.length===0} style={{ minWidth:180 }}>
+                    {loading ? "â³ Analyseren..." : "ðŸ§  Analyseer mijn tuin"}
+                </Btn>
+                {myPlants.length === 0 && <div style={{ fontSize:12, color:T.textMuted, marginTop:8 }}>Voeg eerst planten toe aan je tuin.</div>}
+            </Card>
+            <DevError msg={error}/>
+            {result && (
+                <AiResult model={result.model}>
+                    <div style={{ fontSize:14, lineHeight:1.7, color:T.text, whiteSpace:"pre-wrap" }}>{result.response}</div>
+                </AiResult>
+            )}
+        </>
+    );
+}
+
+// â”€â”€ Tab 3: Compagnons â”€â”€
+function DevCompanions({ state }) {
+    const uid = state.activeUserId;
+    const myPlants = forUser(state.plants, uid);
+    const [plantName, setPlantName] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [result, setResult]   = useState(null);
+    const [error, setError]     = useState(null);
+
+    // Autocomplete from user's plants + PLANT_LIB
+    const suggestions = useMemo(() => {
+        const q = plantName.toLowerCase();
+        if (!q || q.length < 2) return [];
+        const fromMine = myPlants.map(p=>p.name);
+        const fromLib  = PLANT_LIB.map(p=>p.name);
+        return [...new Set([...fromMine, ...fromLib])].filter(n => n.toLowerCase().includes(q)).slice(0,6);
+    }, [plantName, myPlants]);
+
+    async function handleCheck() {
+        if (!plantName.trim()) return;
+        setLoading(true); setResult(null); setError(null);
+        const prompt = `Je bent een tuinexpert. Geef compagnonsplanten advies voor: ${plantName}.
+
+Geef:
+1. Top 5 GOEDE gezelschapsplanten (met korte uitleg waarom)
+2. Top 3 planten om NIET naast te zetten (met korte uitleg waarom)
+
+Antwoord in het Nederlands. Wees praktisch en bondig.`;
+        try {
+            const data = await callAI(prompt);
+            setResult(data);
+        } catch(e) { setError(e.message); }
+        finally { setLoading(false); }
+    }
+
+    return (
+        <>
+            <div style={{ fontSize:13, color:T.textMuted, marginBottom:20 }}>
+                Zoek welke planten goed samengaan (of juist niet) via AI.
+            </div>
+            <Card style={{ padding:24, marginBottom:4 }}>
+                <div style={{ position:"relative", marginBottom:16 }}>
+                    <Input
+                        label="Plant"
+                        value={plantName}
+                        onChange={e=>setPlantName(e.target.value)}
+                        placeholder="bijv. Tomaat, Wortel, Basilicum..."
+                        onKeyDown={e=>{ if(e.key==="Enter") handleCheck(); }}
+                    />
+                    {suggestions.length > 0 && (
+                        <div style={{ position:"absolute", top:"100%", left:0, right:0, background:T.surface, border:`1px solid ${T.border}`, borderRadius:T.radiusMd, boxShadow:T.shMd, zIndex:20, marginTop:2 }}>
+                            {suggestions.map(s => (
+                                <div key={s} onClick={()=>{ setPlantName(s); }}
+                                    style={{ padding:"8px 12px", cursor:"pointer", fontSize:13, borderBottom:`1px solid ${T.borderLight}` }}
+                                    onMouseEnter={e=>e.currentTarget.style.background=T.surfaceAlt}
+                                    onMouseLeave={e=>e.currentTarget.style.background=T.surface}>
+                                    {s}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
+                <Btn variant="primary" onClick={handleCheck} disabled={loading || !plantName.trim()} style={{ minWidth:180 }}>
+                    {loading ? "â³ Opzoeken..." : "ðŸŒ¿ Check compagnons"}
+                </Btn>
             </Card>
-
-            {plants.length > 0 && (
-                <Card>
-                    <div style={{ padding: "14px 18px 12px", borderBottom: `1px solid ${T.border}` }}>
-                        <h2 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: T.text, fontFamily: "Fraunces, serif" }}>Generated Plants</h2>
-                    </div>
-                    <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 12 }}>
-                        {plants.map((p, i) => (
-                            <div key={i} style={{ border: `1px solid ${T.borderSoft}`, borderRadius: T.rs, padding: 12, background: T.surfaceSoft }}>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 4 }}>{p.icon} {p.name}</div>
-                                <div style={{ fontSize: 12, color: T.textSub, marginBottom: 6 }}>
-                                    {p.sunlight} · {p.water_needs} water · {p.days_to_maturity} days
-                                </div>
-                                <div style={{ fontSize: 12, color: T.textSub, marginBottom: 6 }}>{p.description}</div>
-                                {p.varieties && p.varieties.length > 0 && (
-                                    <div style={{ fontSize: 11, color: T.textMuted }}>Varieties: {p.varieties.join(", ")}</div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </Card>
+            <DevError msg={error}/>
+            {result && (
+                <AiResult model={result.model}>
+                    <div style={{ fontSize:14, lineHeight:1.7, color:T.text, whiteSpace:"pre-wrap" }}>{result.response}</div>
+                </AiResult>
             )}
+        </>
+    );
+}
+
+// â”€â”€ Tab 4: Zaaiplan â”€â”€
+function DevSowCalendar() {
+    const MONTHS = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
+    const currentMonth = new Date().getMonth(); // 0-indexed
+    const [month, setMonth]     = useState(String(currentMonth));
+    const [extra, setExtra]     = useState("");
+    const [loading, setLoading] = useState(false);
+    const [result, setResult]   = useState(null);
+    const [error, setError]     = useState(null);
+
+    async function handleGenerate() {
+        setLoading(true); setResult(null); setError(null);
+        const monthName = MONTHS[Number(month)];
+        const extraPart = extra.trim() ? ` Ik focus op: ${extra}.` : "";
+        const prompt = `Je bent een Belgische tuinkalender-expert (klimaatzone 8a). Maak een beknopte, praktische zaai- en tuinagenda voor de maand ${monthName}.${extraPart}
+
+Structureer je antwoord als:
+ðŸŒ± BINNENSHUIS ZAAIEN: [lijst]
+ðŸŒ¿ BUITEN ZAAIEN / PLANTEN: [lijst]
+ðŸ”„ VERPLANTEN / OOGSTEN: [lijst]
+ðŸ’¡ TIPS VOOR ${monthName.toUpperCase()}: [2-3 praktische tips]
+
+Antwoord in het Nederlands. Wees specifiek met plantnamen.`;
+        try {
+            const data = await callAI(prompt);
+            setResult(data);
+        } catch(e) { setError(e.message); }
+        finally { setLoading(false); }
+    }
+
+    return (
+        <>
+            <div style={{ fontSize:13, color:T.textMuted, marginBottom:20 }}>
+                Genereer een maandelijkse zaai- en tuinagenda op basis van het Belgische klimaat.
+            </div>
+            <Card style={{ padding:24, marginBottom:4 }}>
+                <div style={{ display:"flex", gap:16, flexWrap:"wrap", alignItems:"flex-end" }}>
+                    <div style={{ flex:1, minWidth:160 }}>
+                        <Sel label="Maand" value={month} onChange={v=>setMonth(v)} options={MONTHS.map((m,i)=>({ value:String(i), label:m }))}/>
+                    </div>
+                    <div style={{ flex:2, minWidth:200 }}>
+                        <Input label="Focus (optioneel)" value={extra} onChange={e=>setExtra(e.target.value)} placeholder="bijv. groenten, kruiden, exoten..."/>
+                    </div>
+                </div>
+                <div style={{ marginTop:16 }}>
+                    <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:180 }}>
+                        {loading ? "â³ Genereren..." : "ðŸ“… Genereer zaaiplan"}
+                    </Btn>
+                </div>
+            </Card>
+            <DevError msg={error}/>
+            {result && (
+                <AiResult model={result.model}>
+                    <div style={{ fontSize:14, lineHeight:1.8, color:T.text, whiteSpace:"pre-wrap" }}>{result.response}</div>
+                </AiResult>
+            )}
+        </>
+    );
+}
+
+// â”€â”€ Tab 5: Vrije AI â”€â”€
+function DevFreeChat() {
+    const [prompt, setPrompt] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [result, setResult]   = useState(null);
+    const [error, setError]     = useState(null);
+
+    async function handleSend() {
+        if (!prompt.trim()) return;
+        setLoading(true); setResult(null); setError(null);
+        try {
+            const data = await callAI(prompt + "\n\nAntwoord in het Nederlands.");
+            setResult(data);
+        } catch(e) { setError(e.message); }
+        finally { setLoading(false); }
+    }
+
+    return (
+        <>
+            <div style={{ fontSize:13, color:T.textMuted, marginBottom:20 }}>
+                Stel elke tuingerelateerde vraag rechtstreeks aan de AI.
+            </div>
+            <Card style={{ padding:24, marginBottom:4 }}>
+                <Textarea
+                    label="Vraag / prompt"
+                    value={prompt}
+                    onChange={e=>setPrompt(e.target.value)}
+                    placeholder="Bijv: Wat is het verschil tussen determinante en indeterminante tomaten?"
+                    rows={4}
+                />
+                <div style={{ marginTop:12 }}>
+                    <Btn variant="primary" onClick={handleSend} disabled={loading || !prompt.trim()} style={{ minWidth:160 }}>
+                        {loading ? "â³ Nadenken..." : "ðŸ’¬ Vraag stellen"}
+                    </Btn>
+                </div>
+            </Card>
+            <DevError msg={error}/>
+            {result && (
+                <AiResult model={result.model}>
+                    <div style={{ fontSize:14, lineHeight:1.7, color:T.text, whiteSpace:"pre-wrap" }}>{result.response}</div>
+                </AiResult>
+            )}
+        </>
+    );
+}
+
+// â”€â”€ DevScreen root â”€â”€
+function DevScreen({ state, dispatch, lang }) {
+    const [tab, setTab] = useState("plants");
+    const TABS = [
+        { id:"plants",   icon:"ðŸŒ±", label:"Planten genereren" },
+        { id:"advisor",  icon:"ðŸ§ ", label:"Tuinadviseur" },
+        { id:"companions", icon:"ðŸŒ¿", label:"Compagnons" },
+        { id:"calendar", icon:"ðŸ“…", label:"Zaaiplan" },
+        { id:"chat",     icon:"ðŸ’¬", label:"Vrije vraag" },
+    ];
+
+    return (
+        <div style={{ padding:"32px 24px", maxWidth:760, margin:"0 auto" }}>
+            <div style={{ marginBottom:24 }}>
+                <div style={{ fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.primary, marginBottom:4 }}>
+                    âš¡ AI Dev Dashboard
+                </div>
+                <div style={{ fontSize:13, color:T.textMuted }}>Ollama Â· gemma4:e2b / mistral</div>
+            </div>
+
+            {/* Tab bar */}
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:24, padding:"4px", background:T.surfaceAlt, borderRadius:T.radiusMd, border:`1px solid ${T.border}` }}>
+                {TABS.map(t2 => (
+                    <button key={t2.id} onClick={()=>setTab(t2.id)}
+                        style={{ flex:"1 1 auto", padding:"8px 12px", border:"none", borderRadius:T.radiusSm, cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight:tab===t2.id?700:500, background:tab===t2.id?T.surface:"transparent", color:tab===t2.id?T.primary:T.textMuted, boxShadow:tab===t2.id?T.sh:"none", transition:"all 0.15s" }}>
+                        {t2.icon} {t2.label}
+                    </button>
+                ))}
+            </div>
+
+            {tab === "plants"     && <DevPlantGenerator/>}
+            {tab === "advisor"    && <DevGardenAdvisor state={state}/>}
+            {tab === "companions" && <DevCompanions state={state}/>}
+            {tab === "calendar"   && <DevSowCalendar/>}
+            {tab === "chat"       && <DevFreeChat/>}
         </div>
     );
 }
 
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // APP ROOT
-// ═══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export default function GardenGridApp() {
     const [state, dispatch] = useReducer(reducer, SEED);
     const [loggedInUid, setLoggedInUid] = useState(null);
-    const [screen, setScreen] = useState("dashboard");
+    const initialRoute = getRouteFromHash();
+    const [screen, setScreen] = useState(initialRoute.screen);
+    const [routeParams, setRouteParams] = useState(initialRoute.params);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const harvestSyncRef = useRef("");
+    const structureSyncRef = useRef("");
     const [booted, setBooted] = useState(false);
+    const readyToSave = useRef(false);
 
     useEffect(() => {
         let active = true;
@@ -3698,6 +5245,8 @@ export default function GardenGridApp() {
     }, []);
     useEffect(() => {
         if (!booted) return;
+        // First render after boot: mark ready but don't save yet (state may still be pre-hydration SEED)
+        if (!readyToSave.current) { readyToSave.current = true; return; }
         saveState(state).catch(() => {});
     }, [state, booted]);
     useEffect(() => {
@@ -3709,6 +5258,36 @@ export default function GardenGridApp() {
         harvestSyncRef.current = stamp;
         dispatch({ type:"SYNC_HARVEST_TASKS" });
     }, [state.activeUserId, state.plants, state.tasks, booted]);
+    useEffect(() => {
+        if (!booted) return;
+        const uid = state.activeUserId;
+        if (!uid) return;
+        const hedgeStamp = `${uid}:${forUser(state.structures, uid).filter(s => ["hedge","trellis","windbreak","orchard_row"].includes(s.type)).length}:${forUser(state.tasks, uid).filter(t => String(t.id).startsWith("maint_")).length}`;
+        if (structureSyncRef.current === hedgeStamp) return;
+        structureSyncRef.current = hedgeStamp;
+        dispatch({ type:"SYNC_STRUCTURE_TASKS" });
+    }, [state.activeUserId, state.structures, state.tasks, booted]);
+    useEffect(() => {
+        if (!booted || typeof window === "undefined") return;
+        const handleHashChange = () => {
+            const next = getRouteFromHash();
+            setScreen(prev => (prev === next.screen ? prev : next.screen));
+            setRouteParams(prev => {
+                const same = JSON.stringify(prev) === JSON.stringify(next.params);
+                return same ? prev : next.params;
+            });
+        };
+        window.addEventListener("hashchange", handleHashChange);
+        handleHashChange();
+        return () => window.removeEventListener("hashchange", handleHashChange);
+    }, [booted]);
+    useEffect(() => {
+        if (!booted || typeof window === "undefined") return;
+        const target = formatScreenHash(screen, routeParams);
+        if (window.location.hash !== target) {
+            window.location.hash = target;
+        }
+    }, [screen, routeParams, booted]);
 
     // Keep activeUserId in sync with session
     useEffect(() => {
@@ -3720,6 +5299,7 @@ export default function GardenGridApp() {
     const handleLogin = async (uid) => {
         setLoggedInUid(uid);
         await setSession(uid);
+        setRouteParams({});
         setScreen("dashboard");
     };
 
@@ -3727,15 +5307,26 @@ export default function GardenGridApp() {
         await setSession(null);
         setLoggedInUid(null);
         dispatch({ type:"SET_ACTIVE_USER", payload: null });
+        setRouteParams({});
         setScreen("dashboard");
     };
 
-    const navigate = useCallback(s => setScreen(s), []);
+    const navigate = useCallback((s, params = {}) => {
+        const next = SCREEN_NAMES.has(s) ? s : "dashboard";
+        setScreen(next);
+        setRouteParams(params);
+        if (typeof window !== "undefined") {
+            const target = formatScreenHash(next, params);
+            if (window.location.hash !== target) {
+                window.location.hash = target;
+            }
+        }
+    }, []);
     const uid = loggedInUid;
     const activeUser = state.users.find(u => u.id === uid);
     const lang = activeUser?.settings?.lang || "nl";
     const pendingTasks = forUser(state.tasks, uid||"").filter(t => t.status==="pending").length;
-    const props = { state, dispatch, navigate, lang };
+    const props = { state, dispatch, navigate, lang, routeParams };
 
     if (!booted) {
         return (
@@ -3745,7 +5336,7 @@ export default function GardenGridApp() {
         );
     }
 
-    // Not logged in → show login screen
+    // Not logged in â†’ show login screen
     if (!loggedInUid || !activeUser) {
         return <LoginScreen state={state} dispatch={dispatch} onLogin={handleLogin}/>;
     }
@@ -3764,23 +5355,26 @@ export default function GardenGridApp() {
   `;
 
     return (
-        <>
-            <style>{STYLES}</style>
-            <div style={{ display:"flex", minHeight:"100vh", background:"#F5F0E8" }}>
-                <Sidebar screen={screen} setScreen={setScreen} pendingTasks={pendingTasks} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} state={state} dispatch={dispatch} lang={lang} onLogout={handleLogout}/>
-                <main style={{ flex:1, minHeight:"100vh", overflow:"auto" }}>
-                    {screen==="dashboard"   && <DashboardScreen   {...props}/>}
-                    {screen==="gardens"     && <GardensScreen     {...props}/>}
-                    {screen==="editor"      && <EditorScreen      {...props}/>}
-                    {screen==="fields"      && <FieldsScreen      {...props}/>}
-                    {screen==="plants"      && <PlantsScreen      {...props}/>}
-                    {screen==="tasks"       && <TasksScreen       {...props}/>}
-                    {screen==="greenhouses" && <GreenhouseScreen  {...props}/>}
-                    {screen==="account"     && <AccountScreen     {...props} onLogout={handleLogout}/>}
-                    {screen==="settings"    && <SettingsScreen    {...props}/>}
-                    {screen==="dev"         && <DevScreen         {...props}/>}
-                </main>
-            </div>
-        </>
+        <ScreenErrorBoundary key={screen} onGoDashboard={() => navigate("dashboard")} onRetry={() => navigate(screen)}>
+            <>
+                <style>{STYLES}</style>
+                <div style={{ display:"flex", minHeight:"100vh", background:"#F5F0E8" }}>
+                    <Sidebar screen={screen} setScreen={navigate} pendingTasks={pendingTasks} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} state={state} dispatch={dispatch} lang={lang} onLogout={handleLogout}/>
+                    <main style={{ flex:1, minHeight:"100vh", overflow:"auto" }}>
+                        {screen==="dashboard"   && <DashboardScreen   {...props}/>}
+                        {screen==="gardens"     && <GardensScreen     {...props}/>}
+                        {screen==="editor"      && <EditorScreen      {...props}/>}
+                        {screen==="fields"      && <FieldsScreen      {...props}/>}
+                        {screen==="plants"      && <PlantsScreen      {...props}/>}
+                        {screen==="tasks"       && <TasksScreen       {...props}/>}
+                        {screen==="greenhouses" && <GreenhouseScreen  {...props}/>}
+                        {screen==="account"     && <AccountScreen     {...props} onLogout={handleLogout}/>}
+                        {screen==="settings"    && <SettingsScreen    {...props}/>}
+                        {screen==="dev" && activeUser?.is_dev && <DevScreen {...props}/>}
+                    </main>
+                </div>
+            </>
+        </ScreenErrorBoundary>
     );
 }
+
