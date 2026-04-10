@@ -4,7 +4,7 @@
 // THEME
 // ----
 import { PageShell, PageHeader, SectionPanel, PanelGroup, QuickAction, MetaBadge } from "./src/layout/PageChrome.jsx";
-import { SCREEN_ROUTES, getRouteFromHash, formatScreenHash } from "./src/routes.js";
+import { SCREEN_ROUTES, SCREEN_NAMES, getRouteFromHash, formatScreenHash } from "./src/routes.js";
 
 class ScreenErrorBoundary extends React.Component {
     constructor(props) {

@@ -32,4 +32,4 @@ const formatScreenHash = (screen, params = {}) => {
     return search ? `${base}?${search}` : base;
 };
 
-export { SCREEN_ROUTES, getRouteFromHash, formatScreenHash };
+export { SCREEN_ROUTES, SCREEN_NAMES, getRouteFromHash, formatScreenHash };
