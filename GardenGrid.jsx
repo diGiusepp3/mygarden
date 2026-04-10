@@ -130,6 +130,49 @@ const LANG = {
         switch_user:"Switch Profile", add_user:"Add Profile", your_profile:"Profile",
         create_profile:"Create Profile", profile_name:"Display Name", colour:"Colour",
         library_title:"🌱 Plant Library", library_sub:"Click a plant to pre-fill the form",
+        dev_ai_dashboard:"⚡ AI Dev Dashboard",
+        dev_ai_subtitle:"Ollama · gemma4:e2b / mistral",
+        dev_tab_plants:"Plant generation",
+        dev_tab_codex:"Codex plant types",
+        dev_tab_advisor:"Garden advisor",
+        dev_tab_companions:"Companions",
+        dev_tab_calendar:"Sow plan",
+        dev_tab_chat:"Free question",
+        dev_intro:"Use Codex to create new plant varieties and save them straight into the plant library.",
+        dev_category:"Category",
+        dev_count:"Count",
+        dev_generate:"⚡ Generate with Codex",
+        dev_generate_loading:"⏳ Generating...",
+        dev_varieties:"Varieties to carry over",
+        dev_varieties_hint:"This list is sent along so existing varieties can be recognised and extended.",
+        dev_varieties_placeholder:"Tomato, Cherry Tomato, Cluster Tomato",
+        dev_presets_easy:"Easy crops",
+        dev_presets_easy_text:"Focus on beginner-friendly crops with short maturity times.",
+        dev_presets_pollinators:"Pollinators",
+        dev_presets_pollinators_text:"Add more flower species that help pollinators and companion planting.",
+        dev_presets_greenhouse:"Greenhouse",
+        dev_presets_greenhouse_text:"Create greenhouse-friendly vegetables and herbs.",
+        dev_presets_autumn:"Autumn",
+        dev_presets_autumn_text:"Generate hardy late-season crops for a Belgian garden.",
+        dev_prompt:"Codex prompt",
+        dev_prompt_placeholder:"Describe which new plant varieties you want to create.",
+        dev_prompt_hint:"The clearer the prompt, the better the plant types become.",
+        dev_library_title:"Existing library",
+        dev_library_loading:"Library loading...",
+        dev_library_found:"plants found",
+        dev_library_search:"Search",
+        dev_library_search_placeholder:"Search plant or variety...",
+        dev_library_none:"No description.",
+        dev_library_saved:"new",
+        dev_library_updated:"updated",
+        dev_category_vegetable:"Vegetable",
+        dev_category_leafy_green:"Leafy Green",
+        dev_category_herb:"Herb",
+        dev_category_fruit:"Fruit",
+        dev_category_legume:"Legume",
+        dev_category_root:"Root",
+        dev_category_flower:"Flower",
+        dev_category_other:"Other",
         all:"All", all_categories:"All Categories", all_statuses:"All Statuses",
         beds_total:"beds total", no_beds:"No beds yet", no_plants:"No plants yet",
         no_tasks:"No tasks yet", no_gardens:"No gardens yet",
@@ -200,6 +243,49 @@ const LANG = {
         switch_user:"Profiel Wisselen", add_user:"Profiel Toevoegen", your_profile:"Profiel",
         create_profile:"Profiel Aanmaken", profile_name:"Weergavenaam", colour:"Kleur",
         library_title:"🌱 Plantenbibliotheek", library_sub:"Klik op een plant om het formulier in te vullen",
+        dev_ai_dashboard:"⚡ AI Dev Dashboard",
+        dev_ai_subtitle:"Ollama · gemma4:e2b / mistral",
+        dev_tab_plants:"Planten genereren",
+        dev_tab_codex:"Codex plantsoorten",
+        dev_tab_advisor:"Tuinadviseur",
+        dev_tab_companions:"Compagnons",
+        dev_tab_calendar:"Zaaiplan",
+        dev_tab_chat:"Vrije vraag",
+        dev_intro:"Gebruik Codex om nieuwe plantsoorten te maken en direct in de plantenbibliotheek op te slaan.",
+        dev_category:"Categorie",
+        dev_count:"Aantal",
+        dev_generate:"⚡ Codex genereer",
+        dev_generate_loading:"⏳ Genereren...",
+        dev_varieties:"Variëteiten om mee te nemen",
+        dev_varieties_hint:"Deze lijst wordt meegestuurd zodat bestaande variëteiten herkend en aangevuld kunnen worden.",
+        dev_varieties_placeholder:"Tomaat, kerstomaat, trostomaat",
+        dev_presets_easy:"Makkelijke gewassen",
+        dev_presets_easy_text:"Focus op beginner-vriendelijke gewassen met korte groeiduur.",
+        dev_presets_pollinators:"Bestuivers",
+        dev_presets_pollinators_text:"Voeg meer bloeiende soorten toe die bestuivers en combinatieteelt helpen.",
+        dev_presets_greenhouse:"Serre",
+        dev_presets_greenhouse_text:"Maak groenten en kruiden die goed zijn voor in de serre.",
+        dev_presets_autumn:"Najaar",
+        dev_presets_autumn_text:"Genereer sterke late gewassen voor een Belgische tuin.",
+        dev_prompt:"Codex prompt",
+        dev_prompt_placeholder:"Beschrijf welke nieuwe plantsoorten je wil laten maken.",
+        dev_prompt_hint:"Hoe duidelijker de prompt, hoe beter de plantsoorten worden.",
+        dev_library_title:"Bestaande bibliotheek",
+        dev_library_loading:"Bibliotheek laden...",
+        dev_library_found:"planten gevonden",
+        dev_library_search:"Zoeken",
+        dev_library_search_placeholder:"Zoek plant of variëteit...",
+        dev_library_none:"Geen beschrijving.",
+        dev_library_saved:"nieuw",
+        dev_library_updated:"bijgewerkt",
+        dev_category_vegetable:"Groenten",
+        dev_category_leafy_green:"Bladgroen",
+        dev_category_herb:"Kruiden",
+        dev_category_fruit:"Fruit",
+        dev_category_legume:"Peulgewassen",
+        dev_category_root:"Wortelgewassen",
+        dev_category_flower:"Bloemen",
+        dev_category_other:"Overig",
         all:"Alle", all_categories:"Alle Categorieën", all_statuses:"Alle Statussen",
         beds_total:"bedden totaal", no_beds:"Nog geen bedden", no_plants:"Nog geen planten",
         no_tasks:"Nog geen taken", no_gardens:"Nog geen tuinen",
@@ -270,6 +356,49 @@ const LANG = {
         switch_user:"Changer de profil", add_user:"Ajouter un profil", your_profile:"Profil",
         create_profile:"Créer un profil", profile_name:"Nom affiché", colour:"Couleur",
         library_title:"🌱 Bibliothèque de plantes", library_sub:"Cliquez sur une plante pour pré-remplir le formulaire",
+        dev_ai_dashboard:"⚡ Tableau IA de dev",
+        dev_ai_subtitle:"Ollama · gemma4:e2b / mistral",
+        dev_tab_plants:"Générer des plantes",
+        dev_tab_codex:"Types de plantes Codex",
+        dev_tab_advisor:"Conseiller jardin",
+        dev_tab_companions:"Compagnonnage",
+        dev_tab_calendar:"Plan de semis",
+        dev_tab_chat:"Question libre",
+        dev_intro:"Utilisez Codex pour créer de nouvelles variétés et les enregistrer directement dans la bibliothèque de plantes.",
+        dev_category:"Catégorie",
+        dev_count:"Quantité",
+        dev_generate:"⚡ Générer avec Codex",
+        dev_generate_loading:"⏳ Génération...",
+        dev_varieties:"Variétés à reprendre",
+        dev_varieties_hint:"Cette liste est envoyée pour reconnaître et compléter les variétés existantes.",
+        dev_varieties_placeholder:"Tomate, tomate cerise, tomate grappe",
+        dev_presets_easy:"Cultures faciles",
+        dev_presets_easy_text:"Concentrez-vous sur des cultures faciles pour débutants avec une maturité rapide.",
+        dev_presets_pollinators:"Pollinisateurs",
+        dev_presets_pollinators_text:"Ajoutez plus d'espèces florales utiles aux pollinisateurs et aux associations.",
+        dev_presets_greenhouse:"Serre",
+        dev_presets_greenhouse_text:"Créez des légumes et herbes adaptés à la serre.",
+        dev_presets_autumn:"Automne",
+        dev_presets_autumn_text:"Générez des cultures robustes de fin de saison pour un jardin belge.",
+        dev_prompt:"Prompt Codex",
+        dev_prompt_placeholder:"Décrivez quelles nouvelles variétés de plantes vous voulez créer.",
+        dev_prompt_hint:"Plus le prompt est clair, meilleures seront les variétés générées.",
+        dev_library_title:"Bibliothèque existante",
+        dev_library_loading:"Chargement de la bibliothèque...",
+        dev_library_found:"plantes trouvées",
+        dev_library_search:"Rechercher",
+        dev_library_search_placeholder:"Rechercher une plante ou une variété...",
+        dev_library_none:"Aucune description.",
+        dev_library_saved:"nouveau",
+        dev_library_updated:"mis à jour",
+        dev_category_vegetable:"Légume",
+        dev_category_leafy_green:"Feuille",
+        dev_category_herb:"Herbe",
+        dev_category_fruit:"Fruit",
+        dev_category_legume:"Légumineuse",
+        dev_category_root:"Racine",
+        dev_category_flower:"Fleur",
+        dev_category_other:"Autre",
         all:"Tout", all_categories:"Toutes les catégories", all_statuses:"Tous les statuts",
         beds_total:"parterres au total", no_beds:"Aucun parterre", no_plants:"Aucune plante",
         no_tasks:"Aucune tâche", no_gardens:"Aucun jardin",
@@ -340,6 +469,49 @@ const LANG = {
         switch_user:"Profil wechseln", add_user:"Profil hinzufügen", your_profile:"Profil",
         create_profile:"Profil erstellen", profile_name:"Anzeigename", colour:"Farbe",
         library_title:"🌱 Pflanzenbibliothek", library_sub:"Klicke auf eine Pflanze, um das Formular auszufüllen",
+        dev_ai_dashboard:"⚡ AI-Entwicklungs-Dashboard",
+        dev_ai_subtitle:"Ollama · gemma4:e2b / mistral",
+        dev_tab_plants:"Pflanzen generieren",
+        dev_tab_codex:"Codex-Pflanzenarten",
+        dev_tab_advisor:"Gartenberater",
+        dev_tab_companions:"Begleitpflanzen",
+        dev_tab_calendar:"Aussaatplan",
+        dev_tab_chat:"Freie Frage",
+        dev_intro:"Nutze Codex, um neue Pflanzensorten zu erstellen und direkt in der Pflanzenbibliothek zu speichern.",
+        dev_category:"Kategorie",
+        dev_count:"Anzahl",
+        dev_generate:"⚡ Mit Codex generieren",
+        dev_generate_loading:"⏳ Wird generiert...",
+        dev_varieties:"Mitzugebende Sorten",
+        dev_varieties_hint:"Diese Liste wird mitgeschickt, damit vorhandene Sorten erkannt und ergänzt werden können.",
+        dev_varieties_placeholder:"Tomate, Kirschtomate, Rispentomate",
+        dev_presets_easy:"Einfache Kulturen",
+        dev_presets_easy_text:"Fokussiere auf anfängerfreundliche Kulturen mit kurzer Reifezeit.",
+        dev_presets_pollinators:"Bestäuber",
+        dev_presets_pollinators_text:"Füge mehr Blütenarten hinzu, die Bestäuber und Mischkultur unterstützen.",
+        dev_presets_greenhouse:"Gewächshaus",
+        dev_presets_greenhouse_text:"Erzeuge gewächshaustaugliches Gemüse und Kräuter.",
+        dev_presets_autumn:"Herbst",
+        dev_presets_autumn_text:"Erzeuge robuste Spätkulturen für einen belgischen Garten.",
+        dev_prompt:"Codex-Prompt",
+        dev_prompt_placeholder:"Beschreibe, welche neuen Pflanzensorten du erstellen willst.",
+        dev_prompt_hint:"Je klarer der Prompt, desto besser werden die Pflanzentypen.",
+        dev_library_title:"Bestehende Bibliothek",
+        dev_library_loading:"Bibliothek wird geladen...",
+        dev_library_found:"Pflanzen gefunden",
+        dev_library_search:"Suchen",
+        dev_library_search_placeholder:"Pflanze oder Sorte suchen...",
+        dev_library_none:"Keine Beschreibung.",
+        dev_library_saved:"neu",
+        dev_library_updated:"aktualisiert",
+        dev_category_vegetable:"Gemüse",
+        dev_category_leafy_green:"Blattgemüse",
+        dev_category_herb:"Kräuter",
+        dev_category_fruit:"Frucht",
+        dev_category_legume:"Leguminose",
+        dev_category_root:"Wurzel",
+        dev_category_flower:"Blume",
+        dev_category_other:"Sonstiges",
         all:"Alle", all_categories:"Alle Kategorien", all_statuses:"Alle Status",
         beds_total:"Beete gesamt", no_beds:"Noch keine Beete", no_plants:"Noch keine Pflanzen",
         no_tasks:"Noch keine Aufgaben", no_gardens:"Noch keine Gärten",
@@ -4819,6 +4991,16 @@ function SettingsScreen({ state, dispatch, lang }) {
 // SCREEN: DEV (Ollama plant generator)
 // ----
 const DEV_CATEGORIES = ["Vegetable","Leafy Green","Herb","Fruit","Legume","Root","Flower"];
+const DEV_CATEGORY_LABEL_K = {
+    Vegetable:"dev_category_vegetable",
+    "Leafy Green":"dev_category_leafy_green",
+    Herb:"dev_category_herb",
+    Fruit:"dev_category_fruit",
+    Legume:"dev_category_legume",
+    Root:"dev_category_root",
+    Flower:"dev_category_flower",
+    Other:"dev_category_other",
+};
 
 // ----
 async function callAI(prompt) {
@@ -4851,11 +5033,12 @@ function AiResult({ children, model }) {
 }
 
 // ----
-function DevCodexPlantBuilder() {
+function DevCodexPlantBuilder({ lang = "en" }) {
+    const t = useT(lang);
     const [category, setCategory] = useState("Vegetable");
     const [count, setCount]       = useState(8);
-    const [brief, setBrief]       = useState("More easy-to-grow crops for a mixed kitchen garden.");
-    const [varieties, setVarieties] = useState("Tomato, Cherry Tomato, Cluster Tomato");
+    const [brief, setBrief]       = useState(() => t("dev_prompt_placeholder") || "More easy-to-grow crops for a mixed kitchen garden.");
+    const [varieties, setVarieties] = useState(() => t("dev_varieties_placeholder") || "Tomato, Cherry Tomato, Cluster Tomato");
     const [search, setSearch]     = useState("");
     const [library, setLibrary]   = useState([]);
     const [libraryLoading, setLibraryLoading] = useState(false);
@@ -4882,11 +5065,12 @@ function DevCodexPlantBuilder() {
     }, []);
 
     const presets = [
-        { label: "Easy crops", text: "Focus on beginner-friendly crops with short maturity times." },
-        { label: "Pollinators", text: "Add more flower species that help pollinators and companion planting." },
-        { label: "Greenhouse", text: "Create greenhouse-friendly vegetables and herbs." },
-        { label: "Autumn", text: "Generate hardy late-season crops for a Belgian garden." },
+        { label: t("dev_presets_easy"), text: t("dev_presets_easy_text") },
+        { label: t("dev_presets_pollinators"), text: t("dev_presets_pollinators_text") },
+        { label: t("dev_presets_greenhouse"), text: t("dev_presets_greenhouse_text") },
+        { label: t("dev_presets_autumn"), text: t("dev_presets_autumn_text") },
     ];
+    const categoryOptions = DEV_CATEGORIES.map(value => ({ value, label: t(DEV_CATEGORY_LABEL_K[value]) || value }));
 
     async function handleGenerate() {
         setLoading(true);
@@ -4916,23 +5100,23 @@ function DevCodexPlantBuilder() {
     return (
         <>
             <div style={{ fontSize:13, color:T.textMuted, marginBottom:20, lineHeight:1.6 }}>
-                Gebruik Codex om nieuwe plantsoorten te maken en direct in de plantenbibliotheek op te slaan.
+                {t("dev_intro")}
             </div>
             <Card style={{ padding:24, marginBottom:4 }}>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))", gap:14, alignItems:"end" }}>
-                    <Sel label="Categorie" value={category} onChange={v=>setCategory(v)} options={DEV_CATEGORIES}/>
-                    <Input label="Aantal" type="number" value={count} min={1} max={30} onChange={e=>setCount(Number(e.target.value) || 1)}/>
+                    <Sel label={t("dev_category")} value={category} onChange={v=>setCategory(v)} options={categoryOptions}/>
+                    <Input label={t("dev_count")} type="number" value={count} min={1} max={30} onChange={e=>setCount(Number(e.target.value) || 1)}/>
                     <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:170, height:38, justifySelf:"start" }}>
-                        {loading ? "⏳ Genereren..." : "⚡ Codex genereer"}
+                        {loading ? t("dev_generate_loading") : t("dev_generate")}
                     </Btn>
                 </div>
                 <div style={{ marginTop:14 }}>
                     <Input
-                        label="Variëteiten om mee te nemen"
+                        label={t("dev_varieties")}
                         value={varieties}
                         onChange={setVarieties}
-                        placeholder="Tomaat, kerstomaat, trostomaat..."
-                        hint="Deze lijst wordt meegestuurd zodat bestaande variëteiten herkend en aangevuld kunnen worden."
+                        placeholder={t("dev_varieties_placeholder")}
+                        hint={t("dev_varieties_hint")}
                     />
                 </div>
                 <div style={{ marginTop:14, display:"flex", gap:8, flexWrap:"wrap" }}>
@@ -4957,24 +5141,24 @@ function DevCodexPlantBuilder() {
                 </div>
                 <div style={{ marginTop:14 }}>
                     <Textarea
-                        label="Codex prompt"
+                        label={t("dev_prompt")}
                         value={brief}
                         onChange={setBrief}
                         rows={4}
-                        placeholder="Beschrijf welke nieuwe plantsoorten je wil laten maken."
-                        hint="Hoe duidelijker de prompt, hoe beter de plantsoorten worden."
+                        placeholder={t("dev_prompt_placeholder")}
+                        hint={t("dev_prompt_hint")}
                     />
                 </div>
             </Card>
             <Card style={{ padding:24, marginTop:16 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, marginBottom:12 }}>
                     <div>
-                        <div style={{ fontSize:16, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>Bestaande bibliotheek</div>
+                        <div style={{ fontSize:16, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>{t("dev_library_title")}</div>
                         <div style={{ fontSize:12, color:T.textMuted }}>
-                            {libraryLoading ? "Bibliotheek laden..." : `${library.length} planten gevonden`}
+                            {libraryLoading ? t("dev_library_loading") : `${library.length} ${t("dev_library_found")}`}
                         </div>
                     </div>
-                    <Input label="Zoeken" value={search} onChange={setSearch} placeholder="Zoek plant of variëteit..." />
+                    <Input label={t("dev_library_search")} value={search} onChange={setSearch} placeholder={t("dev_library_search_placeholder")} />
                 </div>
                 <div style={{ maxHeight:420, overflow:"auto", borderTop:`1px solid ${T.border}`, paddingTop:12 }}>
                     {library
@@ -4989,9 +5173,9 @@ function DevCodexPlantBuilder() {
                             <div key={item.id} style={{ padding:"10px 0", borderBottom:`1px solid ${T.borderLight}`, display:"flex", flexDirection:"column", gap:5 }}>
                                 <div style={{ display:"flex", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
                                     <div style={{ fontWeight:800, color:T.text }}>{item.icon || "🌱"} {item.name}</div>
-                                    <Badge color={T.primary} bg={T.primaryBg}>{item.category}</Badge>
+                                    <Badge color={T.primary} bg={T.primaryBg}>{t(DEV_CATEGORY_LABEL_K[item.category] || item.category) || item.category}</Badge>
                                 </div>
-                                <div style={{ fontSize:12, color:T.textMuted, lineHeight:1.5 }}>{item.description || "Geen beschrijving."}</div>
+                                <div style={{ fontSize:12, color:T.textMuted, lineHeight:1.5 }}>{item.description || t("dev_library_none")}</div>
                                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                                     {(item.varieties || []).map(v => <Badge key={v} color={T.textSub} bg={T.surfaceAlt}>{v}</Badge>)}
                                 </div>
@@ -5003,7 +5187,7 @@ function DevCodexPlantBuilder() {
             {result && (
                 <AiResult model={result.model}>
                     <div style={{ fontWeight:700, marginBottom:12, color:T.primary }}>
-                        ✅ {result.saved ?? 0} nieuw · {result.updated ?? 0} bijgewerkt
+                        ✅ {result.saved ?? 0} {t("dev_library_saved")} · {result.updated ?? 0} {t("dev_library_updated")}
                     </div>
                     {Array.isArray(result.plants) && result.plants.map((p, i) => (
                         <div key={i} style={{ padding:"8px 0", borderBottom: i < result.plants.length-1 ? `1px solid ${T.border}` : "none", fontSize:13 }}>
@@ -5264,23 +5448,24 @@ function DevFreeChat() {
 
 // ----
 function DevScreen({ state, dispatch, lang }) {
+    const t = useT(lang);
     const [tab, setTab] = useState("plants");
     const TABS = [
-        { id:"plants",   icon:"🌱", label:"Planten genereren" },
-        { id:"codex",    icon:"🧠", label:"Codex plantsoorten" },
-        { id:"advisor",  icon:"🧠", label:"Tuinadviseur" },
-        { id:"companions", icon:"🌿", label:"Compagnons" },
-        { id:"calendar", icon:"📅", label:"Zaaiplan" },
-        { id:"chat",     icon:"💬", label:"Vrije vraag" },
+        { id:"plants",   icon:"🌱", label:t("dev_tab_plants") },
+        { id:"codex",    icon:"🧠", label:t("dev_tab_codex") },
+        { id:"advisor",  icon:"🧠", label:t("dev_tab_advisor") },
+        { id:"companions", icon:"🌿", label:t("dev_tab_companions") },
+        { id:"calendar", icon:"📅", label:t("dev_tab_calendar") },
+        { id:"chat",     icon:"💬", label:t("dev_tab_chat") },
     ];
 
     return (
         <div style={{ padding:"32px 24px", maxWidth:760, margin:"0 auto" }}>
             <div style={{ marginBottom:24 }}>
                 <div style={{ fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.primary, marginBottom:4 }}>
-                    ⚡ AI Dev Dashboard
+                    {t("dev_ai_dashboard")}
                 </div>
-                <div style={{ fontSize:13, color:T.textMuted }}>Ollama · gemma4:e2b / mistral</div>
+                <div style={{ fontSize:13, color:T.textMuted }}>{t("dev_ai_subtitle")}</div>
             </div>
 
             {/* Tab bar */}
@@ -5293,8 +5478,8 @@ function DevScreen({ state, dispatch, lang }) {
                 ))}
             </div>
 
-            {tab === "plants"     && <DevCodexPlantBuilder/>}
-            {tab === "codex"      && <DevCodexPlantBuilder/>}
+            {tab === "plants"     && <DevCodexPlantBuilder lang={lang}/>}
+            {tab === "codex"      && <DevCodexPlantBuilder lang={lang}/>}
             {tab === "advisor"    && <DevGardenAdvisor state={state}/>}
             {tab === "companions" && <DevCompanions state={state}/>}
             {tab === "calendar"   && <DevSowCalendar/>}

@@ -448,11 +448,11 @@ Wat nu al duidelijk is:
 - [ ] Maak geen rare mengelmoes van talen.
 - [ ] Maak nieuwe tekst eerst in i18n.
 - [ ] Maak oude tekst later schoon.
-- [ ] Maak admin/dev tekst ook vertaald als dat kan.
-- [ ] Maak lege states ook vertaald.
-- [ ] Maak helper labels ook vertaald.
+- [x] Maak admin/dev tekst ook vertaald als dat kan.
+- [x] Maak lege states ook vertaald.
+- [x] Maak helper labels ook vertaald.
 - [ ] Maak status labels ook vertaald.
-- [ ] Maak tab labels ook vertaald.
+- [x] Maak tab labels ook vertaald.
 - [ ] Maak tooltips ook vertaald.
 - [ ] Check of de taalwissel overal werkt.
 - [ ] Check of de taalwissel geen stukken mist.
