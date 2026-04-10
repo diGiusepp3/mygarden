@@ -719,12 +719,14 @@ Wat nu al duidelijk is:
 
 - [x] Voeg een tuinreis/progress kaart toe voor profiel, eerste tuin, bedden en eerste planten.
 - [x] Voeg een profielvoortgang toe voor naam, e-mail, avatar, eerste tuin en eerste planten.
-- [ ] Maak de eerste start meer als een kleine quest-lijn.
-- [ ] Laat nieuwe gebruikers direct zien wat ze nog moeten doen.
-- [ ] Laat de dashboard start meer voelen als een tuinwereld.
+- [x] Maak de eerste start meer als een kleine quest-lijn.
+- [x] Laat nieuwe gebruikers direct zien wat ze nog moeten doen.
+- [x] Laat de dashboard start meer voelen als een tuinwereld.
 - [ ] Laat lege staten minder leeg en meer uitnodigend voelen.
 - [ ] Laat de eerste tuin visueel aanvoelen als een unlock-moment.
 - [ ] Laat crops pas echt opduiken nadat de eerste tuin is aangemaakt.
 - [ ] Maak de stappen voor profiel, tuin, bed en plant duidelijk en rustig.
 - [ ] Geef elke stap een klein beloningsgevoel zonder druk te maken.
 - [ ] Laat de app een beetje groeien mee met de gebruiker.
+- [x] Bewaar user voortgang in de opgeslagen state/database.
+- [x] Toon per stap een knop die naar de juiste pagina of functie wijst.

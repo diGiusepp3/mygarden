@@ -1104,6 +1104,33 @@ const polygonCentroid = (points=[]) => {
     const sum = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
     return { x: sum.x / points.length, y: sum.y / points.length };
 };
+const syncAllUserProgress = (state) => {
+    const now = new Date().toISOString();
+    return {
+        ...state,
+        users: (state.users || []).map(user => {
+            const progress = buildUserQuestProgress({
+                user,
+                gardens: forUser(state.gardens || [], user.id),
+                fields: forUser(state.fields || [], user.id),
+                structures: forUser(state.structures || [], user.id),
+                plants: forUser(state.plants || [], user.id),
+                tasks: forUser(state.tasks || [], user.id),
+            });
+            return {
+                ...user,
+                progress: {
+                    version: 1,
+                    percent: progress.progress,
+                    completed_keys: progress.steps.filter(step => step.done).map(step => step.key),
+                    total_steps: progress.steps.length,
+                    next_key: progress.nextStep?.key || null,
+                    updated_at: now,
+                },
+            };
+        }),
+    };
+};
 
 // ----
 // REDUCER
@@ -1111,54 +1138,61 @@ const polygonCentroid = (points=[]) => {
 function reducer(state, { type, payload }) {
     const uid = state.activeUserId;
     const inj = (p) => ({ ...p, user_id: uid });
+    let nextState = state;
     switch (type) {
-        case "ADD_USER":          return { ...state, users: [...state.users, payload] };
-        case "UPDATE_USER":       return { ...state, users: state.users.map(u => u.id===payload.id ? payload : u) };
-        case "DELETE_USER":       return { ...state, users: state.users.filter(u => u.id!==payload), activeUserId: state.activeUserId===payload ? (state.users.find(u=>u.id!==payload)?.id||null) : state.activeUserId };
-        case "SET_ACTIVE_USER":   return { ...state, activeUserId: payload };
-        case "ADD_GARDEN":        return { ...state, gardens: [...state.gardens, inj(payload)], activeGardenId: payload.id };
-        case "UPDATE_GARDEN":     return { ...state, gardens: state.gardens.map(g => g.id===payload.id ? payload : g) };
-        case "DELETE_GARDEN":     return { ...state, gardens: state.gardens.filter(g => g.id!==payload), activeGardenId: state.activeGardenId===payload ? (state.gardens.find(g=>g.user_id===uid&&g.id!==payload)?.id||null) : state.activeGardenId };
-        case "SET_ACTIVE_GARDEN": return { ...state, activeGardenId: payload };
-        case "ADD_FIELD":         return { ...state, fields: [...state.fields, inj(payload)] };
-        case "UPDATE_FIELD":      return { ...state, fields: state.fields.map(f => f.id===payload.id ? payload : f) };
-        case "DELETE_FIELD":      return { ...state, fields: state.fields.filter(f => f.id!==payload) };
+        case "ADD_USER":          nextState = { ...state, users: [...state.users, payload] }; break;
+        case "UPDATE_USER":       nextState = { ...state, users: state.users.map(u => u.id===payload.id ? payload : u) }; break;
+        case "DELETE_USER":       nextState = { ...state, users: state.users.filter(u => u.id!==payload), activeUserId: state.activeUserId===payload ? (state.users.find(u=>u.id!==payload)?.id||null) : state.activeUserId }; break;
+        case "SET_ACTIVE_USER":   nextState = { ...state, activeUserId: payload }; break;
+        case "ADD_GARDEN":        nextState = { ...state, gardens: [...state.gardens, inj(payload)], activeGardenId: payload.id }; break;
+        case "UPDATE_GARDEN":     nextState = { ...state, gardens: state.gardens.map(g => g.id===payload.id ? payload : g) }; break;
+        case "DELETE_GARDEN":     nextState = { ...state, gardens: state.gardens.filter(g => g.id!==payload), activeGardenId: state.activeGardenId===payload ? (state.gardens.find(g=>g.user_id===uid&&g.id!==payload)?.id||null) : state.activeGardenId }; break;
+        case "SET_ACTIVE_GARDEN": nextState = { ...state, activeGardenId: payload }; break;
+        case "ADD_FIELD":         nextState = { ...state, fields: [...state.fields, inj(payload)] }; break;
+        case "UPDATE_FIELD":      nextState = { ...state, fields: state.fields.map(f => f.id===payload.id ? payload : f) }; break;
+        case "DELETE_FIELD":      nextState = { ...state, fields: state.fields.filter(f => f.id!==payload) }; break;
         case "ADD_STRUCT": {
             const struct = inj(payload);
-            return { ...state, structures: [...state.structures, struct], tasks: syncStructureTasks(state.tasks, struct, uid) };
+            nextState = { ...state, structures: [...state.structures, struct], tasks: syncStructureTasks(state.tasks, struct, uid) };
+            break;
         }
         case "UPDATE_STRUCT": {
             const struct = payload;
-            return { ...state, structures: state.structures.map(s => s.id===payload.id ? payload : s), tasks: syncStructureTasks(state.tasks, struct, uid) };
+            nextState = { ...state, structures: state.structures.map(s => s.id===payload.id ? payload : s), tasks: syncStructureTasks(state.tasks, struct, uid) };
+            break;
         }
         case "DELETE_STRUCT": {
             const nextStructs = state.structures.filter(s => s.id!==payload);
             const removedTasks = removeStructureTasks(state.tasks, payload);
-            return { ...state, structures: nextStructs, tasks: removedTasks };
+            nextState = { ...state, structures: nextStructs, tasks: removedTasks };
+            break;
         }
-        case "ADD_SLOT":          return { ...state, slots: [...(state.slots||[]), inj(payload)] };
-        case "UPDATE_SLOT":       return { ...state, slots: (state.slots||[]).map(s => s.id===payload.id ? payload : s) };
-        case "DELETE_SLOT":       return { ...state, slots: (state.slots||[]).filter(s => s.id!==payload) };
-        case "ADD_ZONE":          return { ...state, zones: [...(state.zones||[]), inj(payload)] };
-        case "UPDATE_ZONE":       return { ...state, zones: (state.zones||[]).map(z => z.id===payload.id ? payload : z) };
-        case "DELETE_ZONE":       return { ...state, zones: (state.zones||[]).filter(z => z.id!==payload) };
+        case "ADD_SLOT":          nextState = { ...state, slots: [...(state.slots||[]), inj(payload)] }; break;
+        case "UPDATE_SLOT":       nextState = { ...state, slots: (state.slots||[]).map(s => s.id===payload.id ? payload : s) }; break;
+        case "DELETE_SLOT":       nextState = { ...state, slots: (state.slots||[]).filter(s => s.id!==payload) }; break;
+        case "ADD_ZONE":          nextState = { ...state, zones: [...(state.zones||[]), inj(payload)] }; break;
+        case "UPDATE_ZONE":       nextState = { ...state, zones: (state.zones||[]).map(z => z.id===payload.id ? payload : z) }; break;
+        case "DELETE_ZONE":       nextState = { ...state, zones: (state.zones||[]).filter(z => z.id!==payload) }; break;
         case "ADD_PLANT": {
             const plant = inj(payload);
-            return { ...state, plants: [...state.plants, plant], tasks: syncHarvestTask(state.tasks, plant, uid) };
+            nextState = { ...state, plants: [...state.plants, plant], tasks: syncHarvestTask(state.tasks, plant, uid) };
+            break;
         }
         case "UPDATE_PLANT": {
             const plant = payload;
-            return { ...state, plants: state.plants.map(p => p.id===payload.id ? payload : p), tasks: syncHarvestTask(state.tasks, plant, uid) };
+            nextState = { ...state, plants: state.plants.map(p => p.id===payload.id ? payload : p), tasks: syncHarvestTask(state.tasks, plant, uid) };
+            break;
         }
-        case "DELETE_PLANT":      return { ...state, plants: state.plants.filter(p => p.id!==payload), tasks: removeHarvestTask(state.tasks, payload) };
-        case "ADD_TASK":          return { ...state, tasks: [...state.tasks, inj(payload)] };
-        case "UPDATE_TASK":       return { ...state, tasks: state.tasks.map(t => t.id===payload.id ? payload : t) };
-        case "DELETE_TASK":       return { ...state, tasks: state.tasks.filter(t => t.id!==payload) };
+        case "DELETE_PLANT":      nextState = { ...state, plants: state.plants.filter(p => p.id!==payload), tasks: removeHarvestTask(state.tasks, payload) }; break;
+        case "ADD_TASK":          nextState = { ...state, tasks: [...state.tasks, inj(payload)] }; break;
+        case "UPDATE_TASK":       nextState = { ...state, tasks: state.tasks.map(t => t.id===payload.id ? payload : t) }; break;
+        case "DELETE_TASK":       nextState = { ...state, tasks: state.tasks.filter(t => t.id!==payload) }; break;
         case "SYNC_HARVEST_TASKS": {
             const syncedPlants = state.plants.filter(p => !p.user_id || p.user_id===uid);
             const untouchedTasks = state.tasks.filter(t => !String(t.id).startsWith("harvest_"));
             const harvestTasks = syncedPlants.map(p => getHarvestTaskForPlant(p, uid)).filter(Boolean);
-            return { ...state, tasks: [...untouchedTasks, ...harvestTasks] };
+            nextState = { ...state, tasks: [...untouchedTasks, ...harvestTasks] };
+            break;
         }
         case "SYNC_STRUCTURE_TASKS": {
             const syncedStructs = state.structures.filter(s => !s.user_id || s.user_id===uid);
@@ -1167,12 +1201,15 @@ function reducer(state, { type, payload }) {
                 const task = getStructureMaintenanceTask(struct, uid);
                 if (task) nextTasks.push(task);
             });
-            return { ...state, tasks: nextTasks };
+            nextState = { ...state, tasks: nextTasks };
+            break;
         }
-        case "HYDRATE_STATE":     return normalizeState(payload) || state;
-        case "SET_SETTING":       return { ...state, users: state.users.map(u => u.id===uid ? {...u, settings:{...u.settings,...payload}} : u) };
-        default: return state;
+        case "HYDRATE_STATE":     nextState = normalizeState(payload) || state; break;
+        case "SET_SETTING":       nextState = { ...state, users: state.users.map(u => u.id===uid ? {...u, settings:{...u.settings,...payload}} : u) }; break;
+        case "SYNC_USER_PROGRESS": nextState = state; break;
+        default: nextState = state;
     }
+    return syncAllUserProgress(nextState);
 }
 
 // ----
@@ -2606,7 +2643,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
 // ----
 // ACCOUNT SCREEN
 // ----
-function AccountScreen({ state, dispatch, lang, onLogout }) {
+function AccountScreen({ state, dispatch, navigate, lang, onLogout }) {
     const t = useT(lang);
     const uid = state.activeUserId;
     const user = state.users.find(u => u.id === uid);
@@ -2653,22 +2690,41 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
     const myPlants  = forUser(state.plants, uid);
     const myTasks   = forUser(state.tasks, uid);
     const myFields  = forUser(state.fields, uid);
-    const myJourney = buildProfileJourney({ user, gardens: myGardens, fields: myFields, plants: myPlants, tasks: myTasks });
+    const questBoard = buildUserQuestProgress({ user, gardens: myGardens, fields: myFields, structures: forUser(state.structures, uid), plants: myPlants, tasks: myTasks });
     const joined    = user.created_at ? new Date(user.created_at).toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"long",year:"numeric"}) : "—";
 
     const TABS = [["profile","👤",t("edit_profile")],["password","🔑",t("change_password")],["stats","📊",t("your_stats")]];
+    const handleQuestStep = (step) => {
+        if (step.actionKind === "confirm_email") {
+            dispatch({ type:"SET_SETTING", payload:{ email_verified:true } });
+            return;
+        }
+        if (step.route) {
+            if (step.route === "gardens" && myGardens[0]) {
+                dispatch({ type:"SET_ACTIVE_GARDEN", payload: myGardens[0].id });
+            }
+            if (step.route === "editor" && state.activeGardenId) {
+                dispatch({ type:"SET_ACTIVE_GARDEN", payload: state.activeGardenId });
+            }
+            if (step.route === "plants" && state.activeGardenId) {
+                dispatch({ type:"SET_ACTIVE_GARDEN", payload: state.activeGardenId });
+            }
+            navigate?.(step.route);
+        }
+    };
 
     return (
         <div style={{ padding:28, maxWidth:600, margin:"0 auto" }}>
             <JourneyPanel
                 headerLabel="Profielstatus"
-                title={myJourney.headline}
+                title={questBoard.headline}
                 subtitle="Werk je profiel af en ontgrendel de rest van de tuinwereld."
-                progress={myJourney.progress}
-                steps={myJourney.steps}
-                tokens={myJourney.tokens}
-                reward={myJourney.reward}
-                nextStep={myJourney.nextStep}
+                progress={questBoard.progress}
+                steps={questBoard.steps}
+                tokens={questBoard.tokens}
+                reward={questBoard.reward}
+                nextStep={questBoard.nextStep}
+                onStepAction={handleQuestStep}
                 action={saved ? <Badge color={T.success} bg={T.successBg}>✓ {t("account_saved")}</Badge> : null}
             />
 
@@ -2819,7 +2875,26 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         <Btn key="fields" variant="ghost" size="sm" onClick={() => navigate("fields")}>{t("beds_fields")}</Btn>,
         <Btn key="plants" variant="primary" size="sm" icon="+" onClick={() => navigate("plants")}>{t("add_plant")}</Btn>,
     ];
-    const journeyRoute = journey.nextStep?.key === "garden" ? "gardens" : journey.nextStep?.key === "layout" ? "editor" : "plants";
+    const journeyRoute = journey.progress >= 100
+        ? "gardens"
+        : journey.nextStep?.key === "garden"
+            ? "gardens"
+            : journey.nextStep?.key === "layout"
+                ? "editor"
+                : "plants";
+    const handleQuestStep = (step) => {
+        if (step.actionKind === "confirm_email") {
+            dispatch({ type:"SET_SETTING", payload:{ email_verified:true } });
+            return;
+        }
+        if (step.route === "gardens" && gardens[0]) {
+            dispatch({ type:"SET_ACTIVE_GARDEN", payload: gardens[0].id });
+        }
+        if ((step.route === "editor" || step.route === "plants" || step.route === "tasks" || step.route === "greenhouses") && state.activeGardenId) {
+            dispatch({ type:"SET_ACTIVE_GARDEN", payload: state.activeGardenId });
+        }
+        navigate(step.route || "dashboard");
+    };
     const attentionTasks = overdue.length > 0 ? overdue.slice(0, 4) : soonTasks;
     const renderTaskRow = (task) => {
         const statusCfg = TASK_STATUS_C[task.status] || TASK_STATUS_C.pending;
@@ -2933,6 +3008,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 tokens={journey.tokens}
                 reward={journey.reward}
                 nextStep={journey.nextStep}
+                onStepAction={handleQuestStep}
                 action={
                     <Btn size="sm" variant="primary" onClick={() => navigate(journeyRoute)}>
                         {journey.progress >= 100 ? "Open tuin" : "Ga naar volgende stap"}

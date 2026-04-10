@@ -140,6 +140,158 @@ export function buildProfileJourney({ user, gardens = [], fields = [], plants = 
     };
 }
 
+export function buildUserQuestProgress({ user, gardens = [], fields = [], structures = [], plants = [], tasks = [] }) {
+    const settings = user?.settings || {};
+    const hasGarden = gardens.length > 0;
+    const hasField = fields.length > 0;
+    const hasStructure = structures.length > 0;
+    const hasPlant = plants.length > 0;
+    const hasAssignedPlant = plants.some(plant => plant.field_id || plant.struct_id);
+    const hasTask = tasks.length > 0;
+    const hasHarvestDate = plants.some(plant => !!plant.harvest_date);
+    const hasGardenWithPlants = gardens.some(garden => plants.some(plant => plant.garden_id === garden.id));
+    const hasSecondStep = settings?.email_verified || settings?.email_confirmed;
+
+    const steps = [
+        {
+            key: "profile_name",
+            icon: "✍️",
+            label: "Naam invullen",
+            done: !!user?.name,
+            route: "account",
+            actionLabel: "Open profiel",
+            helper: user?.name ? `Profiel heet ${user.name}.` : "Kies een duidelijke naam.",
+        },
+        {
+            key: "email",
+            icon: "📧",
+            label: "E-mail invullen",
+            done: !!user?.email,
+            route: "account",
+            actionLabel: "Open profiel",
+            helper: user?.email ? `${user.email} staat ingevuld.` : "Voeg een e-mail toe in je profiel.",
+        },
+        {
+            key: "email_verified",
+            icon: "✅",
+            label: "E-mail bevestigd",
+            done: !!settings.email_verified || !!settings.email_confirmed,
+            route: "account",
+            actionLabel: "Bevestig e-mail",
+            helper: (settings.email_verified || settings.email_confirmed)
+                ? "E-mail is bevestigd."
+                : "Bevestig je e-mail vanuit je profiel.",
+            actionKind: "confirm_email",
+        },
+        {
+            key: "style",
+            icon: "🎨",
+            label: "Avatar en kleur",
+            done: !!user?.avatar && !!user?.color,
+            route: "account",
+            actionLabel: "Kies stijl",
+            helper: user?.avatar ? "Avatar en kleur zijn gekozen." : "Geef je profiel een eigen stijl.",
+        },
+        {
+            key: "garden",
+            icon: "🌿",
+            label: "Eerste tuin",
+            done: hasGarden,
+            route: "gardens",
+            actionLabel: "Ga naar tuinen",
+            helper: hasGarden ? `${gardens.length} tuin${gardens.length === 1 ? "" : "en"} actief.` : "Maak je eerste tuin aan.",
+        },
+        {
+            key: "garden_open",
+            icon: "🗺️",
+            label: "Tuin openen",
+            done: hasGarden && !!gardens[0],
+            route: "gardens",
+            actionLabel: "Open tuinen",
+            helper: hasGarden ? "Open je tuinenoverzicht en kies een tuin." : "Eerst een tuin aanmaken.",
+        },
+        {
+            key: "field",
+            icon: "🛏️",
+            label: "Eerste bed",
+            done: hasField,
+            route: "editor",
+            actionLabel: "Open editor",
+            helper: hasField ? `${fields.length} bed${fields.length === 1 ? "" : "den"} klaar.` : "Zet je eerste bed neer in de editor.",
+        },
+        {
+            key: "structure",
+            icon: "🏡",
+            label: "Eerste serre",
+            done: hasStructure,
+            route: "greenhouses",
+            actionLabel: "Open serres",
+            helper: hasStructure ? "Serre of structuur is toegevoegd." : "Plaats je eerste serre of structuur.",
+        },
+        {
+            key: "plant",
+            icon: "🌱",
+            label: "Eerste plant",
+            done: hasPlant,
+            route: "plants",
+            actionLabel: "Open planten",
+            helper: hasPlant ? `${plants.length} plant${plants.length === 1 ? "" : "en"} toegevoegd.` : "Voeg je eerste crop toe.",
+        },
+        {
+            key: "assign",
+            icon: "🔗",
+            label: "Plant koppelen",
+            done: hasAssignedPlant,
+            route: "plants",
+            actionLabel: "Koppel plant",
+            helper: hasAssignedPlant ? "Minstens één plant staat gekoppeld." : "Koppel een plant aan een bed of serre.",
+        },
+        {
+            key: "task",
+            icon: "📋",
+            label: "Eerste taak",
+            done: hasTask,
+            route: "tasks",
+            actionLabel: "Open taken",
+            helper: hasTask ? `${tasks.length} taak${tasks.length === 1 ? "" : "en"} ingepland.` : "Plan je eerste taak.",
+        },
+        {
+            key: "harvest",
+            icon: "🧺",
+            label: "Oogst plannen",
+            done: hasHarvestDate,
+            route: "plants",
+            actionLabel: "Open oogst",
+            helper: hasHarvestDate ? "Een plant heeft al een oogstdatum." : "Geef een plant een oogstdatum.",
+        },
+        {
+            key: "garden_plants",
+            icon: "🌼",
+            label: "Tuin gevuld",
+            done: hasGardenWithPlants,
+            route: "gardens",
+            actionLabel: "Bekijk tuin",
+            helper: hasGardenWithPlants ? "Ten minste één tuin heeft planten." : "Zorg dat je eerste tuin echt leeft.",
+        },
+    ];
+
+    const completed = steps.filter(step => step.done).length;
+    const progress = Math.round((completed / steps.length) * 100);
+    const nextStep = steps.find(step => !step.done) || steps[steps.length - 1];
+
+    return {
+        steps,
+        completed,
+        progress,
+        nextStep,
+        tokens: ["👤", "🌿", "🛏️", "🏡", "🌱", "🔗", "📋", "🧺"],
+        headline: progress >= 100 ? "Je profiel is helemaal klaar." : "Vul je tuinwereld stap voor stap aan.",
+        reward: progress >= 100
+            ? "Nu is je tuinwereld compleet en klaar voor dagelijks gebruik."
+            : "Meer stappen maken de app speelser en duidelijker.",
+    };
+}
+
 export function JourneyPanel({
     title,
     subtitle,
@@ -150,6 +302,7 @@ export function JourneyPanel({
     nextStep,
     action,
     headerLabel = "Tuinreis",
+    onStepAction,
 }) {
     const doneCount = steps.filter(step => step.done).length;
     const totalCount = Math.max(steps.length, 1);
@@ -249,6 +402,27 @@ export function JourneyPanel({
                             </span>
                         </div>
                         {step.helper && <div style={{ fontSize:12, lineHeight:1.5, color:T.textMuted }}>{step.helper}</div>}
+                        {onStepAction && !step.done && (step.route || step.actionKind) && (
+                            <div style={{ display:"flex", justifyContent:"flex-end", marginTop:4 }}>
+                                <button
+                                    type="button"
+                                    onClick={() => onStepAction(step)}
+                                    style={{
+                                        border:`1px solid ${T.primaryBg}`,
+                                        background:T.surface,
+                                        color:T.primary,
+                                        borderRadius:T.radiusRound,
+                                        padding:"6px 10px",
+                                        fontSize:11,
+                                        fontWeight:800,
+                                        cursor:"pointer",
+                                        fontFamily:"inherit",
+                                    }}
+                                >
+                                    {step.actionLabel || "Open"}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
