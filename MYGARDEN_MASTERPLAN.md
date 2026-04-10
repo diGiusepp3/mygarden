@@ -26,6 +26,7 @@ Wat nu al duidelijk is:
 - De keuze om een plant aan een serre te hangen moet werken.
 - Alles moet makkelijker te vinden zijn.
 - Alles moet eenvoudiger te begrijpen zijn.
+- [x] Voeg een automatische check toe die kapotte encoding meteen blokkeert.
 
 ## 1. Basisregels
 

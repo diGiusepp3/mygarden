@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "prebuild": "node scripts/check-encoding.js",
     "build": "esbuild src/main.jsx --bundle --format=esm --jsx=automatic --minify --outfile=public_html/assets/app.js"
   },
   "dependencies": {
