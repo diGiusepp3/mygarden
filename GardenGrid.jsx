@@ -1019,9 +1019,9 @@ const slotDisplayLabel = (slot, allSlots = []) => {
         if (slot.row_count) meta.push(`${slot.row_count} rows`);
         if (slot.spacing_cm) meta.push(`${slot.spacing_cm}cm`);
         if (slot.plant_count) meta.push(`${slot.plant_count} plants`);
-        meta.push(slot.orientation === "vertical" ? "90Â°" : "0Â°");
+        meta.push(slot.orientation === "vertical" ? "90?" : "0?");
     }
-    if (slot.type === "greenhouse_tray" && slot.rows && slot.cols) meta.push(`${slot.rows}Ã—${slot.cols}`);
+    if (slot.type === "greenhouse_tray" && slot.rows && slot.cols) meta.push(`${slot.rows} × ${slot.cols}`);
     const suffix = meta.length ? ` · ${meta.join(" · ")}` : "";
     return parent ? `${slotDisplayLabel(parent, allSlots)} â€º ${base}${suffix}` : `${base}${suffix}`;
 };
@@ -1871,7 +1871,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         <g key={slot.id} style={{ cursor:"pointer" }} onClick={e => { e.stopPropagation(); setSelId(slot.id); setSelKind("slot"); setPickMenu(null); }} onDoubleClick={e => { e.stopPropagation(); renameSlot(slot); }}>
                             <rect x={usableX} y={horizontalTop} width={usableW} height={bandH} rx={3} fill={rowColor + "14"} stroke={selected ? T.accent : rowColor + "9A"} strokeWidth={selected ? 2 : 1} strokeDasharray="3,3" />
                             <text x={usableX + 5} y={horizontalTop + 10} fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={800} fill={rowColor}>{slotBaseLabel(slot)}</text>
-                            <text x={usableX + usableW - 5} y={horizontalTop + 10} textAnchor="end" fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textMuted}>{rows} rows · 0Â°</text>
+                            <text x={usableX + usableW - 5} y={horizontalTop + 10} textAnchor="end" fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textMuted}>{rows} rows · 0?</text>
                             {Array.from({ length: rows }).map((_, r) => {
                                 const ry = rows === 1 ? horizontalTop + bandH / 2 : horizontalTop + 14 + r * rowGap;
                                 return (
@@ -1902,7 +1902,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         <g key={slot.id} style={{ cursor:"pointer" }} onClick={e => { e.stopPropagation(); setSelId(slot.id); setSelKind("slot"); setPickMenu(null); }} onDoubleClick={e => { e.stopPropagation(); renameSlot(slot); }}>
                             <rect x={verticalLeft} y={usableY} width={bandW} height={usableH} rx={3} fill={rowColor + "14"} stroke={selected ? T.accent : rowColor + "9A"} strokeWidth={selected ? 2 : 1} strokeDasharray="3,3" />
                             <text x={verticalLeft + 5} y={usableY + 10} fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={800} fill={rowColor}>{slotBaseLabel(slot)}</text>
-                            <text x={verticalLeft + bandW - 5} y={usableY + 10} textAnchor="end" fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textMuted}>{rows} rows · 90Â°</text>
+                            <text x={verticalLeft + bandW - 5} y={usableY + 10} textAnchor="end" fontSize={8} fontFamily="DM Sans,sans-serif" fontWeight={700} fill={T.textMuted}>{rows} rows · 90?</text>
                             {Array.from({ length: rows }).map((_, r) => {
                                 const rx = rows === 1 ? verticalLeft + bandW / 2 : verticalLeft + 14 + r * rowGap;
                                 return (
@@ -2095,7 +2095,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
         <div>
             <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:T.surfaceAlt, borderRadius:`${T.r} ${T.r} 0 0`, borderBottom:`1px solid ${T.border}`, flexWrap:"wrap" }}>
                 <span style={{ fontSize:12, color:T.textSub, flex:"1 1 320px", fontWeight:600 }}>
-                    📐 {garden.width}m Ã— {garden.height}m · <span style={{ color:T.primary }}>Drag</span> to move · <span style={{ color:T.accent }}>Handles</span> to resize · Click to edit
+                    📐 {garden.width}m × {garden.height}m · <span style={{ color:T.primary }}>Drag</span> to move · <span style={{ color:T.accent }}>Handles</span> to resize · Click to edit
                 </span>
                 <Btn size="sm" variant={zoneDraft ? "danger" : "accent"} onClick={zoneDraft ? cancelZoneDraft : beginZoneDraft}>
                     {zoneDraft ? "Cancel Zone" : "Add Zone"}
@@ -2143,7 +2143,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                 <text x={sx+sw/2} y={sy+sh/2-fs*0.3} textAnchor="middle" fontSize={Math.min(fs+1,15)} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#555"} fontWeight={700} style={{ pointerEvents:"none" }}>{STRUCT_ICONS[st.type]}</text>
                                 {sh > sc*0.6 && <text x={sx+sw/2} y={sy+sh/2+fs*0.9} textAnchor="middle" fontSize={clamp(fs,7,11)} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#555"} fontWeight={600} style={{ pointerEvents:"none" }}>{st.name}</text>}
                                 {sh > sc*1.0 && plantCount > 0 && <text x={sx+sw/2} y={sy+sh/2+fs*2.55} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={T.primary} fontWeight={700} style={{ pointerEvents:"none" }}>{plantCount} plants</text>}
-                                {sh > sc*1.2 && <text x={sx+sw/2} y={sy+sh/2+fs*1.9} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#888"} style={{ pointerEvents:"none" }}>{e_.width}Ã—{e_.height}m</text>}
+                                {sh > sc*1.2 && <text x={sx+sw/2} y={sy+sh/2+fs*1.9} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#888"} style={{ pointerEvents:"none" }}>{e_.width} × {e_.height}m</text>}
                                 {isSel && renderHandles("struct", st)}
                             </g>
                         );
@@ -2171,7 +2171,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                 </>}
                                 {rowSlots.length > 0 && renderBedRowOverlay(f, fx, fy, fw, fh)}
                                 <text x={tx} y={ty+fs*0.4} textAnchor="middle" fontSize={clamp(fs,7,13)} fontFamily="DM Sans,sans-serif" fill={fc} fontWeight={800} style={{ pointerEvents:"none" }}>{f.name}</text>
-                                {fh > sc*0.8 && <text x={tx} y={ty+fs*1.5} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={fc+"AA"} style={{ pointerEvents:"none" }}>{e_.width}Ã—{e_.height}m</text>}
+                                {fh > sc*0.8 && <text x={tx} y={ty+fs*1.5} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={fc+"AA"} style={{ pointerEvents:"none" }}>{e_.width} × {e_.height}m</text>}
                                 {isSel && renderHandles("field", f)}
                             </g>
                         );
@@ -2204,7 +2204,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                         <Btn size="sm" variant="primary" onClick={saveEdit}>Save</Btn>
                                         <Btn size="sm" variant="danger" onClick={() => { if (window.confirm("Delete this zone?")) { dispatch({ type:"DELETE_ZONE", payload:selItem.id }); setSelId(null); setSelKind(null); } }}>Delete</Btn>
                                     </div>
-                                    <div style={{ fontSize:11, color:T.textMuted }}>Area: {polygonArea(selItem.points||[]).toFixed(1)}mÂ²</div>
+                                    <div style={{ fontSize:11, color:T.textMuted }}>Area: {polygonArea(selItem.points||[]).toFixed(1)}m?</div>
                                 </div>
                             ) : (
                                 <div style={{ display:"grid", gap:10 }}>
@@ -2258,13 +2258,13 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                                                 <Badge color={slot.type === "bed_row" ? T.primary : T.accent} bg={slot.type === "bed_row" ? T.primaryBg : T.accentBg}>
                                                                     {Math.max(1, Math.floor(Number(slot.row_count) || 1))} rows
                                                                 </Badge>
-                                                                <Badge color={T.textSub} bg={T.surface}>{slot.orientation === "vertical" ? "90Â°" : "0Â°"}</Badge>
+                                                                <Badge color={T.textSub} bg={T.surface}>{slot.orientation === "vertical" ? "90?" : "0?"}</Badge>
                                                                 <Btn
                                                                     size="xs"
                                                                     variant="secondary"
                                                                     onClick={(e) => { e.stopPropagation(); dispatch({ type:"UPDATE_SLOT", payload:{ ...slot, orientation: slot.orientation === "vertical" ? "horizontal" : "vertical" } }); }}
                                                                 >
-                                                                    Rotate 90Â°
+                                                                    Rotate 90?
                                                                 </Btn>
                                                             </div>
                                                         </div>
@@ -2288,7 +2288,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                             }
                                         }}>Delete</Btn>
                                     </div>
-                                    <div style={{ fontSize:11, color:T.textMuted }}>{selItem.width}m Ã— {selItem.height}m</div>
+                                    <div style={{ fontSize:11, color:T.textMuted }}>{selItem.width}m × {selItem.height}m</div>
                                 </div>
                             )}
                         </div>
@@ -2314,7 +2314,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                             {panelFields.map(f => (
                                                 <button key={f.id} onClick={()=>{ setSelId(f.id); setSelKind("field"); }} style={{ textAlign:"left", border:`1px solid ${selId===f.id&&selKind==="field"?T.primary:T.border}`, background:selId===f.id&&selKind==="field"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
                                                     <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{f.name}</div>
-                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[FIELD_LABEL_K[f.type]] || f.type} · {f.width}Ã—{f.height}m</div>
+                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[FIELD_LABEL_K[f.type]] || f.type} · {f.width} × {f.height}m</div>
                                                 </button>
                                             ))}
                                         </div>
@@ -2329,7 +2329,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                                     <div style={{ display:"flex", justifyContent:"space-between", gap:8, alignItems:"start" }}>
                                                         <div>
                                                             <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{STRUCT_ICONS[st.type] || "ðŸ—ï¸"} {st.name}</div>
-                                                            <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[STRUCT_LABEL_K[st.type]] || st.type} · {st.width}Ã—{st.height}m</div>
+                                                            <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[STRUCT_LABEL_K[st.type]] || st.type} · {st.width} × {st.height}m</div>
                                                         </div>
                                                         {st.linked_field_id && <Badge color={T.accent} bg={T.accentBg}>linked</Badge>}
                                                     </div>
@@ -2345,7 +2345,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                             {panelZones.map(z => (
                                                 <button key={z.id} onClick={()=>{ setSelId(z.id); setSelKind("zone"); }} style={{ textAlign:"left", border:`1px solid ${selId===z.id&&selKind==="zone"?T.primary:T.border}`, background:selId===z.id&&selKind==="zone"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
                                                     <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{ZONE_ICONS[z.type] || "🗺️"} {z.name}</div>
-                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type} · {polygonArea(z.points||[]).toFixed(1)}mÂ²</div>
+                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type} · {polygonArea(z.points||[]).toFixed(1)}m?</div>
                                                 </button>
                                             ))}
                                         </div>
@@ -2427,7 +2427,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                             </div>
                             <div style={{ marginTop:10, display:"flex", gap:8, alignItems:"center" }}>
                                 <Btn size="sm" variant="primary" onClick={saveEdit}>💾 Save Zone</Btn>
-                                <span style={{ fontSize:11, color:T.textMuted }}>Â· {selItem.points?.length || 0} points · {polygonArea(selItem.points||[]).toFixed(1)}mÂ²</span>
+                                <span style={{ fontSize:11, color:T.textMuted }}>? {selItem.points?.length || 0} points · {polygonArea(selItem.points||[]).toFixed(1)}m?</span>
                                 <div style={{ flex:1 }} />
                                 <Btn size="sm" variant="danger" onClick={() => { if (window.confirm("Delete this zone?")) { dispatch({ type:"DELETE_ZONE", payload:selItem.id }); setSelId(null); setSelKind(null); } }}>Delete Zone</Btn>
                             </div>
@@ -2455,7 +2455,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                                 <Textarea label="Notes" value={editForm.notes} onChange={v=>setEditForm(f=>({...f,notes:v}))} rows={2} />
                                 <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                                     <Btn size="sm" variant="primary" onClick={saveEdit}>💾 Save</Btn>
-                                    <Btn size="sm" variant="secondary" onClick={() => dispatch({ type:"UPDATE_SLOT", payload:{ ...selItem, orientation: selItem.orientation === "vertical" ? "horizontal" : "vertical" } })}>Rotate 90Â°</Btn>
+                                    <Btn size="sm" variant="secondary" onClick={() => dispatch({ type:"UPDATE_SLOT", payload:{ ...selItem, orientation: selItem.orientation === "vertical" ? "horizontal" : "vertical" } })}>Rotate 90?</Btn>
                                     <Btn size="sm" variant="ghost" onClick={() => openPlantsForSlot(selItem.id)}>🌱 Plants</Btn>
                                     <Btn size="sm" variant="danger" onClick={() => {
                                         if (window.confirm("Delete this row?")) {
@@ -2531,7 +2531,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                             )}
                             <div style={{ marginTop:10, display:"flex", gap:8, alignItems:"center" }}>
                                 <Btn size="sm" variant="primary" onClick={saveEdit}>💾 Save</Btn>
-                                <span style={{ fontSize:11, color:T.textMuted }}>Â· {selItem.width}m Ã— {selItem.height}m = {(selItem.width*selItem.height).toFixed(1)}mÂ²</span>
+                                <span style={{ fontSize:11, color:T.textMuted }}>· {selItem.width}m × {selItem.height}m = {(selItem.width*selItem.height).toFixed(1)}m²</span>
                                 <div style={{ flex:1 }} />
                                 {selKind === "field" && <Btn size="sm" variant="danger" onClick={() => { if(window.confirm("Delete this bed?")) { dispatch({type:"DELETE_FIELD",payload:selItem.id}); setSelId(null); } }}>Delete Bed</Btn>}
                                 {selKind === "struct" && <Btn size="sm" variant="danger" onClick={() => { if(window.confirm("Delete this structure?")) { dispatch({type:"DELETE_STRUCT",payload:selItem.id}); setSelId(null); } }}>Delete Structure</Btn>}
@@ -2667,7 +2667,7 @@ function LoginScreen({ state, dispatch, onLogin }) {
 
                     {/* Demo hint */}
                     <div style={{ textAlign:"center", marginTop:14, fontSize:12, color:"rgba(255,255,255,0.45)" }}>
-                        Demo accounts: alex@gardengrid.app / garden123 &nbsp;Â·&nbsp; sam@gardengrid.app / moestuin1
+                        Demo accounts: alex@gardengrid.app / garden123 &nbsp;?&nbsp; sam@gardengrid.app / moestuin1
                     </div>
                 </div>
             </div>
@@ -2809,7 +2809,7 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
                         <div style={{ fontSize:12, color:T.textMuted, display:"flex", flexDirection:"column", gap:6 }}>
                             <div>ðŸ“… {t("joined")}: <strong style={{color:T.text}}>{joined}</strong></div>
                             <div>🌱 Total plants in garden: <strong style={{color:T.text}}>{myPlants.reduce((s,p)=>s+(+p.quantity||0),0)}</strong></div>
-                            <div>🛏️ Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}mÂ²</strong></div>
+                            <div>🛏️ Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}m?</strong></div>
                             <div>✓ Tasks completed: <strong style={{color:T.success}}>{myTasks.filter(t2=>t2.status==="done").length}</strong></div>
                         </div>
                     </Card>
@@ -2935,7 +2935,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     const instructionMeta = [
         <MetaBadge key="gardens" value={gardens.length} label={t("gardens")} />,
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
-        <MetaBadge key="area" value={`${totalArea}mÂ²`} label={t("total_area")} />,
+        <MetaBadge key="area" value={`${totalArea}m?`} label={t("total_area")} />,
         <MetaBadge key="tasks" value={pending.length} label={t("tasks_pending")} />,
     ];
     const quickActions = [
@@ -2977,7 +2977,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 title={`${plant.name}${plant.variety ? ` (${plant.variety})` : ""}`}
                 meta={`${fmtDate(plant.harvest_date, lang)} · ${bed?.name || struct?.name || t("unassigned")}`}
                 hint={plant.quantity ? `${plant.quantity} pcs` : undefined}
-                actionSlot={<Badge color={T.textSub} bg={T.surfaceAlt}>Aantal: {plant.quantity || 1}</Badge>}
+                actionSlot={<Badge color={T.textSub} bg={T.surfaceAlt}>×{plant.quantity || 1}</Badge>}
             />
         );
     };
@@ -3002,7 +3002,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:10 }}>
                     <div>
                         <div style={{ fontSize:15, fontWeight:800, color:T.text }}>{garden.name}</div>
-                        <div style={{ fontSize:11, color:T.textMuted }}>{garden.width}Ã—{garden.height}m · {garden.type}</div>
+                        <div style={{ fontSize:11, color:T.textMuted }}>{garden.width} × {garden.height}m · {garden.type}</div>
                     </div>
                     <Badge color={isGreenhouse?T.accent:T.primary} bg={isGreenhouse?T.accentBg:T.primaryBg}>{garden.type}</Badge>
                 </div>
@@ -3050,7 +3050,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
             />
             <PanelGroup>
                 <StatCard icon="🌿" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
-                <StatCard icon="🛏️" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}mÂ² ${t("total_area")}`} onClick={() => navigate("fields")} />
+                <StatCard icon="🛏️" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m? ${t("total_area")}`} onClick={() => navigate("fields")} />
                 <StatCard icon="🌱" label={t("plant_varieties")} value={plants.length} color="#388E3C" sub={`${plants.reduce((sum, p) => sum + (+p.quantity || 0), 0)} plants`} onClick={() => navigate("plants")} />
                 <StatCard icon="✅" label={t("tasks_pending")} value={pending.length} color={overdue.length > 0 ? T.danger : T.warning} sub={overdue.length > 0 ? `${overdue.length} ${t("overdue_badge")}` : t("all_on_track")} onClick={() => navigate("tasks")} />
                 {harvestable.length > 0 && (
@@ -3118,7 +3118,7 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
     const totalArea = fields.reduce((sum, field) => sum + ((+field.width || 0) * (+field.height || 0)), 0).toFixed(1);
     const metaBadges = [
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
-        <MetaBadge key="area" value={`${totalArea}mÂ²`} label={t("total_area")} />,
+        <MetaBadge key="area" value={`${totalArea}m?`} label={t("total_area")} />,
     ];
     return (
         <PageShell width={1040}>
@@ -3145,7 +3145,7 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
                                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:8 }}>
                                     <div>
                                         <div style={{ fontSize:17, fontWeight:900, color:T.text }}>{g.name}</div>
-                                        <div style={{ fontSize:12, color:T.textMuted }}>{g.width}m Ã— {g.height}m · {(g.width * g.height).toFixed(1)}mÂ² total</div>
+                                        <div style={{ fontSize:12, color:T.textMuted }}>{g.width}m × {g.height}m · {(g.width * g.height).toFixed(1)}m² total</div>
                                     </div>
                                     <Badge color={T.primary} bg={T.primaryBg}>{g.type}</Badge>
                                 </div>
@@ -3207,7 +3207,7 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
     const gFields   = state.fields.filter(f=>f.garden_id===garden.id);
     const gStructs  = state.structures.filter(s=>s.garden_id===garden.id);
     const gZones    = state.zones.filter(z=>z.garden_id===garden.id);
-    const posHint = `Garden is ${garden.width}m Ã— ${garden.height}m. Position from top-left (0, 0).`;
+    const posHint = `Garden is ${garden.width}m × ${garden.height}m. Position from top-left (0, 0).`;
     const addField  = () => { if (!ff.name||!ff.x||!ff.y||!ff.width||!ff.height) return; dispatch({type:"ADD_FIELD",payload:{id:gid(),garden_id:garden.id,...ff,x:+ff.x,y:+ff.y,width:+ff.width,height:+ff.height}}); setShowField(false); setFf(ef); };
     const addStruct = () => {
         if (!sf.name||!sf.x||!sf.y||!sf.width||!sf.height) return;
@@ -3239,9 +3239,9 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
         <PageShell width={1320}>
             <PageHeader
                 title={garden.name}
-                subtitle={`${garden.width}m Ã— ${garden.height}m · ${gFields.length} beds · ${gStructs.length} structures · ${gZones.length} zones`}
+                subtitle={`${garden.width}m × ${garden.height}m · ${gFields.length} beds · ${gStructs.length} structures · ${gZones.length} zones`}
                 meta={[
-                    <MetaBadge key="size" value={`${garden.width}Ã—${garden.height}m`} label="Size" />,
+                    <MetaBadge key="size" value={`${garden.width}×${garden.height}m`} label="Size" />,
                     <MetaBadge key="beds" value={gFields.length} label={t("nav_fields")} />,
                     <MetaBadge key="structures" value={gStructs.length} label={t("nav_greenhouses")} />,
                 ]}
@@ -3414,10 +3414,10 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
         <PageShell width={1120}>
             <PageHeader
                 title={`🛏️ ${t("nav_fields")}`}
-                subtitle={`${display.length} ${t("beds_total")} · ${displayArea}mÂ² planned`}
+                subtitle={`${display.length} ${t("beds_total")} · ${displayArea}m? planned`}
                 meta={[
                     <MetaBadge key="beds" value={display.length} label={t("beds_fields")} />,
-                    <MetaBadge key="area" value={`${displayArea}mÂ²`} label={t("total_area")} />
+                    <MetaBadge key="area" value={`${displayArea}m?`} label={t("total_area")} />
                 ]}
                 actions={[<Btn key="add" variant="primary" icon="+" onClick={()=>setShow(true)}>{t("add_bed")}</Btn>]}
             />
@@ -3454,8 +3454,8 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                                     key={f.id}
                                     icon="🛏️"
                                     title={f.name}
-                                    meta={`${f.width}m Ã— ${f.height}m · ${typeLabel}`}
-                                    hint={`Area ${(f.width*f.height).toFixed(1)}mÂ² · Pos (${f.x}m, ${f.y}m) · ${nextLabel}`}
+                                    meta={`${f.width}m × ${f.height}m · ${typeLabel}`}
+                                    hint={`Area ${(f.width*f.height).toFixed(1)}m² · Pos (${f.x}m, ${f.y}m) · ${nextLabel}`}
                                     status={{ label:typeLabel, color:fc, bg:fc+"22" }}
                                     actionSlot={<div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                                         <Badge color={T.textSub} bg={T.surfaceAlt}>{slotCount} slots</Badge>
@@ -3480,7 +3480,7 @@ function FieldsScreen({ state, dispatch, navigate, lang }) {
                         <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Tomato Raised Bed" required/>
                         <Sel label={t("type")} value={form.type} onChange={set("type")} options={FIELD_TYPES.map(ft=>({value:ft,label:LANG[lang]?.[FIELD_LABEL_K[ft]]||ft}))}/>
                         <BedShapePicker value={form.shape||"rect"} onChange={set("shape")}/>
-                        {garden && <InfoBanner icon="📐">Garden is {garden.width}m Ã— {garden.height}m. Position from top-left (0, 0).</InfoBanner>}
+                        {garden && <InfoBanner icon="📐">Garden is {garden.width}m × {garden.height}m. Position from top-left (0, 0).</InfoBanner>}
                         <FormRow><Input label="X (m)" value={form.x} onChange={set("x")} type="number" step="0.1" min="0" required/><Input label="Y (m)" value={form.y} onChange={set("y")} type="number" step="0.1" min="0" required/><Input label={`${t("width")} (m)`} value={form.width} onChange={set("width")} type="number" step="0.1" min="0.1" required/><Input label={`${t("height")} (m)`} value={form.height} onChange={set("height")} type="number" step="0.1" min="0.1" required/></FormRow>
                         <Textarea label={t("notes")} value={form.notes} onChange={set("notes")} rows={2}/>
                         <FormActions onCancel={()=>{ setShow(false); setForm(ef); }} onSave={create} saveLabel={t("add_bed")} t={t}/>
@@ -3918,7 +3918,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                                     <Badge color={sc_.color} bg={sc_.bg}>{sc_l}</Badge>
                                 </div>
                                 <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:10 }}>
-                                    <Badge color={T.textSub} bg={T.surfaceAlt}>Aantal: {p.quantity}</Badge>
+                                    <Badge color={T.textSub} bg={T.surfaceAlt}>×{p.quantity}</Badge>
                                     <Badge color={T.textSub} bg={T.surfaceAlt}>{p.category}</Badge>
                                     {bed && <Badge color={T.primary} bg={T.primaryBg}>{bed.name}</Badge>}
                                     {greenhouse && <Badge color={STRUCT_STROKE[greenhouse.type]||T.info} bg={STRUCT_FILL[greenhouse.type]||T.infoBg}>{greenhouse.name}</Badge>}
@@ -3982,7 +3982,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                         )}
                         {selectedSlotIsRow && quantityValue > 1 && rowCountValue > 1 && (
                             <InfoBanner icon="🌱">
-                                This can be saved as a row plan: {rowCountValue} rows Ã— {rowPlantValue} plants in {slotDisplayLabel(selectedSlot, slots)}.
+                                This can be saved as a row plan: {rowCountValue} rows × {rowPlantValue} plants in {slotDisplayLabel(selectedSlot, slots)}.
                             </InfoBanner>
                         )}
                         <FormRow cols={3}>
@@ -4043,7 +4043,7 @@ function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
                 <Modal title="🌱 Save as row plan?" onClose={()=>setBulkPrompt(null)} width={520}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <InfoBanner icon="🧭">
-                            {bulkPrompt.quantity} plants in {bulkPrompt.slotName} can be stored as a row plan: {bulkPrompt.rowCount} rows Ã— {bulkPrompt.rowPlantCount} plants.
+                            {bulkPrompt.quantity} plants in {bulkPrompt.slotName} can be stored as a row plan: {bulkPrompt.rowCount} rows × {bulkPrompt.rowPlantCount} plants.
                         </InfoBanner>
                         <div style={{ fontSize:13, color:T.textSub, lineHeight:1.5 }}>
                             Keep it as one plant card, or save the row structure so the tunnel preview and counts stay readable.
@@ -4394,7 +4394,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                 {garden && <Badge color={T.textSub} bg={T.surfaceAlt}>{garden.name}</Badge>}
                                                 {linkedField && <Badge color={T.accent} bg={T.accentBg}>ðŸ”— {linkedField.name}</Badge>}
                                             </div>
-                                            <div style={{ fontSize:12, color:T.textMuted, marginTop:4 }}>{st.width}m Ã— {st.height}m = {(st.width*st.height).toFixed(1)}mÂ² · Position ({st.x}m, {st.y}m)</div>
+                                            <div style={{ fontSize:12, color:T.textMuted, marginTop:4 }}>{st.width}m × {st.height}m = {(st.width*st.height).toFixed(1)}m² · Position ({st.x}m, {st.y}m)</div>
                                             {st.notes && <div style={{ fontSize:12, color:T.textSub, marginTop:4, lineHeight:1.5 }}>{st.notes}</div>}
                                         </div>
                                         {/* Ventilation toggle */}
@@ -4463,7 +4463,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                                             variant="secondary"
                                                                             onClick={() => dispatch({ type:"UPDATE_SLOT", payload:{ ...slot, orientation: slot.orientation === "vertical" ? "horizontal" : "vertical" } })}
                                                                         >
-                                                                            Rotate 90Â°
+                                                                            Rotate 90?
                                                                         </Btn>
                                                                     )}
                                                                     <Btn size="sm" variant="ghost" onClick={()=>openEditSlot(slot)}>Edit</Btn>
@@ -4485,7 +4485,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             {(slot.type==="tunnel_row"||slot.type==="bed_row") && renderSlotSeedPlan(slot)}
                                                             {slotPlants.length>0 && (
                                                                 <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:5 }}>
-                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name} · Aantal: {Math.max(1, +p.quantity || 1)}</Badge>)}
+                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name} · ×{Math.max(1, +p.quantity || 1)}</Badge>)}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -4505,7 +4505,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                     return (
                                                         <div key={bed.id} style={{ padding:"8px 12px", background:fc+"12", border:`1.5px solid ${fc}`, borderRadius:T.rs, minWidth:160 }}>
                                                             <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{bed.name}</div>
-                                                            <div style={{ fontSize:11, color:T.textMuted }}>{bed.width}m Ã— {bed.height}m · {LANG[lang]?.[FIELD_LABEL_K[bed.type]]||bed.type}</div>
+                                                            <div style={{ fontSize:11, color:T.textMuted }}>{bed.width}m × {bed.height}m · {LANG[lang]?.[FIELD_LABEL_K[bed.type]]||bed.type}</div>
                                                             {bp.length>0 && (
                                                                 <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:5 }}>
                                                                     {bp.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name}</Badge>)}
@@ -4531,7 +4531,7 @@ function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             <span style={{ fontSize:16 }}>{CAT_ICONS[p.category]||"🌿"}</span>
                                                             <div>
                                                                 <div style={{ fontSize:12, fontWeight:700, color:T.text }}>{p.name}</div>
-                                                                <div style={{ fontSize:10, color:T.textMuted }}>{p.variety} · Aantal: {Math.max(1, +p.quantity || 1)}{slot ? ` · ${slot.name}` : ""}{p.row_count ? ` · ${p.row_count} rows` : ""}{p.row_plant_count ? ` · ${p.row_plant_count}/row` : ""}</div>
+                                                                <div style={{ fontSize:10, color:T.textMuted }}>{p.variety} · ×{Math.max(1, +p.quantity || 1)}{slot ? ` · ${slot.name}` : ""}{p.row_count ? ` · ${p.row_count} rows` : ""}{p.row_plant_count ? ` · ${p.row_plant_count}/row` : ""}</div>
                                                             </div>
                                                             <Badge color={sc_.color} bg={sc_.bg} style={{fontSize:9}}>{sc_l}</Badge>
                                                         </div>
@@ -4782,7 +4782,7 @@ function SettingsScreen({ state, dispatch, lang }) {
                                 <div>
                                     <div style={{ fontSize:12, color:T.textMuted }}>Current weather</div>
                                     <div style={{ fontSize:18, fontWeight:800, color:T.text }}>
-                                        {weather.current.temperature_2m}Â°C · {WEATHER_CODE_LABELS[weather.current.weather_code] || `Code ${weather.current.weather_code}`}
+                                        {weather.current.temperature_2m}?C · {WEATHER_CODE_LABELS[weather.current.weather_code] || `Code ${weather.current.weather_code}`}
                                     </div>
                                 </div>
                                 <div style={{ fontSize:12, color:T.textSub }}>

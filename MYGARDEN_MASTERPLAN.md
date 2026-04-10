@@ -255,8 +255,8 @@ Wat nu al duidelijk is:
 - [ ] Laat objecten ook in kaartvorm goed werken.
 - [ ] Laat objecten ook in forms selecteerbaar zijn.
 - [ ] Laat objecten ook als linked target werken.
-- [ ] Laat serres in plant toevoegen voorkomen.
-- [ ] Laat serres in task linken voorkomen.
+- [x] Laat serres in plant toevoegen voorkomen.
+- [x] Laat serres in task linken voorkomen.
 - [ ] Laat serres in dev panel voorkomen.
 - [ ] Laat serres in dashboard samenvatting voorkomen.
 - [ ] Laat objecten niet verdwijnen tussen de schermen.
