@@ -714,3 +714,16 @@ Wat nu al duidelijk is:
 - [ ] Vermijd een saaie administratie-look.
 - [ ] Vermijd een te drukke game-look.
 - [ ] Vind de balans tussen mooi, simpel en duidelijk.
+
+## 30. Gamification en onboarding
+
+- [x] Voeg een tuinreis/progress kaart toe voor profiel, eerste tuin, bedden en eerste planten.
+- [ ] Maak de eerste start meer als een kleine quest-lijn.
+- [ ] Laat nieuwe gebruikers direct zien wat ze nog moeten doen.
+- [ ] Laat de dashboard start meer voelen als een tuinwereld.
+- [ ] Laat lege staten minder leeg en meer uitnodigend voelen.
+- [ ] Laat de eerste tuin visueel aanvoelen als een unlock-moment.
+- [ ] Laat crops pas echt opduiken nadat de eerste tuin is aangemaakt.
+- [ ] Maak de stappen voor profiel, tuin, bed en plant duidelijk en rustig.
+- [ ] Geef elke stap een klein beloningsgevoel zonder druk te maken.
+- [ ] Laat de app een beetje groeien mee met de gebruiker.

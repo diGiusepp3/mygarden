@@ -4,6 +4,7 @@
 // THEME
 // ----
 import { PageShell, PageHeader, SectionPanel, PanelGroup, QuickAction, MetaBadge } from "./src/layout/PageChrome.jsx";
+import { JourneyPanel, buildJourneyTrack } from "./src/layout/GardenJourney.jsx";
 import { SCREEN_ROUTES, SCREEN_NAMES, getRouteFromHash, formatScreenHash } from "./src/routes.js";
 
 class ScreenErrorBoundary extends React.Component {
@@ -2472,6 +2473,20 @@ function LoginScreen({ state, dispatch, onLogin }) {
     const [color, setColor] = useState(USER_COLORS[0]);
     const [error, setError] = useState("");
     const [shake, setShake] = useState(false);
+    const onboardingJourney = {
+        title: "Maak je tuinwereld stap voor stap",
+        subtitle: "Eerst je profiel, dan je eerste tuin, daarna bedden en crops.",
+        progress: mode === "register" ? 12 : 0,
+        steps: [
+            { key:"profile", icon:"👤", label:"Profiel", done:false, helper:"Maak een profiel aan om te starten." },
+            { key:"garden", icon:"🌿", label:"Eerste tuin", done:false, helper:"Geef je tuin een naam en vorm." },
+            { key:"layout", icon:"🛏️", label:"Bedden", done:false, helper:"Leg je eerste vakken neer." },
+            { key:"plants", icon:"🌱", label:"Crops", done:false, helper:"Daarna verschijnen je planten en oogst." },
+        ],
+        tokens: ["👤", "🌿", "🛏️", "🌱"],
+        reward: "Na je eerste tuin zie je de crops en planning echt tot leven komen.",
+        nextStep: { icon:"👤", label:"Profiel maken", helper:"Begin met een account. Daarna open je de tuinwereld." },
+    };
 
     const doShake = () => { setShake(true); setTimeout(() => setShake(false), 500); };
 
@@ -2519,6 +2534,19 @@ function LoginScreen({ state, dispatch, onLogin }) {
                                 <button key={code} onClick={()=>setLang(code)} style={{ background:lang===code?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.08)", border:`1.5px solid ${lang===code?"rgba(255,255,255,0.6)":"transparent"}`, borderRadius:T.rs, padding:"4px 10px", cursor:"pointer", fontSize:16, color:"#FFF", transition:"all 0.15s" }}>{flag}</button>
                             ))}
                         </div>
+                    </div>
+
+                    <div style={{ marginBottom:16 }}>
+                        <JourneyPanel
+                            headerLabel="Start van je tuinwereld"
+                            title={onboardingJourney.title}
+                            subtitle={onboardingJourney.subtitle}
+                            progress={onboardingJourney.progress}
+                            steps={onboardingJourney.steps}
+                            tokens={onboardingJourney.tokens}
+                            reward={onboardingJourney.reward}
+                            nextStep={onboardingJourney.nextStep}
+                        />
                     </div>
 
                     {/* Card */}
@@ -2738,11 +2766,13 @@ function AccountScreen({ state, dispatch, lang, onLogout }) {
 function DashboardScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
+    const user = state.users.find(u => u.id === uid);
     const gardens = forUser(state.gardens, uid);
     const fields = forUser(state.fields, uid);
     const plants = forUser(state.plants, uid);
     const structures = forUser(state.structures, uid);
     const tasks = forUser(state.tasks, uid);
+    const journey = buildJourneyTrack({ user, gardens, fields, plants, structures });
     const pending = tasks.filter(task => task.status !== "done");
     const overdue = pending.filter(task => isOverdue(task.due_date, task.status));
     const harvestable = plants.filter(p => p.status === "harvestable");
@@ -2775,6 +2805,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         <Btn key="fields" variant="ghost" size="sm" onClick={() => navigate("fields")}>{t("beds_fields")}</Btn>,
         <Btn key="plants" variant="primary" size="sm" icon="+" onClick={() => navigate("plants")}>{t("add_plant")}</Btn>,
     ];
+    const journeyRoute = journey.nextStep?.key === "garden" ? "gardens" : journey.nextStep?.key === "layout" ? "editor" : "plants";
     const attentionTasks = overdue.length > 0 ? overdue.slice(0, 4) : soonTasks;
     const renderTaskRow = (task) => {
         const statusCfg = TASK_STATUS_C[task.status] || TASK_STATUS_C.pending;
@@ -2879,6 +2910,21 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 meta={instructionMeta}
                 actions={quickActions}
             />
+            <JourneyPanel
+                headerLabel="Tuinmissies"
+                title={journey.title || "Je tuin groeit verder"}
+                subtitle={journey.subtitle || "Maak je tuinwereld stap voor stap groter."}
+                progress={journey.progress}
+                steps={journey.steps}
+                tokens={journey.tokens}
+                reward={journey.reward}
+                nextStep={journey.nextStep}
+                action={
+                    <Btn size="sm" variant="primary" onClick={() => navigate(journeyRoute)}>
+                        {journey.progress >= 100 ? "Open tuin" : "Ga naar volgende stap"}
+                    </Btn>
+                }
+            />
             <PanelGroup>
                 <StatCard icon="🌿" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
                 <StatCard icon="🛏️" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m² ${t("total_area")}`} onClick={() => navigate("fields")} />
@@ -2936,6 +2982,8 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
     const uid = state.activeUserId;
     const gardens = forUser(state.gardens, uid);
     const fields  = forUser(state.fields, uid);
+    const plants  = forUser(state.plants, uid);
+    const structures = forUser(state.structures, uid);
     const tasks = forUser(state.tasks, uid);
     const [show, setShow] = useState(false);
     const ef = { name:"", width:"", height:"", unit:"m", type:"mixed", notes:"" };
@@ -2947,6 +2995,8 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
         setShow(false); setForm(ef);
     };
     const totalArea = fields.reduce((sum, field) => sum + ((+field.width || 0) * (+field.height || 0)), 0).toFixed(1);
+    const user = state.users.find(u => u.id === uid);
+    const journey = buildJourneyTrack({ user, gardens, fields, plants, structures });
     const metaBadges = [
         <MetaBadge key="beds" value={fields.length} label={t("beds_fields")} />,
         <MetaBadge key="area" value={`${totalArea}m²`} label={t("total_area")} />,
@@ -2958,6 +3008,17 @@ function GardensScreen({ state, dispatch, navigate, lang }) {
                 subtitle={`${gardens.length} ${t("gardens").toLowerCase()}`}
                 meta={metaBadges}
                 actions={[<Btn key="new" icon="+" variant="primary" onClick={()=>setShow(true)}>{t("new_garden")}</Btn>]}
+            />
+            <JourneyPanel
+                headerLabel="Tuinwereld"
+                title={journey.title}
+                subtitle={journey.subtitle}
+                progress={journey.progress}
+                steps={journey.steps}
+                tokens={journey.tokens}
+                reward={journey.reward}
+                nextStep={journey.nextStep}
+                action={<Btn size="sm" variant="primary" icon="+" onClick={()=>setShow(true)}>{t("create_garden")}</Btn>}
             />
             {gardens.length===0 ? (
                 <SectionPanel title={t("nav_gardens")} subtitle="Start by creating your first garden" action={<Btn size="sm" icon="+" variant="primary" onClick={()=>setShow(true)}>{t("create_garden")}</Btn>}>
