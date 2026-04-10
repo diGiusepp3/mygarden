@@ -35,14 +35,14 @@ export function SectionPanel({ title, subtitle, action, children, style, accent,
             minHeight:subtitle || action ? 0 : 120,
             ...style
         }}>
-            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:14, marginBottom:subtitle||action ? 12 : 8 }}>
+            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:14, marginBottom:subtitle || action ? 12 : 8 }}>
                 <div>
                     <h3 style={{ margin:0, fontSize:15, fontWeight:900, fontFamily:"Fraunces, serif", color:accent?.titleColor || T.text }}>{title}</h3>
                     {subtitle && <p style={{ margin:"6px 0 0", fontSize:12, color:accent?.subColor || T.textMuted }}>{subtitle}</p>}
+                </div>
+                {action && <div>{action}</div>}
             </div>
-            {action && <div>{action}</div>}
-        </div>
-        {children}
+            {children}
         </div>
     );
 }

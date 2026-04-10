@@ -5152,6 +5152,7 @@ export default function GardenGridApp() {
     const uid = loggedInUid;
     const activeUser = state.users.find(u => u.id === uid);
     const lang = activeUser?.settings?.lang || "nl";
+    const t = useT(lang);
     const pendingTasks = forUser(state.tasks, uid||"").filter(t => t.status==="pending").length;
     const props = { state, dispatch, navigate, lang, routeParams };
 
