@@ -4855,9 +4855,31 @@ function DevCodexPlantBuilder() {
     const [category, setCategory] = useState("Vegetable");
     const [count, setCount]       = useState(8);
     const [brief, setBrief]       = useState("More easy-to-grow crops for a mixed kitchen garden.");
+    const [varieties, setVarieties] = useState("Tomato, Cherry Tomato, Cluster Tomato");
+    const [search, setSearch]     = useState("");
+    const [library, setLibrary]   = useState([]);
+    const [libraryLoading, setLibraryLoading] = useState(false);
     const [loading, setLoading]   = useState(false);
     const [result, setResult]     = useState(null);
     const [error, setError]       = useState(null);
+
+    useEffect(() => {
+        let active = true;
+        (async () => {
+            try {
+                setLibraryLoading(true);
+                const res = await fetch("/api/plants-library.php?limit=300");
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Could not load plant library");
+                if (active) setLibrary(Array.isArray(data.plants) ? data.plants : []);
+            } catch (e) {
+                if (active) setError(e.message);
+            } finally {
+                if (active) setLibraryLoading(false);
+            }
+        })();
+        return () => { active = false; };
+    }, []);
 
     const presets = [
         { label: "Easy crops", text: "Focus on beginner-friendly crops with short maturity times." },
@@ -4874,11 +4896,16 @@ function DevCodexPlantBuilder() {
             const res = await fetch("/api/generate-plants.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ count, category, prompt: brief }),
+                body: JSON.stringify({ count, category, prompt: `${brief}\nExisting varieties to consider: ${varieties}` }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Server error");
             setResult(data);
+            const refreshed = await fetch("/api/plants-library.php?limit=300");
+            const refreshedData = await refreshed.json();
+            if (refreshed.ok && Array.isArray(refreshedData.plants)) {
+                setLibrary(refreshedData.plants);
+            }
         } catch (e) {
             setError(e.message);
         } finally {
@@ -4898,6 +4925,15 @@ function DevCodexPlantBuilder() {
                     <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:170, height:38, justifySelf:"start" }}>
                         {loading ? "⏳ Genereren..." : "⚡ Codex genereer"}
                     </Btn>
+                </div>
+                <div style={{ marginTop:14 }}>
+                    <Input
+                        label="Variëteiten om mee te nemen"
+                        value={varieties}
+                        onChange={setVarieties}
+                        placeholder="Tomaat, kerstomaat, trostomaat..."
+                        hint="Deze lijst wordt meegestuurd zodat bestaande variëteiten herkend en aangevuld kunnen worden."
+                    />
                 </div>
                 <div style={{ marginTop:14, display:"flex", gap:8, flexWrap:"wrap" }}>
                     {presets.map(p => (
@@ -4930,11 +4966,44 @@ function DevCodexPlantBuilder() {
                     />
                 </div>
             </Card>
+            <Card style={{ padding:24, marginTop:16 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, marginBottom:12 }}>
+                    <div>
+                        <div style={{ fontSize:16, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>Bestaande bibliotheek</div>
+                        <div style={{ fontSize:12, color:T.textMuted }}>
+                            {libraryLoading ? "Bibliotheek laden..." : `${library.length} planten gevonden`}
+                        </div>
+                    </div>
+                    <Input label="Zoeken" value={search} onChange={setSearch} placeholder="Zoek plant of variëteit..." />
+                </div>
+                <div style={{ maxHeight:420, overflow:"auto", borderTop:`1px solid ${T.border}`, paddingTop:12 }}>
+                    {library
+                        .filter(p => {
+                            const q = search.trim().toLowerCase();
+                            if (!q) return true;
+                            const hay = `${p.name} ${p.category} ${(p.varieties || []).join(" ")} ${p.description || ""}`.toLowerCase();
+                            return hay.includes(q);
+                        })
+                        .slice(0, 80)
+                        .map(item => (
+                            <div key={item.id} style={{ padding:"10px 0", borderBottom:`1px solid ${T.borderLight}`, display:"flex", flexDirection:"column", gap:5 }}>
+                                <div style={{ display:"flex", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+                                    <div style={{ fontWeight:800, color:T.text }}>{item.icon || "🌱"} {item.name}</div>
+                                    <Badge color={T.primary} bg={T.primaryBg}>{item.category}</Badge>
+                                </div>
+                                <div style={{ fontSize:12, color:T.textMuted, lineHeight:1.5 }}>{item.description || "Geen beschrijving."}</div>
+                                <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                                    {(item.varieties || []).map(v => <Badge key={v} color={T.textSub} bg={T.surfaceAlt}>{v}</Badge>)}
+                                </div>
+                            </div>
+                        ))}
+                </div>
+            </Card>
             <DevError msg={error}/>
             {result && (
                 <AiResult model={result.model}>
                     <div style={{ fontWeight:700, marginBottom:12, color:T.primary }}>
-                        ✅ {result.saved ?? 0} planten opgeslagen
+                        ✅ {result.saved ?? 0} nieuw · {result.updated ?? 0} bijgewerkt
                     </div>
                     {Array.isArray(result.plants) && result.plants.map((p, i) => (
                         <div key={i} style={{ padding:"8px 0", borderBottom: i < result.plants.length-1 ? `1px solid ${T.border}` : "none", fontSize:13 }}>

@@ -732,3 +732,5 @@ Wat nu al duidelijk is:
 - [x] Toon per stap een knop die naar de juiste pagina of functie wijst.
 - [x] Maak op de dev-pagina een Codex-plantbuilder voor nieuwe plantsoorten.
 - [x] Voeg een MySQL-seedbestand toe met meer dan 100 onboarding stappen.
+- [x] Laat de dev-pagina eerst bestaande plantsoorten en variëteiten laden.
+- [x] Laat Codex bestaande variëteiten samenvoegen in plaats van zomaar dubbel op te slaan.
