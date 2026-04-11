@@ -1084,8 +1084,8 @@ const MAINTENANCE_STRUCT_TYPES = new Set(["hedge","trellis","windbreak","orchard
 // ----
 const PLANT_LIB = [
     // Vegetables
-    { name:"Tomato",       category:"Vegetable",   varieties:["Roma","Cherry","Beefsteak","San Marzano","Black Krim","Yellow Pear","Gardener's Delight"] },
-    { name:"Pepper",       category:"Vegetable",   varieties:["Sweet Bell","Paprika","Jalapeño","Cayenne","Habanero","Banana Pepper"] },
+    { name:"Tomato",       category:"Vegetable",   varieties:["Roma","Cherry","Beefsteak","San Marzano","Black Krim","Yellow Pear","Gardener's Delight","OG","OG-tomaat"] },
+    { name:"Pepper",       category:"Vegetable",   varieties:["Sweet Bell","Paprika","Jalapeño","Cayenne","Cayennepeper","Habanero","Banana Pepper"] },
     { name:"Aubergine",    category:"Vegetable",   varieties:["Black Beauty","Listada di Gandia","White Egg","Slim Jim"] },
     { name:"Zucchini",     category:"Vegetable",   varieties:["Dark Green","Golden","Romanesco","Patio Star","Cocozelle"] },
     { name:"Cucumber",     category:"Vegetable",   varieties:["Marketmore","Gherkin","Mini Munch","Straight Eight","Crystal Apple"] },
@@ -1103,7 +1103,7 @@ const PLANT_LIB = [
     { name:"Fennel",       category:"Vegetable",   varieties:["Florence","Romanesco","Zefa Fino","Perfection"] },
     { name:"Celery",       category:"Vegetable",   varieties:["Utah","Self-blanching","Giant Red","Tall Utah"] },
     { name:"Leek",         category:"Vegetable",   varieties:["Musselburgh","King Richard","Bleu de Solaise","Autumn Giant"] },
-    { name:"Onion",        category:"Vegetable",   varieties:["Red Baron","Stuttgart","Sturon","White Lisbon","Ailsa Craig"] },
+    { name:"Onion",        category:"Vegetable",   varieties:["Red Baron","Stuttgart","Sturon","White Lisbon","Spring Onion","Lente ui","Ailsa Craig"] },
     { name:"Garlic",       category:"Vegetable",   varieties:["Softneck","Hardneck","Elephant","Solent Wight","Lautrec Wight"] },
     { name:"Shallot",      category:"Vegetable",   varieties:["Zebrune","Ambition","Red Sun","Mikor"] },
     { name:"Sweetcorn",    category:"Vegetable",   varieties:["Earlibird","Golden Bantam","Painted Mountain","Swift","Lark"] },
@@ -1122,12 +1122,12 @@ const PLANT_LIB = [
     { name:"Celeriac",     category:"Root",        varieties:["Prinz","Giant Prague","Monarch","Brilliant"] },
     { name:"Swede",        category:"Root",        varieties:["Marian","Best of All","Wilhemsburger"] },
     // Herbs
-    { name:"Basil",        category:"Herb",        varieties:["Genovese","Thai","Purple Opal","Lemon","Holy","Greek Miniature"] },
-    { name:"Parsley",      category:"Herb",        varieties:["Flat-leaf","Curly","Hamburg Root","Italian Giant"] },
+    { name:"Basil",        category:"Herb",        varieties:["Genovese","Thai","Purple Opal","Lemon","Holy","Greek Miniature","Basilicum"] },
+    { name:"Parsley",      category:"Herb",        varieties:["Flat-leaf","Curly","Krul peterselie","Hamburg Root","Italian Giant"] },
     { name:"Cilantro",     category:"Herb",        varieties:["Leisure","Confetti","Santo","Calypso"] },
     { name:"Dill",         category:"Herb",        varieties:["Bouquet","Fernleaf","Mammoth","Dukat"] },
     { name:"Chives",       category:"Herb",        varieties:["Common","Garlic Chives","Giant Siberian","Staro"] },
-    { name:"Mint",         category:"Herb",        varieties:["Spearmint","Peppermint","Apple Mint","Chocolate Mint","Moroccan"] },
+    { name:"Mint",         category:"Herb",        varieties:["Spearmint","Peppermint","Apple Mint","Chocolate Mint","Moroccan","Munt"] },
     { name:"Oregano",      category:"Herb",        varieties:["Greek","Italian","Golden","Compactum"] },
     { name:"Thyme",        category:"Herb",        varieties:["Common","Lemon","Silver Posie","Creeping","Doone Valley"] },
     { name:"Rosemary",     category:"Herb",        varieties:["Tuscan Blue","Miss Jessopp","Majorca Pink","Prostratus"] },
@@ -1281,6 +1281,13 @@ const SEED = {
         { id:"pl21", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Aubergine",     variety:"Black Beauty",   category:"Vegetable",  status:"planted",     quantity:3,  sow_date:"2026-02-15", plant_date:"2026-04-10", harvest_date:"2026-08-15", notes:"Keep warm — minimum 18°C" },
         { id:"pl22", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Cucumber",      variety:"Mini Munch",     category:"Vegetable",  status:"growing",     quantity:4,  sow_date:"2026-03-10", plant_date:"2026-04-15", harvest_date:"2026-07-01", notes:"Train up vertical wire" },
         { id:"pl23", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Melon",         variety:"Sweetheart",     category:"Fruit",      status:"sown",        quantity:2,  sow_date:"2026-03-20", plant_date:"",           harvest_date:"2026-08-20", notes:"Needs greenhouse warmth" },
+        // Garden 1 — greenhouse sowings from 3 March 2026
+        { id:"pl46", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Tomato",        variety:"OG-tomaat",      category:"Vegetable",  status:"sown",        quantity:4,  sow_date:"2026-03-03", plant_date:"",           harvest_date:"2026-07-20", notes:"Gezaaid in serre in potjes" },
+        { id:"pl47", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Basil",         variety:"Basilicum",      category:"Herb",       status:"sown",        quantity:6,  sow_date:"2026-03-03", plant_date:"",           harvest_date:"2026-06-15", notes:"Volle potjes in serre" },
+        { id:"pl48", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Parsley",       variety:"Krul peterselie",category:"Herb",       status:"sown",        quantity:3,  sow_date:"2026-03-03", plant_date:"",           harvest_date:"2026-05-25", notes:"Volle potjes in serre" },
+        { id:"pl49", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Onion",         variety:"Lente ui",       category:"Vegetable",  status:"sown",        quantity:6,  sow_date:"2026-03-03", plant_date:"",           harvest_date:"2026-05-20", notes:"In serre, in compacte potjes" },
+        { id:"pl50", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Mint",          variety:"Munt",           category:"Herb",       status:"sown",        quantity:2,  sow_date:"2026-03-03", plant_date:"",           harvest_date:"",           notes:"Twee volle potjes in serre" },
+        { id:"pl51", garden_id:"g1", user_id:"u1", field_id:"f6", name:"Pepper",        variety:"Cayennepeper",   category:"Vegetable",  status:"sown",        quantity:14, sow_date:"2026-03-03", plant_date:"",           harvest_date:"2026-08-20", notes:"Serrezaailingen in potjes" },
         // Garden 2 — Mediterranean Herbs
         { id:"pl24", garden_id:"g2", user_id:"u1", field_id:"f7", name:"Oregano",       variety:"Greek",          category:"Herb",       status:"growing",     quantity:3,  sow_date:"2026-02-01", plant_date:"2026-03-15", harvest_date:"",           notes:"Perennial" },
         { id:"pl25", garden_id:"g2", user_id:"u1", field_id:"f7", name:"Sage",          variety:"Common",         category:"Herb",       status:"growing",     quantity:2,  sow_date:"2026-01-20", plant_date:"2026-03-10", harvest_date:"",           notes:"Prune hard each spring" },
@@ -2081,10 +2088,12 @@ const Sidebar = React.lazy(() => import("./src/layout/Sidebar.jsx"));
 // ----
 function GardenEditor({ garden, fields, structures, zones, plants = [], slots = [], dispatch, lang, navigate }) {
     const [zoom, setZoom] = useState(1);
-    const sc = SCALE * zoom;
+    const [fitZoom, setFitZoom] = useState(1);
     const pad = 44;
+    const sc = SCALE * zoom * fitZoom;
     const gW = garden.width * sc, gH = garden.height * sc;
     const svgRef = useRef(null);
+    const canvasWrapRef = useRef(null);
     const [selId, setSelId] = useState(null);
     const [selKind, setSelKind] = useState(null);
     const dragRef = useRef(null);
@@ -2112,6 +2121,28 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
             }
         });
     }, [dispatch]);
+    useEffect(() => {
+        const updateFitZoom = () => {
+            const wrap = canvasWrapRef.current;
+            if (!wrap) return;
+            const availableWidth = Math.max(320, wrap.clientWidth - 24);
+            const naturalWidth = Math.max(1, garden.width * SCALE + pad * 2);
+            const nextFit = clamp(availableWidth / naturalWidth, 0.35, 1);
+            setFitZoom(nextFit);
+        };
+        updateFitZoom();
+        const wrap = canvasWrapRef.current;
+        let observer = null;
+        if (wrap && typeof ResizeObserver !== "undefined") {
+            observer = new ResizeObserver(updateFitZoom);
+            observer.observe(wrap);
+        }
+        window.addEventListener("resize", updateFitZoom);
+        return () => {
+            observer?.disconnect?.();
+            window.removeEventListener("resize", updateFitZoom);
+        };
+    }, [garden.width, garden.height]);
     useEffect(() => {
         if (!selItem) {
             setEditForm(null);
@@ -2622,12 +2653,12 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                 </Btn>
                 {zoneDraft && <Btn size="sm" variant="primary" onClick={finishZoneDraft} disabled={zoneDraft.points.length < 3}>Finish Zone</Btn>}
                 <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.max(0.35, +(z-0.15).toFixed(2)))}>−</Btn>
-                <span style={{ fontSize:12, color:T.textSub, minWidth:38, textAlign:"center", fontWeight:700 }}>{Math.round(zoom*100)}%</span>
+                <span style={{ fontSize:12, color:T.textSub, minWidth:38, textAlign:"center", fontWeight:700 }}>{Math.round(zoom * fitZoom * 100)}%</span>
                 <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.min(2.5, +(z+0.15).toFixed(2)))}>+</Btn>
                 <Btn size="sm" variant="ghost" onClick={() => setZoom(1)}>Reset</Btn>
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) 280px", gap:12, alignItems:"start" }}>
-                <div style={{ overflow:"auto", background:"#F2EDE4", minHeight:320, border:`1px solid ${T.border}`, borderTop:"none" }}>
+                <div ref={canvasWrapRef} style={{ overflow:"auto", background:"#F2EDE4", minHeight:320, border:`1px solid ${T.border}`, borderTop:"none" }}>
                     <svg ref={svgRef} width={pad*2+gW} height={pad*2+gH} style={{ display:"block", userSelect:"none" }}>
                     <defs>
                         <pattern id="soil" patternUnits="userSpaceOnUse" width="8" height="8">

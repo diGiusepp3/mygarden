@@ -2,7 +2,7 @@ export const PLANT_LIB = [
     // Vegetables
     {
         name:"Tomato", category:"Vegetable",
-        varieties:["Roma","Cherry","Beefsteak","San Marzano","Black Krim","Yellow Pear","Gardener's Delight"],
+        varieties:["Roma","Cherry","Beefsteak","San Marzano","Black Krim","Yellow Pear","Gardener's Delight","OG","OG-tomaat"],
         family:"Solanaceae", spacing_cm:60, row_spacing_cm:90, days_to_harvest:70, greenhouse:true,
         companions:["Basil","Marigold","Carrot","Parsley","Nasturtium","Borage","Chives","Calendula"],
         avoid:["Fennel","Broccoli","Cabbage","Cauliflower","Kale","Potato","Aubergine"],
@@ -10,7 +10,7 @@ export const PLANT_LIB = [
     },
     {
         name:"Pepper", category:"Vegetable",
-        varieties:["Sweet Bell","Paprika","Jalapeño","Cayenne","Habanero","Banana Pepper"],
+        varieties:["Sweet Bell","Paprika","Jalapeño","Cayenne","Cayennepeper","Habanero","Banana Pepper"],
         family:"Solanaceae", spacing_cm:45, row_spacing_cm:60, days_to_harvest:80, greenhouse:true,
         companions:["Basil","Marigold","Carrot","Tomato","Parsley"],
         avoid:["Fennel","Potato","Cabbage","Broccoli"],
@@ -154,7 +154,7 @@ export const PLANT_LIB = [
     },
     {
         name:"Onion", category:"Vegetable",
-        varieties:["Red Baron","Stuttgart","Sturon","White Lisbon","Ailsa Craig"],
+        varieties:["Red Baron","Stuttgart","Sturon","White Lisbon","Spring Onion","Lente ui","Ailsa Craig"],
         family:"Amaryllidaceae", spacing_cm:10, row_spacing_cm:25, days_to_harvest:100,
         companions:["Carrot","Beetroot","Lettuce","Chamomile","Parsnip","Tomato"],
         avoid:["Beans","Peas","Sage","Asparagus"],
@@ -292,7 +292,7 @@ export const PLANT_LIB = [
     // Herbs
     {
         name:"Basil", category:"Herb",
-        varieties:["Genovese","Thai","Purple Opal","Lemon","Holy","Greek Miniature"],
+        varieties:["Genovese","Thai","Purple Opal","Lemon","Holy","Greek Miniature","Basilicum"],
         family:"Lamiaceae", spacing_cm:20, row_spacing_cm:30, days_to_harvest:30, greenhouse:true,
         companions:["Tomato","Pepper","Marigold","Oregano"],
         avoid:["Sage","Cucumber","Fennel"],
@@ -300,7 +300,7 @@ export const PLANT_LIB = [
     },
     {
         name:"Parsley", category:"Herb",
-        varieties:["Flat-leaf","Curly","Hamburg Root","Italian Giant"],
+        varieties:["Flat-leaf","Curly","Krul peterselie","Hamburg Root","Italian Giant"],
         family:"Apiaceae", spacing_cm:20, row_spacing_cm:30, days_to_harvest:70,
         companions:["Asparagus","Tomato","Chives","Carrot","Rose"],
         avoid:["Lettuce","Onion","Fennel","Mint"],
@@ -332,7 +332,7 @@ export const PLANT_LIB = [
     },
     {
         name:"Mint", category:"Herb",
-        varieties:["Spearmint","Peppermint","Apple Mint","Chocolate Mint","Moroccan"],
+        varieties:["Spearmint","Peppermint","Apple Mint","Chocolate Mint","Moroccan","Munt"],
         family:"Lamiaceae", spacing_cm:30, row_spacing_cm:40, days_to_harvest:30,
         companions:["Brassicas","Tomato","Pea"],
         avoid:["Parsley","Chamomile"],

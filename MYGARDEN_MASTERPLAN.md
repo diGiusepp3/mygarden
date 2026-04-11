@@ -742,6 +742,9 @@ Wat nu al duidelijk is:
 - [x] Laat de dev-pagina eerst bestaande plantsoorten en variëteiten laden.
 - [x] Laat Codex bestaande variëteiten samenvoegen in plaats van zomaar dubbel op te slaan.
 
+- [x] Voeg Nederlandse plant-aliassen toe zodat `basilicum`, `krul peterselie`, `lente ui`, `munt` en `cayennepeper` ook direct zoekbaar zijn.
+- [x] Zet de serre-zaailingen van 3 maart 2026 ook in de demo-tuin zodat editor en bibliotheek gelijk lopen.
+
 ## 31. Brede tuinwereld
 
 - [ ] Maak de plantbibliotheek veel breder dan alleen moestuinplanten.
