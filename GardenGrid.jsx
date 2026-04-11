@@ -3604,7 +3604,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
     const plants = forUser(state.plants, uid);
     const structures = forUser(state.structures, uid);
     const tasks = forUser(state.tasks, uid);
-    const journey = buildJourneyTrack({ user, gardens, fields, plants, structures, lang });
+    const journey = buildUserQuestProgress({ user, gardens, fields, structures, plants, tasks, lang });
     const pending = tasks.filter(task => task.status !== "done");
     const overdue = pending.filter(task => isOverdue(task.due_date, task.status));
     const harvestable = plants.filter(p => p.status === "harvestable");
@@ -3637,13 +3637,7 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
         <Btn key="fields" variant="ghost" size="sm" onClick={() => navigate("fields")}>{t("beds_fields")}</Btn>,
         <Btn key="plants" variant="primary" size="sm" icon="+" onClick={() => navigate("plants")}>{t("add_plant")}</Btn>,
     ];
-    const journeyRoute = journey.progress >= 100
-        ? "gardens"
-        : journey.nextStep?.key === "garden"
-            ? "gardens"
-            : journey.nextStep?.key === "layout"
-                ? "editor"
-                : "plants";
+    const journeyRoute = journey.nextStep?.route || "dashboard";
     const handleQuestStep = (step) => {
         if (step.actionKind === "confirm_email") {
             dispatch({ type:"SET_SETTING", payload:{ email_verified:true } });
@@ -3779,11 +3773,24 @@ function DashboardScreen({ state, dispatch, navigate, lang }) {
                 onStepAction={handleQuestStep}
                 lang={lang}
                 action={
-                    <Btn size="sm" variant="primary" onClick={() => navigate(journeyRoute)}>
-                        {journey.progress >= 100 ? t("dashboard_open_garden") : t("dashboard_next_step")}
-                    </Btn>
-                }
-            />
+                <Btn size="sm" variant="primary" onClick={() => {
+                    const next = journey.nextStep;
+                    if (next?.actionKind === "confirm_email") {
+                        dispatch({ type:"SET_SETTING", payload:{ email_verified:true } });
+                        return;
+                    }
+                    if (next?.route === "gardens" && gardens[0]) {
+                        dispatch({ type:"SET_ACTIVE_GARDEN", payload: gardens[0].id });
+                    }
+                    if ((next?.route === "editor" || next?.route === "plants" || next?.route === "tasks" || next?.route === "greenhouses") && state.activeGardenId) {
+                        dispatch({ type:"SET_ACTIVE_GARDEN", payload: state.activeGardenId });
+                    }
+                    navigate(journeyRoute);
+                }}>
+                    {journey.progress >= 100 ? (journey.nextStep?.actionLabel || t("dashboard_open_garden")) : t("dashboard_next_step")}
+                </Btn>
+            }
+        />
             <PanelGroup>
                 <StatCard icon="🌿" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
                 <StatCard icon="🛏️" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m² ${t("total_area")}`} onClick={() => navigate("fields")} />
