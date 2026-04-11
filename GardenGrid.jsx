@@ -1154,6 +1154,11 @@ const USER_COLORS   = ["#2B5C10","#1565C0","#C4622D","#7B1FA2","#00695C","#E6510
 const USER_AVATARS  = ["👩‍🌾","👨‍🌾","🧑‍🌾","👩‍🍳","👨‍🍳","🧑‍🍳","🌱","🍀"];
 const GH_TYPES      = ["greenhouse","tunnel_greenhouse"];
 const MAINTENANCE_STRUCT_TYPES = new Set(["hedge","trellis","windbreak","orchard_row"]);
+const normalizeSearchText = (value) => String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 
 // ----
 // PLANT LIBRARY (60+ species)
@@ -1192,7 +1197,7 @@ const PLANT_LIB = [
     { name:"Beetroot",     category:"Root",        varieties:["Boltardy","Chioggia","Golden","Cylindra","Bull's Blood","Action"] },
     { name:"Parsnip",      category:"Root",        varieties:["Gladiator","Tender & True","Hollow Crown","White Gem"] },
     { name:"Turnip",       category:"Root",        varieties:["Purple Top","Tokyo Cross","Milan White","Golden Ball"] },
-    { name:"Radish",       category:"Root",        varieties:["French Breakfast","Cherry Belle","Watermelon","Daikon","Black Spanish"] },
+    { name:"Radish",       category:"Root",        varieties:["French Breakfast","Cherry Belle","Watermelon","Daikon","Black Spanish","Radijs","Radijzen","Rettich"] },
     { name:"Potato",       category:"Root",        varieties:["Charlotte","Maris Piper","King Edward","Desiree","Pink Fir Apple","Jersey Royal"] },
     { name:"Sweet Potato", category:"Root",        varieties:["Beauregard","Hernandez","O'Henry","Erato Orange"] },
     { name:"Celeriac",     category:"Root",        varieties:["Prinz","Giant Prague","Monarch","Brilliant"] },
@@ -4465,8 +4470,8 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
 
     const hits = query.length >= 1
         ? PLANT_LIB.filter(p =>
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.varieties.some(v => v.toLowerCase().includes(query.toLowerCase()))
+            normalizeSearchText(p.name).includes(normalizeSearchText(query)) ||
+            p.varieties.some(v => normalizeSearchText(v).includes(normalizeSearchText(query)))
           ).slice(0, 6)
         : [];
 
@@ -6012,11 +6017,11 @@ function DevCompanions({ state }) {
 
     // Autocomplete from user's plants + PLANT_LIB
     const suggestions = useMemo(() => {
-        const q = plantName.toLowerCase();
+        const q = normalizeSearchText(plantName);
         if (!q || q.length < 2) return [];
         const fromMine = myPlants.map(p=>p.name);
         const fromLib  = PLANT_LIB.map(p=>p.name);
-        return [...new Set([...fromMine, ...fromLib])].filter(n => n.toLowerCase().includes(q)).slice(0,6);
+        return [...new Set([...fromMine, ...fromLib])].filter(n => normalizeSearchText(n).includes(q)).slice(0,6);
     }, [plantName, myPlants]);
 
     async function handleCheck() {

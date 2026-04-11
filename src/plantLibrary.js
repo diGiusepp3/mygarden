@@ -251,7 +251,7 @@ export const PLANT_LIB = [
     },
     {
         name:"Radish", category:"Root",
-        varieties:["French Breakfast","Cherry Belle","Watermelon","Daikon","Black Spanish"],
+        varieties:["French Breakfast","Cherry Belle","Watermelon","Daikon","Black Spanish","Radijs","Radijzen","Rettich"],
         family:"Brassicaceae", spacing_cm:5, row_spacing_cm:20, days_to_harvest:25,
         companions:["Lettuce","Carrot","Cucumber","Pea","Spinach","Nasturtium"],
         avoid:["Hyssop","Agastache"],
