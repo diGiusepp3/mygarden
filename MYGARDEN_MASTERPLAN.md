@@ -361,6 +361,7 @@ Wat nu al duidelijk is:
 - [ ] Maak companion hints makkelijker te gebruiken.
 - [ ] Maak zaai kalender makkelijker te gebruiken.
 - [ ] Maak chat makkelijker te gebruiken.
+- [x] Voeg een kennis/test-tab toe met een simpele bodem-pH test.
 - [ ] Maak dev panel beter op mobiel.
 - [ ] Maak dev panel beter op desktop.
 - [ ] Maak dev panel beter voor debuggen.

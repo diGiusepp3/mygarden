@@ -6101,6 +6101,52 @@ function DevFreeChat() {
 }
 
 // ----
+function DevKnowledgeBase({ lang }) {
+    const t = useT(lang);
+    const steps = [
+        { n:"1", text:t("dev_tests_soil_step1") },
+        { n:"2", text:t("dev_tests_soil_step2") },
+        { n:"3", text:t("dev_tests_soil_step3") },
+        { n:"4", text:t("dev_tests_soil_step4") },
+        { n:"5", text:t("dev_tests_soil_step5") },
+    ];
+
+    return (
+        <div style={{ display:"grid", gap:16 }}>
+            <Card style={{ padding:24 }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                    <div style={{ fontSize:13, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.6 }}>
+                        {t("dev_tests_title")}
+                    </div>
+                    <div style={{ fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>
+                        {t("dev_tests_soil_title")}
+                    </div>
+                    <div style={{ fontSize:13, color:T.textMuted, lineHeight:1.6 }}>
+                        {t("dev_tests_subtitle")}
+                    </div>
+                </div>
+            </Card>
+            <Card style={{ padding:24 }}>
+                <div style={{ display:"grid", gap:10 }}>
+                    <div style={{ fontSize:14, fontWeight:800, color:T.text }}>{t("dev_tests_soil_intro")}</div>
+                    {steps.map(step => (
+                        <div key={step.n} style={{ display:"flex", gap:12, alignItems:"flex-start", padding:12, border:`1px solid ${T.borderSoft}`, borderRadius:16, background:T.surfaceSoft }}>
+                            <div style={{ width:28, height:28, flex:"0 0 28px", borderRadius:999, display:"flex", alignItems:"center", justifyContent:"center", background:T.primaryBg, color:T.primary, fontSize:12, fontWeight:900 }}>
+                                {step.n}
+                            </div>
+                            <div style={{ fontSize:13, lineHeight:1.6, color:T.text }}>{step.text}</div>
+                        </div>
+                    ))}
+                    <div style={{ padding:12, borderRadius:16, background:T.accentBg, color:T.text, fontSize:12, lineHeight:1.6 }}>
+                        {t("dev_tests_soil_note")}
+                    </div>
+                </div>
+            </Card>
+        </div>
+    );
+}
+
+// ----
 function DevScreen({ state, dispatch, lang }) {
     const t = useT(lang);
     const [tab, setTab] = useState("plants");
@@ -6110,6 +6156,7 @@ function DevScreen({ state, dispatch, lang }) {
         { id:"advisor",  icon:"🧠", label:t("dev_tab_advisor") },
         { id:"companions", icon:"🌿", label:t("dev_tab_companions") },
         { id:"calendar", icon:"📅", label:t("dev_tab_calendar") },
+        { id:"tests",    icon:"🧪", label:t("dev_tab_tests") },
         { id:"chat",     icon:"💬", label:t("dev_tab_chat") },
     ];
 
@@ -6137,6 +6184,7 @@ function DevScreen({ state, dispatch, lang }) {
             {tab === "advisor"    && <DevGardenAdvisor state={state}/>}
             {tab === "companions" && <DevCompanions state={state}/>}
             {tab === "calendar"   && <DevSowCalendar/>}
+            {tab === "tests"      && <DevKnowledgeBase lang={lang}/>}
             {tab === "chat"       && <DevFreeChat/>}
         </div>
     );
