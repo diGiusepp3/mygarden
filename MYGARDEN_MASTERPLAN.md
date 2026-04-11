@@ -362,6 +362,7 @@ Wat nu al duidelijk is:
 - [ ] Maak zaai kalender makkelijker te gebruiken.
 - [ ] Maak chat makkelijker te gebruiken.
 - [x] Voeg een kennis/test-tab toe met een simpele bodem-pH test.
+- [x] Maak van de knowledge tab een kleine kennisbank met meerdere simpele bodemtests.
 - [ ] Maak dev panel beter op mobiel.
 - [ ] Maak dev panel beter op desktop.
 - [ ] Maak dev panel beter voor debuggen.

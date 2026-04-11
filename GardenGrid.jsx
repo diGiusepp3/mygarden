@@ -211,6 +211,24 @@ const LANG = {
         dev_tab_calendar:"Sow plan",
         dev_tab_knowledge:"Knowledge Base",
         dev_tab_chat:"Free question",
+        dev_tests_title:"Knowledge base",
+        dev_tests_subtitle:"Simple soil checks and garden rules you can use in the editor.",
+        dev_tests_soil_title:"Soil pH test",
+        dev_tests_soil_intro:"Use two small samples and check the reaction carefully.",
+        dev_tests_soil_step1:"Mix 2 tablespoons of soil with 1/2 cup vinegar.",
+        dev_tests_soil_step2:"If it fizzes, the soil is alkaline (pH > 7).",
+        dev_tests_soil_step3:"If there is no reaction, test another sample with baking soda and water.",
+        dev_tests_soil_step4:"If that fizzes, the soil is acidic (pH < 6).",
+        dev_tests_soil_step5:"No reaction to either test usually means neutral soil.",
+        dev_tests_soil_note:"Use this as a quick guide, not a lab result.",
+        dev_tests_moisture_title:"Moisture test",
+        dev_tests_moisture_subtitle:"A quick check for wet, okay or too dry soil.",
+        dev_tests_moisture_intro:"Use your finger or a clean wooden stick.",
+        dev_tests_moisture_step1:"Push 2 to 3 cm into the soil.",
+        dev_tests_moisture_step2:"If it feels dusty dry, water soon.",
+        dev_tests_moisture_step3:"If it feels cool and slightly damp, it is usually fine.",
+        dev_tests_moisture_step4:"If it feels muddy or smells sour, it may be too wet.",
+        dev_tests_moisture_note:"Combine this with plant needs and the weather.",
         dev_intro:"Use Codex to create new plant varieties and save them straight into the plant library.",
         dev_category:"Category",
         dev_count:"Count",
@@ -417,6 +435,24 @@ const LANG = {
         dev_tab_calendar:"Zaaiplan",
         dev_tab_knowledge:"Kennisbank",
         dev_tab_chat:"Vrije vraag",
+        dev_tests_title:"Kennisbank",
+        dev_tests_subtitle:"Eenvoudige bodemdingen en tuinregels voor in de editor.",
+        dev_tests_soil_title:"Bodem-pH test",
+        dev_tests_soil_intro:"Gebruik twee kleine monsters en kijk rustig naar de reactie.",
+        dev_tests_soil_step1:"Meng 2 eetlepels grond met 1/2 kop azijn.",
+        dev_tests_soil_step2:"Als het bruist, is de bodem alkalisch (pH > 7).",
+        dev_tests_soil_step3:"Als er geen reactie is, test een ander monster met bakpoeder en water.",
+        dev_tests_soil_step4:"Als dat bruist, is de bodem zuur (pH < 6).",
+        dev_tests_soil_step5:"Geen reactie op beide tests wijst meestal op neutrale grond.",
+        dev_tests_soil_note:"Gebruik dit als snelle richtlijn, niet als laboratoriumtest.",
+        dev_tests_moisture_title:"Vochttest",
+        dev_tests_moisture_subtitle:"Een snelle check voor natte, goede of te droge grond.",
+        dev_tests_moisture_intro:"Gebruik je vinger of een schoon houten stokje.",
+        dev_tests_moisture_step1:"Duw 2 tot 3 cm in de grond.",
+        dev_tests_moisture_step2:"Voelt het stoffig droog, dan straks water geven.",
+        dev_tests_moisture_step3:"Voelt het koel en een beetje vochtig, dan zit je meestal goed.",
+        dev_tests_moisture_step4:"Voelt het modderig of ruikt het zuur, dan is het mogelijk te nat.",
+        dev_tests_moisture_note:"Combineer dit met de behoefte van de plant en het weer.",
         dev_intro:"Gebruik Codex om nieuwe plantsoorten te maken en direct in de plantenbibliotheek op te slaan.",
         dev_category:"Categorie",
         dev_count:"Aantal",
@@ -623,6 +659,24 @@ const LANG = {
         dev_tab_calendar:"Plan de semis",
         dev_tab_knowledge:"Base de connaissances",
         dev_tab_chat:"Question libre",
+        dev_tests_title:"Base de connaissances",
+        dev_tests_subtitle:"Petits tests de sol et règles de jardin simples pour l'éditeur.",
+        dev_tests_soil_title:"Test du pH du sol",
+        dev_tests_soil_intro:"Prenez deux petits échantillons et observez la réaction.",
+        dev_tests_soil_step1:"Mélangez 2 cuillères à soupe de terre avec 1/2 tasse de vinaigre.",
+        dev_tests_soil_step2:"Si ça mousse, le sol est alcalin (pH > 7).",
+        dev_tests_soil_step3:"S'il n'y a aucune réaction, testez un autre échantillon avec du bicarbonate et de l'eau.",
+        dev_tests_soil_step4:"Si cela mousse, le sol est acide (pH < 6).",
+        dev_tests_soil_step5:"Aucune réaction aux deux tests indique généralement un sol neutre.",
+        dev_tests_soil_note:"À utiliser comme guide rapide, pas comme résultat de laboratoire.",
+        dev_tests_moisture_title:"Test d'humidité",
+        dev_tests_moisture_subtitle:"Un contrôle rapide pour savoir si le sol est humide, correct ou trop sec.",
+        dev_tests_moisture_intro:"Utilisez votre doigt ou un bâtonnet en bois propre.",
+        dev_tests_moisture_step1:"Poussez 2 à 3 cm dans le sol.",
+        dev_tests_moisture_step2:"Si c'est sec comme de la poussière, arrosez bientôt.",
+        dev_tests_moisture_step3:"Si c'est frais et légèrement humide, c'est généralement bon.",
+        dev_tests_moisture_step4:"Si c'est boueux ou sent l'acide, il y a peut-être trop d'eau.",
+        dev_tests_moisture_note:"À combiner avec les besoins de la plante et la météo.",
         dev_intro:"Utilisez Codex pour créer de nouvelles variétés et les enregistrer directement dans la bibliothèque de plantes.",
         dev_category:"Catégorie",
         dev_count:"Quantité",
@@ -829,6 +883,24 @@ const LANG = {
         dev_tab_calendar:"Aussaatplan",
         dev_tab_knowledge:"Wissensbasis",
         dev_tab_chat:"Freie Frage",
+        dev_tests_title:"Wissensbasis",
+        dev_tests_subtitle:"Einfache Bodentests und Gartenregeln für den Editor.",
+        dev_tests_soil_title:"Boden-pH-Test",
+        dev_tests_soil_intro:"Nimm zwei kleine Proben und beobachte die Reaktion genau.",
+        dev_tests_soil_step1:"Mische 2 Esslöffel Erde mit 1/2 Tasse Essig.",
+        dev_tests_soil_step2:"Wenn es schäumt, ist der Boden alkalisch (pH > 7).",
+        dev_tests_soil_step3:"Wenn keine Reaktion auftritt, teste eine weitere Probe mit Natron und Wasser.",
+        dev_tests_soil_step4:"Wenn das schäumt, ist der Boden sauer (pH < 6).",
+        dev_tests_soil_step5:"Keine Reaktion bei beiden Tests bedeutet meist neutralen Boden.",
+        dev_tests_soil_note:"Als schnelle Orientierung nutzen, nicht als Laborwert.",
+        dev_tests_moisture_title:"Feuchtigkeits-Test",
+        dev_tests_moisture_subtitle:"Eine schnelle Prüfung für nasse, passende oder zu trockene Erde.",
+        dev_tests_moisture_intro:"Nutze deinen Finger oder einen sauberen Holzstab.",
+        dev_tests_moisture_step1:"Drücke 2 bis 3 cm in die Erde.",
+        dev_tests_moisture_step2:"Fühlt sie sich staubtrocken an, bald gießen.",
+        dev_tests_moisture_step3:"Fühlt sie sich kühl und leicht feucht an, ist sie meist gut.",
+        dev_tests_moisture_step4:"Fühlt sie sich matschig an oder riecht sauer, ist sie vielleicht zu nass.",
+        dev_tests_moisture_note:"Mit Pflanzenbedarf und Wetter zusammen beurteilen.",
         dev_intro:"Nutze Codex, um neue Pflanzensorten zu erstellen und direkt in der Pflanzenbibliothek zu speichern.",
         dev_category:"Kategorie",
         dev_count:"Anzahl",
@@ -6107,12 +6179,34 @@ function DevFreeChat() {
 // ----
 function DevKnowledgeBase({ lang }) {
     const t = useT(lang);
-    const steps = [
-        { n:"1", text:t("dev_tests_soil_step1") },
-        { n:"2", text:t("dev_tests_soil_step2") },
-        { n:"3", text:t("dev_tests_soil_step3") },
-        { n:"4", text:t("dev_tests_soil_step4") },
-        { n:"5", text:t("dev_tests_soil_step5") },
+    const cards = [
+        {
+            badge: "1",
+            title: t("dev_tests_soil_title"),
+            subtitle: t("dev_tests_subtitle"),
+            intro: t("dev_tests_soil_intro"),
+            steps: [
+                t("dev_tests_soil_step1"),
+                t("dev_tests_soil_step2"),
+                t("dev_tests_soil_step3"),
+                t("dev_tests_soil_step4"),
+                t("dev_tests_soil_step5"),
+            ],
+            note: t("dev_tests_soil_note"),
+        },
+        {
+            badge: "2",
+            title: t("dev_tests_moisture_title"),
+            subtitle: t("dev_tests_moisture_subtitle"),
+            intro: t("dev_tests_moisture_intro"),
+            steps: [
+                t("dev_tests_moisture_step1"),
+                t("dev_tests_moisture_step2"),
+                t("dev_tests_moisture_step3"),
+                t("dev_tests_moisture_step4"),
+            ],
+            note: t("dev_tests_moisture_note"),
+        },
     ];
 
     return (
@@ -6131,19 +6225,32 @@ function DevKnowledgeBase({ lang }) {
                 </div>
             </Card>
             <Card style={{ padding:24 }}>
-                <div style={{ display:"grid", gap:10 }}>
-                    <div style={{ fontSize:14, fontWeight:800, color:T.text }}>{t("dev_tests_soil_intro")}</div>
-                    {steps.map(step => (
-                        <div key={step.n} style={{ display:"flex", gap:12, alignItems:"flex-start", padding:12, border:`1px solid ${T.borderSoft}`, borderRadius:16, background:T.surfaceSoft }}>
-                            <div style={{ width:28, height:28, flex:"0 0 28px", borderRadius:999, display:"flex", alignItems:"center", justifyContent:"center", background:T.primaryBg, color:T.primary, fontSize:12, fontWeight:900 }}>
-                                {step.n}
+                <div style={{ display:"grid", gap:14 }}>
+                    {cards.map(card => (
+                        <div key={card.title} style={{ display:"grid", gap:10, padding:16, border:`1px solid ${T.borderSoft}`, borderRadius:18, background:T.surfaceSoft }}>
+                            <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                                <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+                                    <div style={{ width:28, height:28, borderRadius:999, display:"flex", alignItems:"center", justifyContent:"center", background:T.primaryBg, color:T.primary, fontSize:12, fontWeight:900 }}>{card.badge}</div>
+                                    <div style={{ fontSize:16, fontWeight:900, color:T.text }}>{card.title}</div>
+                                </div>
+                                <div style={{ fontSize:12, color:T.textMuted, lineHeight:1.6 }}>{card.subtitle}</div>
                             </div>
-                            <div style={{ fontSize:13, lineHeight:1.6, color:T.text }}>{step.text}</div>
+                            <div style={{ fontSize:13, fontWeight:800, color:T.text }}>{card.intro}</div>
+                            <div style={{ display:"grid", gap:8 }}>
+                                {card.steps.map((step, idx) => (
+                                    <div key={`${card.badge}-${idx}`} style={{ display:"flex", gap:12, alignItems:"flex-start", padding:12, border:`1px solid ${T.borderSoft}`, borderRadius:16, background:T.surface }}>
+                                        <div style={{ width:28, height:28, flex:"0 0 28px", borderRadius:999, display:"flex", alignItems:"center", justifyContent:"center", background:T.primaryBg, color:T.primary, fontSize:12, fontWeight:900 }}>
+                                            {idx + 1}
+                                        </div>
+                                        <div style={{ fontSize:13, lineHeight:1.6, color:T.text }}>{step}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div style={{ padding:12, borderRadius:16, background:T.accentBg, color:T.text, fontSize:12, lineHeight:1.6 }}>
+                                {card.note}
+                            </div>
                         </div>
                     ))}
-                    <div style={{ padding:12, borderRadius:16, background:T.accentBg, color:T.text, fontSize:12, lineHeight:1.6 }}>
-                        {t("dev_tests_soil_note")}
-                    </div>
                 </div>
             </Card>
         </div>
