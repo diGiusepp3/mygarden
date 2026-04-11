@@ -110,7 +110,7 @@ export function PanelGroup({ children, cols = "repeat(auto-fit,minmax(240px,1fr)
     return <div style={{ display:"grid", gridTemplateColumns:cols, gap:16 }}>{children}</div>;
 }
 
-export function QuickAction({ icon, label, helper, onClick }) {
+export function QuickAction({ icon, label, helper, onClick, style }) {
     return (
         <button onClick={onClick} style={{
             border:`1px solid ${T.borderSoft}`,
@@ -126,6 +126,8 @@ export function QuickAction({ icon, label, helper, onClick }) {
             color:T.text,
             boxShadow:"0 8px 22px rgba(20,18,14,0.06)",
             transition:"transform 0.2s ease, box-shadow 0.2s ease",
+            width:"100%",
+            ...style,
         }}>
             <span style={{ fontSize:22, width:38, height:38, borderRadius:16, display:"inline-flex", alignItems:"center", justifyContent:"center", background:T.primaryBg, flexShrink:0 }}>{icon}</span>
             <div style={{ textAlign:"left" }}>

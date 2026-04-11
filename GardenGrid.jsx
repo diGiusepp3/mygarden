@@ -110,6 +110,47 @@ const LANG = {
         dashboard_missions:"Garden missions",
         dashboard_world_title:"Your garden world keeps growing.",
         dashboard_world_subtitle:"Open the next chapter in your garden, step by step.",
+        editor_no_garden_title:"No garden selected",
+        editor_no_garden_subtitle:"Pick a garden first to shape the layout.",
+        editor_no_garden_action:"Go to gardens",
+        editor_summary_title:"Layout summary",
+        editor_summary_subtitle:"A quick read on the garden you are shaping now.",
+        editor_quick_actions:"Quick actions",
+        editor_quick_actions_subtitle:"The most common editor tasks stay one click away.",
+        editor_map_title:"Map workspace",
+        editor_map_subtitle:"Drag, resize, and review the full layout here.",
+        editor_garden_label:"Garden details",
+        editor_position_hint:"Position is measured from the top-left corner.",
+        editor_stats_beds:"Beds",
+        editor_stats_structures:"Structures",
+        editor_stats_zones:"Zones",
+        editor_stats_plants:"Plants",
+        editor_stats_slots:"Slots",
+        editor_stats_area:"Area",
+        editor_stats_unassigned:"Unassigned",
+        editor_open_gardens:"Open gardens",
+        editor_open_beds:"Open beds",
+        editor_open_plants:"Open plants",
+        editor_add_bed_hint:"Place a new bed or field in the selected garden.",
+        editor_add_structure_hint:"Add a greenhouse, shed, or other structure.",
+        editor_delete_row_confirm:"Delete this row? This also removes nested slots and linked plants.",
+        editor_rename_row:"Rename row",
+        editor_edit_row:"Edit row",
+        editor_add_row:"Add row",
+        editor_no_link:"No link",
+        editor_short_description:"Short description shown in details",
+        editor_prune_interval:"Prune interval (weeks)",
+        editor_next_prune_date:"Next prune date",
+        editor_maintenance_notes:"Maintenance notes",
+        editor_bed_overview:"Bed overview",
+        editor_bed_overview_sub:"Compact status per bed, row, and linked plants.",
+        editor_clear_filter:"Clear filter",
+        editor_clear_filters:"Clear filters",
+        editor_no_match:"No plants match filters",
+        editor_no_match_sub:"Adjust the status or category filters to see more plants.",
+        editor_row_plan:"Save as row plan?",
+        editor_keep_as_one:"Keep as one item",
+        editor_row_plan_hint:"This can be saved as a row plan.",
         dashboard_open_garden:"Open garden",
         dashboard_next_step:"Next step",
         dashboard_attention_title:"Needs attention",
@@ -274,6 +315,47 @@ const LANG = {
         dashboard_missions:"Tuinmissies",
         dashboard_world_title:"Je tuinwereld groeit verder.",
         dashboard_world_subtitle:"Open de volgende laag van je tuin, stap voor stap.",
+        editor_no_garden_title:"Geen tuin geselecteerd",
+        editor_no_garden_subtitle:"Kies eerst een tuin om de indeling te maken.",
+        editor_no_garden_action:"Naar tuinen",
+        editor_summary_title:"Indelingsoverzicht",
+        editor_summary_subtitle:"Een snelle blik op de tuin die je nu vormgeeft.",
+        editor_quick_actions:"Snelle acties",
+        editor_quick_actions_subtitle:"De meeste editor-taken blijven één klik verwijderd.",
+        editor_map_title:"Werkruimte op de kaart",
+        editor_map_subtitle:"Sleep, pas aan en bekijk hier de volledige indeling.",
+        editor_garden_label:"Tuininfo",
+        editor_position_hint:"Positie wordt gemeten vanaf de linkerbovenhoek.",
+        editor_stats_beds:"Bedden",
+        editor_stats_structures:"Structuren",
+        editor_stats_zones:"Zones",
+        editor_stats_plants:"Planten",
+        editor_stats_slots:"Vakjes",
+        editor_stats_area:"Oppervlak",
+        editor_stats_unassigned:"Niet toegewezen",
+        editor_open_gardens:"Tuinen openen",
+        editor_open_beds:"Bedden openen",
+        editor_open_plants:"Planten openen",
+        editor_add_bed_hint:"Plaats een nieuw bed of veld in de gekozen tuin.",
+        editor_add_structure_hint:"Voeg een serre, schuurtje of andere structuur toe.",
+        editor_delete_row_confirm:"Deze rij verwijderen? Dit haalt ook geneste vakjes en gekoppelde planten weg.",
+        editor_rename_row:"Rij hernoemen",
+        editor_edit_row:"Rij bewerken",
+        editor_add_row:"Rij toevoegen",
+        editor_no_link:"Geen koppeling",
+        editor_short_description:"Korte beschrijving die in details verschijnt",
+        editor_prune_interval:"Snoei-interval (weken)",
+        editor_next_prune_date:"Volgende snoeidatum",
+        editor_maintenance_notes:"Onderhoudsnotities",
+        editor_bed_overview:"Bedoverzicht",
+        editor_bed_overview_sub:"Compacte status per bed, rij en gekoppelde planten.",
+        editor_clear_filter:"Filter wissen",
+        editor_clear_filters:"Filters wissen",
+        editor_no_match:"Geen planten passen bij de filters",
+        editor_no_match_sub:"Pas status of categorie aan om meer planten te zien.",
+        editor_row_plan:"Opslaan als rijplan?",
+        editor_keep_as_one:"Als één item bewaren",
+        editor_row_plan_hint:"Dit kan als rijplan worden opgeslagen.",
         dashboard_open_garden:"Open tuin",
         dashboard_next_step:"Volgende stap",
         dashboard_attention_title:"Aandacht nodig",
@@ -438,6 +520,47 @@ const LANG = {
         dashboard_missions:"Missions du jardin",
         dashboard_world_title:"Votre univers de jardin grandit.",
         dashboard_world_subtitle:"Débloquez la suite du jardin, étape par étape.",
+        editor_no_garden_title:"Aucun jardin sélectionné",
+        editor_no_garden_subtitle:"Choisissez d'abord un jardin pour créer le plan.",
+        editor_no_garden_action:"Aller aux jardins",
+        editor_summary_title:"Aperçu du plan",
+        editor_summary_subtitle:"Un regard rapide sur le jardin que vous dessinez.",
+        editor_quick_actions:"Actions rapides",
+        editor_quick_actions_subtitle:"Les tâches les plus courantes restent à un clic.",
+        editor_map_title:"Espace carte",
+        editor_map_subtitle:"Déplacez, redimensionnez et vérifiez le plan complet ici.",
+        editor_garden_label:"Détails du jardin",
+        editor_position_hint:"La position se mesure depuis le coin supérieur gauche.",
+        editor_stats_beds:"Parterres",
+        editor_stats_structures:"Structures",
+        editor_stats_zones:"Zones",
+        editor_stats_plants:"Plantes",
+        editor_stats_slots:"Emplacements",
+        editor_stats_area:"Surface",
+        editor_stats_unassigned:"Non attribuées",
+        editor_open_gardens:"Ouvrir les jardins",
+        editor_open_beds:"Ouvrir les parterres",
+        editor_open_plants:"Ouvrir les plantes",
+        editor_add_bed_hint:"Ajouter un nouveau parterre ou champ dans le jardin choisi.",
+        editor_add_structure_hint:"Ajouter une serre, un abri ou une autre structure.",
+        editor_delete_row_confirm:"Supprimer cette rangée ? Cela supprimera aussi les emplacements imbriqués et les plantes liées.",
+        editor_rename_row:"Renommer la rangée",
+        editor_edit_row:"Modifier la rangée",
+        editor_add_row:"Ajouter une rangée",
+        editor_no_link:"Aucun lien",
+        editor_short_description:"Courte description affichée dans les détails",
+        editor_prune_interval:"Intervalle de taille (semaines)",
+        editor_next_prune_date:"Prochaine taille",
+        editor_maintenance_notes:"Notes d'entretien",
+        editor_bed_overview:"Vue des parterres",
+        editor_bed_overview_sub:"Statut compact par parterre, rangée et plantes liées.",
+        editor_clear_filter:"Effacer le filtre",
+        editor_clear_filters:"Effacer les filtres",
+        editor_no_match:"Aucune plante ne correspond aux filtres",
+        editor_no_match_sub:"Ajustez le statut ou la catégorie pour voir plus de plantes.",
+        editor_row_plan:"Enregistrer comme plan de rangée ?",
+        editor_keep_as_one:"Garder comme un seul élément",
+        editor_row_plan_hint:"Cela peut être enregistré comme plan de rangée.",
         dashboard_open_garden:"Ouvrir le jardin",
         dashboard_next_step:"Étape suivante",
         dashboard_attention_title:"À surveiller",
@@ -602,6 +725,47 @@ const LANG = {
         dashboard_missions:"Gartenmissionen",
         dashboard_world_title:"Deine Gartenwelt wächst weiter.",
         dashboard_world_subtitle:"Schalte Schritt für Schritt die nächste Ebene frei.",
+        editor_no_garden_title:"Kein Garten ausgewählt",
+        editor_no_garden_subtitle:"Wähle zuerst einen Garten, um den Plan zu gestalten.",
+        editor_no_garden_action:"Zu den Gärten",
+        editor_summary_title:"Planübersicht",
+        editor_summary_subtitle:"Ein schneller Blick auf den Garten, den du gerade formst.",
+        editor_quick_actions:"Schnellaktionen",
+        editor_quick_actions_subtitle:"Die häufigsten Editor-Aufgaben bleiben einen Klick entfernt.",
+        editor_map_title:"Kartenarbeitsbereich",
+        editor_map_subtitle:"Verschieben, anpassen und den gesamten Plan hier prüfen.",
+        editor_garden_label:"Gartendetails",
+        editor_position_hint:"Die Position wird von der oberen linken Ecke gemessen.",
+        editor_stats_beds:"Beete",
+        editor_stats_structures:"Strukturen",
+        editor_stats_zones:"Zonen",
+        editor_stats_plants:"Pflanzen",
+        editor_stats_slots:"Abschnitte",
+        editor_stats_area:"Fläche",
+        editor_stats_unassigned:"Nicht zugewiesen",
+        editor_open_gardens:"Gärten öffnen",
+        editor_open_beds:"Beete öffnen",
+        editor_open_plants:"Pflanzen öffnen",
+        editor_add_bed_hint:"Ein neues Beet oder Feld im ausgewählten Garten anlegen.",
+        editor_add_structure_hint:"Ein Gewächshaus, Schuppen oder eine andere Struktur hinzufügen.",
+        editor_delete_row_confirm:"Diese Reihe löschen? Dabei werden auch verschachtelte Bereiche und verknüpfte Pflanzen entfernt.",
+        editor_rename_row:"Reihe umbenennen",
+        editor_edit_row:"Reihe bearbeiten",
+        editor_add_row:"Reihe hinzufügen",
+        editor_no_link:"Kein Link",
+        editor_short_description:"Kurze Beschreibung, die in den Details angezeigt wird",
+        editor_prune_interval:"Schnittintervall (Wochen)",
+        editor_next_prune_date:"Nächster Schnitttermin",
+        editor_maintenance_notes:"Pflegenotizen",
+        editor_bed_overview:"Beetübersicht",
+        editor_bed_overview_sub:"Kompakter Status pro Beet, Reihe und verknüpften Pflanzen.",
+        editor_clear_filter:"Filter löschen",
+        editor_clear_filters:"Filter löschen",
+        editor_no_match:"Keine Pflanzen passen zu den Filtern",
+        editor_no_match_sub:"Passe Status oder Kategorie an, um mehr Pflanzen zu sehen.",
+        editor_row_plan:"Als Reihenplan speichern?",
+        editor_keep_as_one:"Als einzelnes Element behalten",
+        editor_row_plan_hint:"Das kann als Reihenplan gespeichert werden.",
         dashboard_open_garden:"Garten öffnen",
         dashboard_next_step:"Nächster Schritt",
         dashboard_attention_title:"Braucht Aufmerksamkeit",
@@ -3607,11 +3771,42 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
     const [ff, setFf] = useState(ef); const [sf, setSf] = useState(es);
     const setF = k=>v=>setFf(f=>({...f,[k]:v}));
     const setS = k=>v=>setSf(f=>({...f,[k]:v}));
-    if (!garden) return <div style={{ padding:28 }}><EmptyState icon="🗺️" title="No garden selected" subtitle="Select a garden first." action={<Btn onClick={()=>navigate("gardens")} variant="primary">{t("nav_gardens")}</Btn>}/></div>;
+    if (!garden) {
+        return (
+            <PageShell width={980}>
+                <EmptyState
+                    icon="🗺️"
+                    title={t("editor_no_garden_title")}
+                    subtitle={t("editor_no_garden_subtitle")}
+                    action={<Btn onClick={()=>navigate("gardens")} variant="primary">{t("editor_no_garden_action")}</Btn>}
+                />
+            </PageShell>
+        );
+    }
     const gFields   = state.fields.filter(f=>f.garden_id===garden.id);
     const gStructs  = state.structures.filter(s=>s.garden_id===garden.id);
     const gZones    = state.zones.filter(z=>z.garden_id===garden.id);
-    const posHint = `Garden is ${garden.width}m × ${garden.height}m. Position from top-left (0, 0).`;
+    const gPlants   = state.plants.filter(p=>p.garden_id===garden.id);
+    const gSlots    = (state.slots||[]).filter(s => s.garden_id===garden.id);
+    const linkedPlants = gPlants.filter(p => p.field_id || p.struct_id || p.slot_id).length;
+    const unassignedPlants = Math.max(0, gPlants.length - linkedPlants);
+    const gardenArea = (garden.width * garden.height).toFixed(1);
+    const gardenTypeLabel = LANG[lang]?.[GARDEN_TYPE_LABEL_K[garden.type]] || garden.type;
+    const posHint = `${t("editor_position_hint")} ${garden.width}m × ${garden.height}m.`;
+    const summaryCards = [
+        { label:t("editor_stats_beds"), value:gFields.length, helper:t("nav_fields") },
+        { label:t("editor_stats_structures"), value:gStructs.length, helper:t("nav_greenhouses") },
+        { label:t("editor_stats_zones"), value:gZones.length, helper:t("editor_stats_zones") },
+        { label:t("editor_stats_plants"), value:gPlants.length, helper:t("nav_plants") },
+        { label:t("editor_stats_slots"), value:gSlots.length, helper:t("editor_stats_slots") },
+        { label:t("editor_stats_unassigned"), value:unassignedPlants, helper:t("editor_stats_plants") },
+    ];
+    const quickActions = [
+        { icon:"🛏️", label:t("add_bed"), helper:t("editor_add_bed_hint"), onClick:()=>setShowField(true) },
+        { icon:"🏡", label:t("add_structure"), helper:t("editor_add_structure_hint"), onClick:()=>setShowStruct(true) },
+        { icon:"🌿", label:t("editor_open_beds"), helper:t("editor_bed_overview_sub"), onClick:()=>navigate("fields") },
+        { icon:"🌱", label:t("editor_open_plants"), helper:t("editor_position_hint"), onClick:()=>navigate("plants") },
+    ];
     const addField  = () => { if (!ff.name||!ff.x||!ff.y||!ff.width||!ff.height) return; dispatch({type:"ADD_FIELD",payload:{id:gid(),garden_id:garden.id,...ff,x:+ff.x,y:+ff.y,width:+ff.width,height:+ff.height}}); setShowField(false); setFf(ef); };
     const addStruct = () => {
         if (!sf.name||!sf.x||!sf.y||!sf.width||!sf.height) return;
@@ -3640,23 +3835,75 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
         setSf(es);
     };
     return (
-        <PageShell width={1320}>
+        <PageShell width={1460}>
             <PageHeader
                 title={garden.name}
-                subtitle={`${garden.width}m × ${garden.height}m · ${gFields.length} beds · ${gStructs.length} structures · ${gZones.length} zones`}
+                subtitle={`${gardenTypeLabel} · ${garden.width}m × ${garden.height}m · ${gFields.length} ${t("editor_stats_beds").toLowerCase()} · ${gStructs.length} ${t("editor_stats_structures").toLowerCase()}`}
                 meta={[
-                    <MetaBadge key="size" value={`${garden.width}×${garden.height}m`} label="Size" />,
-                    <MetaBadge key="beds" value={gFields.length} label={t("nav_fields")} />,
-                    <MetaBadge key="structures" value={gStructs.length} label={t("nav_greenhouses")} />,
+                    <MetaBadge key="size" value={`${garden.width}×${garden.height}m`} label={t("editor_stats_area")} />,
+                    <MetaBadge key="beds" value={gFields.length} label={t("editor_stats_beds")} />,
+                    <MetaBadge key="structures" value={gStructs.length} label={t("editor_stats_structures")} />,
+                    <MetaBadge key="plants" value={gPlants.length} label={t("editor_stats_plants")} />,
                 ]}
                 actions={[
+                    <Btn key="gardens" size="sm" variant="ghost" onClick={()=>navigate("gardens")} icon="🌿">{t("editor_open_gardens")}</Btn>,
                     <Btn key="struct" size="sm" variant="secondary" onClick={()=>setShowStruct(true)} icon="🏡">{t("add_structure")}</Btn>,
                     <Btn key="bed" size="sm" variant="primary" onClick={()=>setShowField(true)} icon="🛏️">{t("add_bed")}</Btn>
                 ]}
             />
-            <Card style={{ padding:12 }}>
-                <GardenEditor garden={garden} fields={gFields} structures={gStructs} zones={gZones} plants={forUser(state.plants, state.activeUserId)} slots={forUser(state.slots||[], state.activeUserId)} dispatch={dispatch} lang={lang} navigate={navigate}/>
-            </Card>
+            <PanelGroup cols="repeat(auto-fit,minmax(250px,1fr))">
+                <SectionPanel title={t("editor_summary_title")} subtitle={t("editor_summary_subtitle")} style={{ minHeight:"100%" }}>
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(2,minmax(0,1fr))", gap:10 }}>
+                        {summaryCards.map(card => (
+                            <div key={card.label} style={{ padding:"12px 12px 11px", border:`1px solid ${T.borderSoft}`, borderRadius:18, background:`linear-gradient(180deg, ${T.surfaceSoft} 0%, ${T.surface} 100%)`, boxShadow:"0 8px 18px rgba(20,18,14,0.05)" }}>
+                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.6 }}>{card.label}</div>
+                                <div style={{ marginTop:6, fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>{card.value}</div>
+                                <div style={{ marginTop:4, fontSize:11, color:T.textSub }}>{card.helper}</div>
+                            </div>
+                        ))}
+                    </div>
+                </SectionPanel>
+                <SectionPanel title={t("editor_quick_actions")} subtitle={t("editor_quick_actions_subtitle")} style={{ minHeight:"100%" }}>
+                    <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                        {quickActions.map(action => (
+                            <QuickAction key={action.label} icon={action.icon} label={action.label} helper={action.helper} onClick={action.onClick} style={{ width:"100%" }} />
+                        ))}
+                    </div>
+                </SectionPanel>
+                <SectionPanel title={t("editor_garden_label")} subtitle={t("editor_position_hint")} style={{ minHeight:"100%" }}>
+                    <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                        <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                            <Badge color={T.primary} bg={T.primaryBg}>{gardenTypeLabel}</Badge>
+                            <Badge color={T.textSub} bg={T.surfaceAlt}>{garden.width}m × {garden.height}m</Badge>
+                            <Badge color={T.textSub} bg={T.surfaceAlt}>{gardenArea}m²</Badge>
+                        </div>
+                        <div style={{ display:"grid", gridTemplateColumns:"repeat(2,minmax(0,1fr))", gap:10 }}>
+                            <div style={{ padding:"12px 12px 11px", border:`1px solid ${T.borderSoft}`, borderRadius:18, background:T.surfaceSoft }}>
+                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.6 }}>{t("editor_stats_beds")}</div>
+                                <div style={{ marginTop:6, fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>{gFields.length}</div>
+                            </div>
+                            <div style={{ padding:"12px 12px 11px", border:`1px solid ${T.borderSoft}`, borderRadius:18, background:T.surfaceSoft }}>
+                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.6 }}>{t("editor_stats_structures")}</div>
+                                <div style={{ marginTop:6, fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>{gStructs.length}</div>
+                            </div>
+                            <div style={{ padding:"12px 12px 11px", border:`1px solid ${T.borderSoft}`, borderRadius:18, background:T.surfaceSoft }}>
+                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.6 }}>{t("editor_stats_plants")}</div>
+                                <div style={{ marginTop:6, fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>{gPlants.length}</div>
+                            </div>
+                            <div style={{ padding:"12px 12px 11px", border:`1px solid ${T.borderSoft}`, borderRadius:18, background:T.surfaceSoft }}>
+                                <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.6 }}>{t("editor_stats_unassigned")}</div>
+                                <div style={{ marginTop:6, fontSize:22, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>{unassignedPlants}</div>
+                            </div>
+                        </div>
+                        <div style={{ fontSize:12, color:T.textSub, lineHeight:1.6 }}>
+                            {posHint}
+                        </div>
+                    </div>
+                </SectionPanel>
+            </PanelGroup>
+            <SectionPanel title={t("editor_map_title")} subtitle={t("editor_map_subtitle")} style={{ padding:16 }}>
+                <GardenEditor garden={garden} fields={gFields} structures={gStructs} zones={gZones} plants={gPlants} slots={gSlots} dispatch={dispatch} lang={lang} navigate={navigate}/>
+            </SectionPanel>
             {showField && (
                 <Modal title={`🛏️ ${t("add_bed")}`} onClose={()=>setShowField(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>

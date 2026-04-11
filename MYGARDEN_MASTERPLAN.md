@@ -196,6 +196,10 @@ Wat nu al duidelijk is:
 - [ ] Zorg dat resize en plaatsing duidelijk zijn.
 - [ ] Zorg dat de editor niet te veel inline code bevat.
 - [ ] Zorg dat de editor in losse onderdelen testbaar wordt.
+- [x] Geef de tuin-editor een bredere werkbench met overzicht, snelle acties en een duidelijk kaartvlak.
+- [x] Zet de belangrijkste editor-acties bovenaan.
+- [x] Maak het editor-scherm luchtiger en minder dicht opeengepakt.
+- [x] Maak de lege editor-state duidelijker.
 
 ## 8. Canvas en kaart
 
