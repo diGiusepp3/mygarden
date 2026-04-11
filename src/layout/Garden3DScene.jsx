@@ -133,6 +133,33 @@ const resolvePathSurface = (item) => {
     return "grass";
 };
 
+const zoneDepthForType = (type) => {
+    if (type === "path") return 0.04;
+    if (type === "gravel") return 0.03;
+    if (type === "mulch") return 0.035;
+    if (type === "grass") return 0.025;
+    return 0.02;
+};
+
+const zoneMaterialForType = (type, pathMaterials) => {
+    if (type === "path") return pathMaterials.path;
+    if (type === "gravel") return pathMaterials.gravel;
+    if (type === "mulch") return pathMaterials.mulch;
+    if (type === "grass") return pathMaterials.grass;
+    return pathMaterials.grass;
+};
+
+const pointsToShape = (points = []) => {
+    const shape = new THREE.Shape();
+    if (!points.length) return shape;
+    shape.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) {
+        shape.lineTo(points[i].x, points[i].y);
+    }
+    shape.closePath();
+    return shape;
+};
+
 export default function Garden3DScene({ garden, fields = [], structures = [], zones = [], plants = [] }) {
     const mountRef = useRef(null);
     const resetRef = useRef(null);
@@ -169,25 +196,20 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
             });
         });
         zones.forEach((zone, index) => {
-            if (!zone || (zone.type !== "path" && zone.type !== "gravel" && zone.type !== "mulch" && zone.type !== "grass")) return;
-            const points = Array.isArray(zone.points) ? zone.points : [];
-            if (points.length < 2) return;
-            const xs = points.map((p) => p.x);
-            const ys = points.map((p) => p.y);
-            const minX = Math.min(...xs);
-            const minY = Math.min(...ys);
-            const maxX = Math.max(...xs);
-            const maxY = Math.max(...ys);
+            if (!zone || !Array.isArray(zone.points) || zone.points.length < 3) return;
+            if (!["path", "gravel", "mulch", "grass"].includes(zone.type)) return;
             items.push({
-                kind: "path",
-                x: minX,
-                y: minY,
-                w: Math.max(0.25, maxX - minX),
-                d: Math.max(0.25, maxY - minY),
-                h: zone.type === "path" ? 0.08 : 0.06,
+                kind: "zone",
+                x: 0,
+                y: 0,
+                w: 0,
+                d: 0,
+                h: zoneDepthForType(zone.type),
                 color: zone.type === "gravel" ? "#A7A7A7" : zone.type === "mulch" ? "#8A6548" : zone.type === "grass" ? "#5F9540" : "#9BCB7C",
                 label: zone.name || `Zone ${index + 1}`,
                 surface: zone.surface || zone.texture || zone.material || zone.finish || zone.type,
+                zoneType: zone.type,
+                points: zone.points,
             });
         });
         plants.forEach((plant) => {
@@ -274,7 +296,7 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
         const root = new THREE.Group();
         scene.add(root);
 
-        const addBox = ({ x, y, w, d, h, color, label, kind, roof, type, surface }) => {
+        const addBox = ({ x, y, w, d, h, color, label, kind, roof, type, surface, zoneType, points }) => {
             const group = new THREE.Group();
 
             if (kind === "struct" && type === "greenhouse") {
@@ -395,6 +417,48 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
                 transparent: kind !== "garden",
                 opacity: kind === "plant" ? 0.95 : 0.98,
             });
+            if (kind === "zone" && Array.isArray(points) && points.length >= 3) {
+                const zoneKey = zoneType || "grass";
+                const zoneMat = zoneMaterialForType(zoneKey, pathMaterials);
+                const shape = pointsToShape(points);
+                const extrude = new THREE.ExtrudeGeometry(shape, {
+                    depth: Math.max(0.02, h),
+                    bevelEnabled: false,
+                    steps: 1,
+                });
+                const zoneMesh = new THREE.Mesh(extrude, zoneMat);
+                zoneMesh.rotation.x = -Math.PI / 2;
+                zoneMesh.position.y = 0.01;
+                zoneMesh.castShadow = true;
+                zoneMesh.receiveShadow = true;
+                group.add(zoneMesh);
+
+                const borderPts = [...points, points[0]];
+                const borderGeom = new THREE.BufferGeometry().setFromPoints(borderPts.map((p) => new THREE.Vector3(p.x, 0.03, p.y)));
+                const borderLine = new THREE.LineLoop(
+                    borderGeom,
+                    new THREE.LineBasicMaterial({ color: zoneKey === "grass" ? "#4F7D34" : "#7A563B" })
+                );
+                group.add(borderLine);
+
+                const centroid = points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+                const cx = centroid.x / points.length;
+                const cy = centroid.y / points.length;
+                const labelTag = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.32, 0.06, 0.08),
+                    new THREE.MeshStandardMaterial({ color: "#D8D1C4", roughness: 0.95, metalness: 0.02 })
+                );
+                labelTag.position.set(cx, 0.08, cy);
+                labelTag.castShadow = true;
+                labelTag.receiveShadow = true;
+                group.add(labelTag);
+
+                group.userData = { label, kind };
+                root.add(group);
+                objects.push(group);
+                return;
+            }
+
             const surfaceKey = kind === "path" ? resolvePathSurface({ surface, texture: surface, material: surface, finish: surface, variant: surface }) : null;
             const height = Math.max(0.08, h);
             const mesh = new THREE.Mesh(

@@ -200,6 +200,8 @@ Wat nu al duidelijk is:
 - [x] Zet de belangrijkste editor-acties bovenaan.
 - [x] Maak het editor-scherm luchtiger en minder dicht opeengepakt.
 - [x] Maak de lege editor-state duidelijker.
+- [x] Maak het tuinformaat rechtstreeks aanpasbaar in de editor.
+- [x] Laat paden en graszones in vrije vorm met vrije breedte werken.
 
 ## 8. Canvas en kaart
 

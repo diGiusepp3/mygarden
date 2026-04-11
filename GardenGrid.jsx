@@ -3901,6 +3901,22 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
     const gardenArea = (garden.width * garden.height).toFixed(1);
     const gardenTypeLabel = LANG[lang]?.[GARDEN_TYPE_LABEL_K[garden.type]] || garden.type;
     const posHint = `${t("editor_position_hint")} ${garden.width}m × ${garden.height}m.`;
+    const [gardenForm, setGardenForm] = useState({
+        name: garden.name || "",
+        type: garden.type || "mixed",
+        width: String(garden.width ?? ""),
+        height: String(garden.height ?? ""),
+        notes: garden.notes || "",
+    });
+    useEffect(() => {
+        setGardenForm({
+            name: garden.name || "",
+            type: garden.type || "mixed",
+            width: String(garden.width ?? ""),
+            height: String(garden.height ?? ""),
+            notes: garden.notes || "",
+        });
+    }, [garden.id, garden.name, garden.type, garden.width, garden.height, garden.notes]);
     const summaryCards = [
         { label:t("editor_stats_beds"), value:gFields.length, helper:t("nav_fields") },
         { label:t("editor_stats_structures"), value:gStructs.length, helper:t("nav_greenhouses") },
@@ -3909,6 +3925,21 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
         { label:t("editor_stats_slots"), value:gSlots.length, helper:t("editor_stats_slots") },
         { label:t("editor_stats_unassigned"), value:unassignedPlants, helper:t("editor_stats_plants") },
     ];
+    const saveGarden = () => {
+        const nextWidth = Math.max(1, +gardenForm.width || garden.width);
+        const nextHeight = Math.max(1, +gardenForm.height || garden.height);
+        dispatch({
+            type:"UPDATE_GARDEN",
+            payload:{
+                ...garden,
+                name: gardenForm.name.trim() || garden.name,
+                type: gardenForm.type || garden.type,
+                width: nextWidth,
+                height: nextHeight,
+                notes: gardenForm.notes || "",
+            }
+        });
+    };
     const quickActions = [
         { icon:"🛏️", label:t("add_bed"), helper:t("editor_add_bed_hint"), onClick:()=>setShowField(true) },
         { icon:"🏡", label:t("add_structure"), helper:t("editor_add_structure_hint"), onClick:()=>setShowStruct(true) },
@@ -3984,6 +4015,24 @@ function EditorScreen({ state, dispatch, navigate, lang }) {
                             <Badge color={T.primary} bg={T.primaryBg}>{gardenTypeLabel}</Badge>
                             <Badge color={T.textSub} bg={T.surfaceAlt}>{garden.width}m × {garden.height}m</Badge>
                             <Badge color={T.textSub} bg={T.surfaceAlt}>{gardenArea}m²</Badge>
+                        </div>
+                        <div style={{ display:"grid", gap:10, padding:12, border:`1px solid ${T.borderSoft}`, borderRadius:18, background:T.surfaceSoft }}>
+                            <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.6 }}>{t("garden_settings")}</div>
+                            <Input label={t("name")} value={gardenForm.name} onChange={v=>setGardenForm(f=>({...f, name:v}))} />
+                            <Sel
+                                label={t("type")}
+                                value={gardenForm.type}
+                                onChange={v=>setGardenForm(f=>({...f, type:v}))}
+                                options={GARDEN_TYPES.map(gt => ({ value:gt, label: LANG[lang]?.[GARDEN_TYPE_LABEL_K[gt]] || gt }))}
+                            />
+                            <FormRow cols={2}>
+                                <Input label={`${t("width")} (m)`} value={gardenForm.width} onChange={v=>setGardenForm(f=>({...f, width:v}))} type="number" min="1" step="0.1" />
+                                <Input label={`${t("height")} (m)`} value={gardenForm.height} onChange={v=>setGardenForm(f=>({...f, height:v}))} type="number" min="1" step="0.1" />
+                            </FormRow>
+                            <Textarea label={t("notes")} value={gardenForm.notes} onChange={v=>setGardenForm(f=>({...f, notes:v}))} rows={2} />
+                            <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                                <Btn size="sm" variant="primary" onClick={saveGarden}>{t("save_garden")}</Btn>
+                            </div>
                         </div>
                         <div style={{ display:"grid", gridTemplateColumns:"repeat(2,minmax(0,1fr))", gap:10 }}>
                             <div style={{ padding:"12px 12px 11px", border:`1px solid ${T.borderSoft}`, borderRadius:18, background:T.surfaceSoft }}>
