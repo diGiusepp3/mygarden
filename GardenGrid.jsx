@@ -5905,10 +5905,10 @@ function DevCodexPlantBuilder({ lang = "en" }) {
                 <div style={{ maxHeight:420, overflow:"auto", borderTop:`1px solid ${T.border}`, paddingTop:12 }}>
                     {library
                         .filter(p => {
-                            const q = search.trim().toLowerCase();
+                            const q = normalizeSearchText(search);
                             if (!q) return true;
-                            const hay = `${p.name} ${p.category} ${(p.varieties || []).join(" ")} ${p.description || ""}`.toLowerCase();
-                            return hay.includes(q);
+                            const hay = `${p.name} ${p.category} ${(p.varieties || []).join(" ")} ${p.description || ""}`;
+                            return normalizeSearchText(hay).includes(q);
                         })
                         .slice(0, 80)
                         .map(item => (
@@ -6020,7 +6020,7 @@ function DevCompanions({ state }) {
         const q = normalizeSearchText(plantName);
         if (!q || q.length < 2) return [];
         const fromMine = myPlants.map(p=>p.name);
-        const fromLib  = PLANT_LIB.map(p=>p.name);
+        const fromLib  = PLANT_LIB.flatMap(p => [p.name, ...(p.varieties || [])]);
         return [...new Set([...fromMine, ...fromLib])].filter(n => normalizeSearchText(n).includes(q)).slice(0,6);
     }, [plantName, myPlants]);
 
