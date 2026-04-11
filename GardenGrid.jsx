@@ -2083,6 +2083,7 @@ function BedShapePicker({ value, onChange }) {
 }
 
 const Sidebar = React.lazy(() => import("./src/layout/Sidebar.jsx"));
+const Garden3DScene = React.lazy(() => import("./src/layout/Garden3DScene.jsx"));
 // ----
 // GARDEN EDITOR (SVG with drag/resize/edit)
 // ----
@@ -2663,8 +2664,11 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) 280px", gap:12, alignItems:"start" }}>
                 <div ref={canvasWrapRef} style={{ overflow:"auto", background:"#F2EDE4", minHeight:320, border:`1px solid ${T.border}`, borderTop:"none" }}>
-                    <div style={viewMode === "3d" ? { padding:32, perspective:"1600px" } : undefined}>
-                        <div style={viewMode === "3d" ? { transform:"rotateX(62deg) rotateZ(-18deg) scale(0.92)", transformOrigin:"top left", filter:"drop-shadow(0 28px 34px rgba(0,0,0,0.18))" } : undefined}>
+                    {viewMode === "3d" ? (
+                        <React.Suspense fallback={<div style={{ minHeight:460, display:"flex", alignItems:"center", justifyContent:"center", color:T.textMuted, fontSize:13, fontWeight:700 }}>Loading 3D scene…</div>}>
+                            <Garden3DScene garden={garden} fields={fields} structures={structures} zones={zones} plants={plants} />
+                        </React.Suspense>
+                    ) : (
                     <svg ref={svgRef} width={pad*2+gW} height={pad*2+gH} style={{ display:"block", userSelect:"none" }}>
                     <defs>
                         <pattern id="soil" patternUnits="userSpaceOnUse" width="8" height="8">
@@ -2806,8 +2810,7 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         <text x={sc/2} y={17} textAnchor="middle" fontSize={9} fill={T.textSub} fontFamily="DM Sans,sans-serif">1 metre</text>
                     </g>
                     </svg>
-                        </div>
-                    </div>
+                    )}
                 </div>
                 <Card style={{ padding:14, position:"sticky", top:12, alignSelf:"start", maxHeight:"calc(100vh - 140px)", overflow:"auto" }}>
                     {selItem && editForm ? (

@@ -218,8 +218,8 @@ Wat nu al duidelijk is:
 - [ ] Maak snapping logisch.
 - [ ] Maak overlap waarschuwingen duidelijk.
 - [ ] Maak object controlepunten duidelijk.
-- [x] Voeg een simpele 3D-preview toe aan de editor zonder de gewone 2D-editor kapot te maken.
-- [x] Geef serres in de 3D-preview een echte volumetrische vorm in plaats van een plat vlak.
+- [x] Voeg een echte 3D-scene toe aan de editor zonder de gewone 2D-editor kapot te maken.
+- [x] Geef serres in de 3D-scene een echte volumetrische vorm in plaats van een plat vlak.
 - [ ] Bepaal of 3D een aparte weergave wordt of alleen een extra preview.
 - [ ] Maak de kaart niet te druk.
 - [ ] Maak de kaart niet te licht of te zwaar.
