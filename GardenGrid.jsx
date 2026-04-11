@@ -209,6 +209,7 @@ const LANG = {
         dev_tab_advisor:"Garden advisor",
         dev_tab_companions:"Companions",
         dev_tab_calendar:"Sow plan",
+        dev_tab_knowledge:"Knowledge Base",
         dev_tab_chat:"Free question",
         dev_intro:"Use Codex to create new plant varieties and save them straight into the plant library.",
         dev_category:"Category",
@@ -414,6 +415,7 @@ const LANG = {
         dev_tab_advisor:"Tuinadviseur",
         dev_tab_companions:"Compagnons",
         dev_tab_calendar:"Zaaiplan",
+        dev_tab_knowledge:"Kennisbank",
         dev_tab_chat:"Vrije vraag",
         dev_intro:"Gebruik Codex om nieuwe plantsoorten te maken en direct in de plantenbibliotheek op te slaan.",
         dev_category:"Categorie",
@@ -619,6 +621,7 @@ const LANG = {
         dev_tab_advisor:"Conseiller jardin",
         dev_tab_companions:"Compagnonnage",
         dev_tab_calendar:"Plan de semis",
+        dev_tab_knowledge:"Base de connaissances",
         dev_tab_chat:"Question libre",
         dev_intro:"Utilisez Codex pour créer de nouvelles variétés et les enregistrer directement dans la bibliothèque de plantes.",
         dev_category:"Catégorie",
@@ -824,6 +827,7 @@ const LANG = {
         dev_tab_advisor:"Gartenberater",
         dev_tab_companions:"Begleitpflanzen",
         dev_tab_calendar:"Aussaatplan",
+        dev_tab_knowledge:"Wissensbasis",
         dev_tab_chat:"Freie Frage",
         dev_intro:"Nutze Codex, um neue Pflanzensorten zu erstellen und direkt in der Pflanzenbibliothek zu speichern.",
         dev_category:"Kategorie",
@@ -6156,7 +6160,7 @@ function DevScreen({ state, dispatch, lang }) {
         { id:"advisor",  icon:"🧠", label:t("dev_tab_advisor") },
         { id:"companions", icon:"🌿", label:t("dev_tab_companions") },
         { id:"calendar", icon:"📅", label:t("dev_tab_calendar") },
-        { id:"tests",    icon:"🧪", label:t("dev_tab_tests") },
+        { id:"knowledge", icon:"🧪", label:t("dev_tab_knowledge") },
         { id:"chat",     icon:"💬", label:t("dev_tab_chat") },
     ];
 
@@ -6184,7 +6188,7 @@ function DevScreen({ state, dispatch, lang }) {
             {tab === "advisor"    && <DevGardenAdvisor state={state}/>}
             {tab === "companions" && <DevCompanions state={state}/>}
             {tab === "calendar"   && <DevSowCalendar/>}
-            {tab === "tests"      && <DevKnowledgeBase lang={lang}/>}
+            {tab === "knowledge"  && <DevKnowledgeBase lang={lang}/>}
             {tab === "chat"       && <DevFreeChat/>}
         </div>
     );
