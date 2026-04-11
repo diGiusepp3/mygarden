@@ -114,9 +114,29 @@ const makePlateMaterial = () =>
         roughness: 0.72,
     });
 
+const makePathMaterials = () => ({
+    grass: new THREE.MeshStandardMaterial({ color: "#5F9540", roughness: 1, metalness: 0 }),
+    soil: new THREE.MeshStandardMaterial({ color: "#7A563B", roughness: 1, metalness: 0 }),
+    gravel: new THREE.MeshStandardMaterial({ color: "#A7A7A7", roughness: 1, metalness: 0 }),
+    mulch: new THREE.MeshStandardMaterial({ color: "#8A6548", roughness: 1, metalness: 0 }),
+    tile: new THREE.MeshStandardMaterial({ color: "#C8C1B8", roughness: 0.92, metalness: 0.02 }),
+    woodchip: new THREE.MeshStandardMaterial({ color: "#95735A", roughness: 1, metalness: 0 }),
+});
+
+const resolvePathSurface = (item) => {
+    const raw = `${item.surface || item.texture || item.material || item.finish || item.variant || ""}`.toLowerCase();
+    if (raw.includes("soil") || raw.includes("earth") || raw.includes("grond")) return "soil";
+    if (raw.includes("gravel") || raw.includes("kies") || raw.includes("stone") || raw.includes("grind")) return "gravel";
+    if (raw.includes("mulch") || raw.includes("bark")) return "mulch";
+    if (raw.includes("tile") || raw.includes("teg")) return "tile";
+    if (raw.includes("wood") || raw.includes("chip")) return "woodchip";
+    return "grass";
+};
+
 export default function Garden3DScene({ garden, fields = [], structures = [], zones = [], plants = [] }) {
     const mountRef = useRef(null);
     const resetRef = useRef(null);
+    const pathMaterials = useMemo(() => makePathMaterials(), []);
 
     const sceneData = useMemo(() => {
         const items = [];
@@ -146,6 +166,28 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
                 color: STRUCT_FILL[st.type] || metrics.color,
                 label: st.name,
                 type: st.type,
+            });
+        });
+        zones.forEach((zone, index) => {
+            if (!zone || (zone.type !== "path" && zone.type !== "gravel" && zone.type !== "mulch" && zone.type !== "grass")) return;
+            const points = Array.isArray(zone.points) ? zone.points : [];
+            if (points.length < 2) return;
+            const xs = points.map((p) => p.x);
+            const ys = points.map((p) => p.y);
+            const minX = Math.min(...xs);
+            const minY = Math.min(...ys);
+            const maxX = Math.max(...xs);
+            const maxY = Math.max(...ys);
+            items.push({
+                kind: "path",
+                x: minX,
+                y: minY,
+                w: Math.max(0.25, maxX - minX),
+                d: Math.max(0.25, maxY - minY),
+                h: zone.type === "path" ? 0.08 : 0.06,
+                color: zone.type === "gravel" ? "#A7A7A7" : zone.type === "mulch" ? "#8A6548" : zone.type === "grass" ? "#5F9540" : "#9BCB7C",
+                label: zone.name || `Zone ${index + 1}`,
+                surface: zone.surface || zone.texture || zone.material || zone.finish || zone.type,
             });
         });
         plants.forEach((plant) => {
@@ -232,7 +274,7 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
         const root = new THREE.Group();
         scene.add(root);
 
-        const addBox = ({ x, y, w, d, h, color, label, kind, roof, type }) => {
+        const addBox = ({ x, y, w, d, h, color, label, kind, roof, type, surface }) => {
             const group = new THREE.Group();
 
             if (kind === "struct" && type === "greenhouse") {
@@ -353,12 +395,17 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
                 transparent: kind !== "garden",
                 opacity: kind === "plant" ? 0.95 : 0.98,
             });
+            const surfaceKey = kind === "path" ? resolvePathSurface({ surface, texture: surface, material: surface, finish: surface, variant: surface }) : null;
             const height = Math.max(0.08, h);
             const mesh = new THREE.Mesh(
                 new THREE.BoxGeometry(w, height, d),
-                kind === "garden" ? surfaceMaterials.grass() : material
+                kind === "garden"
+                    ? surfaceMaterials.grass()
+                    : kind === "path"
+                        ? pathMaterials[surfaceKey] || pathMaterials.grass
+                        : material
             );
-            const baseY = kind === "field" ? -0.05 : 0;
+            const baseY = kind === "field" ? -0.05 : kind === "path" ? 0.012 : 0;
             mesh.position.set(x + w / 2, baseY + height / 2, y + d / 2);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
@@ -380,6 +427,16 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
                 soilTop.castShadow = true;
                 soilTop.receiveShadow = true;
                 group.add(soilTop);
+            }
+
+            if (kind === "path") {
+                const border = new THREE.Mesh(
+                    new THREE.BoxGeometry(w + 0.08, 0.03, d + 0.08),
+                    new THREE.MeshStandardMaterial({ color: "#6C8E4A", roughness: 1, metalness: 0 })
+                );
+                border.position.set(x + w / 2, 0.008, y + d / 2);
+                border.receiveShadow = true;
+                group.add(border);
             }
 
             if (kind === "struct" && h > 1.3) {
