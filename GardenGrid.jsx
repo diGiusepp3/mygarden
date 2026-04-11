@@ -2693,6 +2693,72 @@ function GardenEditor({ garden, fields, structures, zones, plants = [], slots = 
                         const isSel = selId === st.id;
                         const plantCount = countPlantsForStruct(st);
                         const rowSlots = structRowIndex[st.id] || [];
+                        const depth = Math.max(8, Math.min(sw, sh) * 0.22);
+                        const roofRise = Math.max(10, depth * 0.75);
+                        const faceFill = STRUCT_FILL[st.type] || "rgba(128,128,128,0.2)";
+                        const faceStroke = STRUCT_STROKE[st.type] || "#888";
+                        if (viewMode === "3d" && isGH) {
+                            const topY = sy - roofRise;
+                            const rightX = sx + depth;
+                            const rightY = sy + depth * 0.45;
+                            return (
+                                <g key={st.id}>
+                                    <polygon
+                                        points={`${sx},${sy} ${sx + sw},${sy} ${sx + sw},${sy + sh} ${sx},${sy + sh}`}
+                                        fill={faceFill}
+                                        stroke={isSel ? T.accent : faceStroke}
+                                        strokeWidth={isSel ? 2.5 : 1.4}
+                                        style={{ cursor:"move" }}
+                                        onMouseDown={e => startDrag(e, "struct", st)}
+                                        onClick={e => handleItemPick("struct", st, e)}
+                                    />
+                                    <polygon
+                                        points={`${sx},${sy} ${sx + depth},${sy - roofRise} ${sx + sw + depth},${sy - roofRise} ${sx + sw},${sy}`}
+                                        fill={faceFill}
+                                        opacity={0.96}
+                                        stroke={isSel ? T.accent : faceStroke}
+                                        strokeWidth={isSel ? 2.2 : 1.2}
+                                        onMouseDown={e => startDrag(e, "struct", st)}
+                                        onClick={e => handleItemPick("struct", st, e)}
+                                    />
+                                    <polygon
+                                        points={`${sx + sw},${sy} ${sx + sw + depth},${sy - roofRise} ${sx + sw + depth},${sy + sh - roofRise * 0.15} ${sx + sw},${sy + sh}`}
+                                        fill={faceFill}
+                                        opacity={0.72}
+                                        stroke={isSel ? T.accent : faceStroke}
+                                        strokeWidth={isSel ? 2 : 1}
+                                        onMouseDown={e => startDrag(e, "struct", st)}
+                                        onClick={e => handleItemPick("struct", st, e)}
+                                    />
+                                    <polygon
+                                        points={`${sx},${sy} ${sx + depth},${sy - roofRise} ${sx + depth},${sy + sh - roofRise * 0.15} ${sx},${sy + sh}`}
+                                        fill="#ffffff"
+                                        opacity={0.08}
+                                        stroke="none"
+                                    />
+                                    <rect
+                                        x={sx + depth * 0.15}
+                                        y={topY + roofRise * 0.2}
+                                        width={sw}
+                                        height={sh}
+                                        fill="none"
+                                        stroke={isSel ? T.accent : faceStroke}
+                                        strokeWidth={isSel ? 2.5 : 1.3}
+                                        strokeDasharray="8,4"
+                                        rx={isGH ? 6 : 3}
+                                        style={{ cursor:"move" }}
+                                        onMouseDown={e => startDrag(e, "struct", st)}
+                                        onClick={e => handleItemPick("struct", st, e)}
+                                    />
+                                    <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 - fs*0.3 - roofRise * 0.18} textAnchor="middle" fontSize={Math.min(fs+1,15)} fontFamily="DM Sans,sans-serif" fill={faceStroke} fontWeight={800} style={{ pointerEvents:"none" }}>{STRUCT_ICONS[st.type]}</text>
+                                    {sh > sc*0.55 && <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 + fs*0.85 - roofRise * 0.18} textAnchor="middle" fontSize={clamp(fs,7,11)} fontFamily="DM Sans,sans-serif" fill={faceStroke} fontWeight={700} style={{ pointerEvents:"none" }}>{st.name}</text>}
+                                    {sh > sc*0.95 && plantCount > 0 && <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 + fs*2.35 - roofRise * 0.18} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={T.primary} fontWeight={700} style={{ pointerEvents:"none" }}>{plantCount} plants</text>}
+                                    {sh > sc*1.1 && <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 + fs*1.65 - roofRise * 0.18} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={faceStroke} style={{ pointerEvents:"none" }}>{e_.width} × {e_.height}m</text>}
+                                    {rowSlots.length > 0 && <g transform={`translate(${depth * 0.5}, ${-roofRise * 0.15})`}>{renderRowSlotOverlay(rowSlots, sx, sy, sw, sh)}</g>}
+                                    {isSel && renderHandles("struct", st)}
+                                </g>
+                            );
+                        }
                         return (
                             <g key={st.id}>
                                 <rect x={sx} y={sy} width={sw} height={sh} fill={STRUCT_FILL[st.type] || "rgba(128,128,128,0.2)"} stroke={isSel ? T.accent : (STRUCT_STROKE[st.type] || "#888")} strokeWidth={isSel ? 2.5 : (isGH ? 2 : 1.2)} strokeDasharray={isGH ? "8,4" : "none"} rx={isGH ? 5 : 3} style={{ cursor:"move" }} onMouseDown={e => startDrag(e, "struct", st)} onClick={e => handleItemPick("struct", st, e)} />
