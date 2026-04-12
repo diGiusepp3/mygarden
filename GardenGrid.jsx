@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer, useCallback, useRef } from "react";
-import { SCREEN_NAMES, getRouteFromHash, formatScreenHash } from "./src/routes.js";
+import { SCREEN_NAMES, getRouteFromPath, formatScreenPath, updateDocTitle } from "./src/routes.js";
 import { ScreenErrorBoundary } from "./src/ui/ScreenErrorBoundary.jsx";
 import DashboardScreen from "./src/screens/DashboardScreen.jsx";
 import GardensScreen from "./src/screens/GardensScreen.jsx";
@@ -28,7 +28,7 @@ const Sidebar = React.lazy(() => import("./src/layout/Sidebar.jsx"));
 export default function GardenGridApp() {
     const [state, dispatch] = useReducer(reducer, SEED);
     const [loggedInUid, setLoggedInUid] = useState(null);
-    const initialRoute = getRouteFromHash();
+    const initialRoute = getRouteFromPath();
     const [screen, setScreen] = useState(initialRoute.screen);
     const [routeParams, setRouteParams] = useState(initialRoute.params);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -50,11 +50,13 @@ export default function GardenGridApp() {
         })();
         return () => { active = false; };
     }, []);
+
     useEffect(() => {
         if (!booted) return;
         if (!readyToSave.current) { readyToSave.current = true; return; }
         saveState(state).catch(() => {});
     }, [state, booted]);
+
     useEffect(() => {
         if (!booted) return;
         const uid = state.activeUserId;
@@ -64,6 +66,7 @@ export default function GardenGridApp() {
         harvestSyncRef.current = stamp;
         dispatch({ type:"SYNC_HARVEST_TASKS" });
     }, [state.activeUserId, state.plants, state.tasks, booted]);
+
     useEffect(() => {
         if (!booted) return;
         const uid = state.activeUserId;
@@ -73,27 +76,32 @@ export default function GardenGridApp() {
         structureSyncRef.current = hedgeStamp;
         dispatch({ type:"SYNC_STRUCTURE_TASKS" });
     }, [state.activeUserId, state.structures, state.tasks, booted]);
+
+    // Sync URL → screen state (browser back/forward)
     useEffect(() => {
         if (!booted || typeof window === "undefined") return;
-        const handleHashChange = () => {
-            const next = getRouteFromHash();
-            setScreen(prev => (prev === next.screen ? prev : next.screen));
+        const handlePop = () => {
+            const next = getRouteFromPath();
+            setScreen(prev => prev === next.screen ? prev : next.screen);
             setRouteParams(prev => {
                 const same = JSON.stringify(prev) === JSON.stringify(next.params);
                 return same ? prev : next.params;
             });
         };
-        window.addEventListener("hashchange", handleHashChange);
-        handleHashChange();
-        return () => window.removeEventListener("hashchange", handleHashChange);
+        window.addEventListener("popstate", handlePop);
+        return () => window.removeEventListener("popstate", handlePop);
     }, [booted]);
+
+    // Sync screen state → URL + document title
     useEffect(() => {
         if (!booted || typeof window === "undefined") return;
-        const target = formatScreenHash(screen, routeParams);
-        if (window.location.hash !== target) {
-            window.location.hash = target;
+        const effectiveScreen = (!loggedInUid) ? "login" : screen;
+        const target = formatScreenPath(effectiveScreen, routeParams);
+        if (window.location.pathname + window.location.search !== target) {
+            window.history.pushState({}, "", target);
         }
-    }, [screen, routeParams, booted]);
+        updateDocTitle(effectiveScreen);
+    }, [screen, routeParams, booted, loggedInUid]);
 
     useEffect(() => {
         if (loggedInUid && loggedInUid !== state.activeUserId) {
@@ -121,10 +129,11 @@ export default function GardenGridApp() {
         setScreen(next);
         setRouteParams(params);
         if (typeof window !== "undefined") {
-            const target = formatScreenHash(next, params);
-            if (window.location.hash !== target) {
-                window.location.hash = target;
+            const target = formatScreenPath(next, params);
+            if (window.location.pathname + window.location.search !== target) {
+                window.history.pushState({}, "", target);
             }
+            updateDocTitle(next);
         }
     }, []);
 

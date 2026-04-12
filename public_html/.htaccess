@@ -1,0 +1,14 @@
+Options -MultiViews
+RewriteEngine On
+
+# Don't rewrite actual files/dirs
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Don't rewrite API calls
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !^/assets/
+RewriteCond %{REQUEST_URI} !^/seo/
+
+# All other paths → index.html (SPA)
+RewriteRule ^ /index.html [L]

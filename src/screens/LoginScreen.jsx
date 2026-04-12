@@ -1,12 +1,8 @@
 import { useState } from "react";
-import { JourneyPanel, buildJourneyTrack } from "../layout/GardenJourney.jsx";
 import { Btn } from "../ui/Btn.jsx";
-import { Badge } from "../ui/Badge.jsx";
-import { Card } from "../ui/Card.jsx";
 import { Input } from "../ui/Input.jsx";
-import { Sel } from "../ui/Sel.jsx";
 import { T } from "../theme.js";
-import { LANG, useT } from "../translations.js";
+import { useT } from "../translations.js";
 import { USER_COLORS, USER_AVATARS } from "../constants.js";
 import { gid } from "../helpers.js";
 import { setSession } from "../state/persistence.js";
@@ -24,13 +20,6 @@ export default function LoginScreen({ state, dispatch, onLogin }) {
     const [color, setColor] = useState(USER_COLORS[0]);
     const [error, setError] = useState("");
     const [shake, setShake] = useState(false);
-    const onboardingJourneyBase = buildJourneyTrack({ user: null, gardens: [], fields: [], plants: [], structures: [], lang });
-    const onboardingJourney = {
-        ...onboardingJourneyBase,
-        title: onboardingJourneyBase.headline,
-        subtitle: onboardingJourneyBase.subtitle,
-        progress: mode === "register" ? 12 : 0,
-    };
 
     const doShake = () => { setShake(true); setTimeout(() => setShake(false), 500); };
 
@@ -81,19 +70,6 @@ export default function LoginScreen({ state, dispatch, onLogin }) {
                         </div>
                     </div>
 
-                    <div style={{ marginBottom:16 }}>
-            <JourneyPanel
-                headerLabel={t("dashboard_missions")}
-                title={onboardingJourney.title}
-                subtitle={onboardingJourney.subtitle}
-                progress={onboardingJourney.progress}
-                steps={onboardingJourney.steps}
-                tokens={onboardingJourney.tokens}
-                reward={onboardingJourney.reward}
-                nextStep={onboardingJourney.nextStep}
-                lang={lang}
-            />
-                    </div>
 
                     {/* Card */}
                     <div className={shake?"gg-shake":""} style={{ background:T.surface, borderRadius:T.rl, padding:"28px 30px", boxShadow:T.shLg }}>
