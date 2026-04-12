@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useMemo } from "react";
 import { PageShell, PageHeader, SectionPanel, PanelGroup, MetaBadge } from "../layout/PageChrome.jsx";
 import { Btn } from "../ui/Btn.jsx";
 import { Badge } from "../ui/Badge.jsx";
@@ -12,14 +12,17 @@ import { Modal } from "../ui/Modal.jsx";
 import { FormRow } from "../ui/FormRow.jsx";
 import { FormActions } from "../ui/FormActions.jsx";
 import { PillFilter } from "../ui/PillFilter.jsx";
+import { InfoBanner } from "../ui/InfoBanner.jsx";
 import { T } from "../theme.js";
 import { LANG, useT } from "../translations.js";
-import { FIELD_TYPES, FIELD_LABEL_K, FIELD_COLORS, STRUCT_TYPES, STRUCT_LABEL_K, STRUCT_ICONS, GARDEN_TYPES, GH_TYPES } from "../constants.js";
+import { FIELD_TYPES, FIELD_LABEL_K, FIELD_COLORS, STRUCT_TYPES, STRUCT_LABEL_K, STRUCT_ICONS, GARDEN_TYPES, GH_TYPES, CAT_ICONS } from "../constants.js";
 import { forUser, gid, fmtDate, slotDisplayLabel, childSlotsFor, findFieldAtPoint, polygonArea, polygonPointsString, pointInPolygon, polygonCentroid, isInsideGH } from "../helpers.js";
 import { normalizeSearchText } from "../utils/text.js";
 import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js";
+import { PLANT_LIB } from "../plantLibrary.js";
 
-// SCREEN: BEDS & FIELDSexport default function FieldsScreen({ state, dispatch, navigate, lang }) {
+// SCREEN: BEDS & FIELDS
+export default function FieldsScreen({ state, dispatch, navigate, lang }) {
     const t = useT(lang);
     const uid = state.activeUserId;
     const gardens = forUser(state.gardens, uid);
@@ -281,7 +284,7 @@ import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js"
 // ----
 // QUICK ADD PLANT MODAL
 // ----
-function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispatch, uid }) {
+export function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispatch, uid }) {
     const t = useT(lang);
     const [query, setQuery] = useState("");
     const [libEntry, setLibEntry] = useState(null);
@@ -383,7 +386,7 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
                                 <button key={h.name} onClick={() => selectEntry(h)} style={{ display:"flex", alignItems:"center", gap:10, width:"100%", padding:"10px 14px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, color:T.text, textAlign:"left", borderBottom:`1px solid ${T.borderLight}` }}
                                     onMouseEnter={e => e.currentTarget.style.background = T.surfaceSoft}
                                     onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                                    <span style={{ fontSize:18 }}>{CAT_ICONS[plant.category] || "🌿"}</span>
+                                    <span style={{ fontSize:18 }}>{CAT_ICONS[h.category] || "🌿"}</span>
                                     <div>
                                         <div style={{ fontWeight:700 }}>{h.name}</div>
                                         <div style={{ fontSize:11, color:T.textMuted }}>{h.category}{h.varieties.length ? ` · ${h.varieties[0]}` : ""}</div>
@@ -454,4 +457,3 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
 }
 
 // ----
-

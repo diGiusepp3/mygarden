@@ -19,6 +19,8 @@ import { PLANT_LIB } from "../plantLibrary.js";
 import { CATEGORIES, CAT_ICONS, PLANT_STATUSES, STATUS_K, STATUS_CFG, GH_TYPES, STRUCT_STROKE, STRUCT_FILL, TASK_STATUS_K } from "../constants.js";
 import { fmtDate, forUser, gid, slotDisplayLabel, childSlotsFor } from "../helpers.js";
 import { normalizeSearchText } from "../utils/text.js";
+import { QuickAddPlantModal } from "./FieldsScreen.jsx";
+import {FormActions} from "../ui/FormActions";
 
 const useT = (lang) => (key) => LANG[lang]?.[key] ?? LANG.en[key] ?? key;
 export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, navigate }) {
