@@ -5,7 +5,7 @@ export function PageShell({ children, width = 1180 }) {
     return (
         <div style={{
             position:"relative",
-            padding:"30px 0 48px",
+            padding:"clamp(16px, 3vw, 30px) 0 clamp(80px, 12vw, 48px)",
             minHeight:"100vh",
             overflow:"hidden",
         }}>
@@ -29,7 +29,7 @@ export function PageShell({ children, width = 1180 }) {
                 filter:"blur(12px)",
                 pointerEvents:"none",
             }} />
-            <div style={{ position:"relative", maxWidth:width, margin:"0 auto", display:"flex", flexDirection:"column", gap:22, padding:"0 22px" }}>
+            <div style={{ position:"relative", maxWidth:width, margin:"0 auto", display:"flex", flexDirection:"column", gap:"clamp(14px, 2.5vw, 22px)", padding:"0 clamp(12px, 4vw, 22px)" }}>
                 {children}
             </div>
         </div>

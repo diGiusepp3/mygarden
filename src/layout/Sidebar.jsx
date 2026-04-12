@@ -1,22 +1,107 @@
+import { useMobile } from "../hooks/useMobile.js";
 import { T } from "../theme.js";
 import { SidebarHeader } from "./SidebarHeader.jsx";
 import { SidebarFooter } from "./SidebarFooter.jsx";
 
+// Primary nav items (shown in bottom bar on mobile)
+const NAV_MAIN = [
+    { id:"dashboard", icon:"🏡", key:"nav_dashboard" },
+    { id:"plants",    icon:"🌱", key:"nav_plants" },
+    { id:"tasks",     icon:"✅", key:"nav_tasks" },
+    { id:"editor",    icon:"📐", key:"nav_editor" },
+];
+const NAV_ALL = [
+    ...NAV_MAIN,
+    { id:"gardens",     icon:"🌿", key:"nav_gardens" },
+    { id:"fields",      icon:"🛏️", key:"nav_fields" },
+    { id:"greenhouses", icon:"🏡", key:"nav_greenhouses" },
+    { id:"account",     icon:"👤", key:"account" },
+    { id:"settings",    icon:"⚙️", key:"nav_settings" },
+];
+
+function BottomNav({ screen, setScreen, pendingTasks, t, state }) {
+    const uid = state.activeUserId;
+    const activeUser = state.users.find(u => u.id === uid);
+    const allNav = [
+        ...NAV_ALL,
+        ...(activeUser?.is_dev ? [{ id:"dev", icon:"⚡", key:"dev" }] : []),
+    ];
+    // Show 4 primary + "more" (last active item if outside primary)
+    const primaryIds = NAV_MAIN.map(n => n.id);
+    const inPrimary = primaryIds.includes(screen);
+    const tabs = inPrimary
+        ? [...NAV_MAIN, { id:"__more", icon:"⋯", key:"nav_more" }]
+        : [
+            ...NAV_MAIN.slice(0, 3),
+            allNav.find(n => n.id === screen) || NAV_MAIN[3],
+            { id:"__more", icon:"⋯", key:"nav_more" },
+          ];
+
+    return (
+        <nav style={{
+            position:"fixed", bottom:0, left:0, right:0, zIndex:100,
+            background:"linear-gradient(180deg, #1B3E09 0%, #244F0D 100%)",
+            borderTop:"1px solid rgba(255,255,255,0.12)",
+            display:"flex",
+            height:62,
+            paddingBottom:"env(safe-area-inset-bottom, 0px)",
+            boxShadow:"0 -6px 24px rgba(0,0,0,0.22)",
+        }}>
+            {tabs.map(item => {
+                const active = screen === item.id;
+                if (item.id === "__more") {
+                    return (
+                        <button key="more"
+                            onClick={() => {
+                                // cycle through "more" items
+                                const moreIdx = allNav.findIndex(n => !primaryIds.includes(n.id) && n.id !== screen);
+                                if (moreIdx >= 0) setScreen(allNav[moreIdx].id);
+                            }}
+                            style={{ flex:1, background:"none", border:"none", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:2, color:"rgba(255,255,255,0.55)", fontFamily:"inherit" }}
+                        >
+                            <span style={{ fontSize:20 }}>≡</span>
+                            <span style={{ fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:0.5 }}>{t("nav_more") || "Meer"}</span>
+                        </button>
+                    );
+                }
+                return (
+                    <button key={item.id}
+                        onClick={() => setScreen(item.id)}
+                        style={{
+                            flex:1, background:"none", border:"none", cursor:"pointer",
+                            display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:2,
+                            color: active ? "#FFF" : "rgba(255,255,255,0.55)",
+                            fontFamily:"inherit",
+                            borderTop: active ? `2.5px solid ${T.accent}` : "2.5px solid transparent",
+                            transition:"color 0.15s",
+                        }}
+                    >
+                        <span style={{ fontSize:20, position:"relative" }}>
+                            {item.icon}
+                            {item.id === "tasks" && pendingTasks > 0 && (
+                                <span style={{ position:"absolute", top:-4, right:-8, background:T.accent, color:"#FFF", borderRadius:999, fontSize:9, fontWeight:800, padding:"1px 5px" }}>{pendingTasks}</span>
+                            )}
+                        </span>
+                        <span style={{ fontSize:9, fontWeight:active ? 800 : 600, textTransform:"uppercase", letterSpacing:0.5 }}>{t(item.key)}</span>
+                    </button>
+                );
+            })}
+        </nav>
+    );
+}
+
 export function Sidebar({ screen, setScreen, pendingTasks, collapsed, setCollapsed, state, onLogout, t }) {
+    const isMobile = useMobile();
     const uid = state.activeUserId;
     const activeUser = state.users.find(u => u.id === uid);
     const nav = [
-        { id:"dashboard", icon:"🏡", key:"nav_dashboard" },
-        { id:"gardens", icon:"🌿", key:"nav_gardens" },
-        { id:"editor", icon:"📐", key:"nav_editor" },
-        { id:"fields", icon:"🛏️", key:"nav_fields" },
-        { id:"plants", icon:"🌱", key:"nav_plants" },
-        { id:"tasks", icon:"✅", key:"nav_tasks" },
-        { id:"greenhouses", icon:"🏡", key:"nav_greenhouses" },
-        { id:"account", icon:"👤", key:"account" },
-        { id:"settings", icon:"⚙️", key:"nav_settings" },
+        ...NAV_ALL,
         ...(activeUser?.is_dev ? [{ id:"dev", icon:"⚡", key:"dev" }] : []),
     ];
+
+    if (isMobile) {
+        return <BottomNav screen={screen} setScreen={setScreen} pendingTasks={pendingTasks} t={t} state={state} />;
+    }
 
     return (
         <nav style={{
