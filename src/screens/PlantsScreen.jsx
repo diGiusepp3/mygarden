@@ -167,7 +167,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                     </InfoBanner>
                 )}
                 <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
-                                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`?? ${t("search")}`} style={{ flex:1, minWidth:220, fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.radiusLg, padding:"10px 14px", outline:"none" }}/>
+                                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`🔍 ${t("search")}`} style={{ flex:1, minWidth:220, fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.radiusLg, padding:"10px 14px", outline:"none" }}/>
                     <span style={{ fontSize:12, color:T.textMuted }}>{filtered.length} / {plants.length} plants</span>
                 </div>
                 <div>
@@ -213,23 +213,23 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                                 </div>
                                 {slot && ["bed_row","tunnel_row"].includes(slot.type) && (p.sow_spacing_cm || p.row_plant_count || p.row_length_m) && (
                                     <div style={{ fontSize:11, color:T.textMuted, marginBottom:8, display:"flex", gap:8, flexWrap:"wrap" }}>
-                                        {p.row_count && <span>?? {p.row_count} rows</span>}
-                                        {p.sow_spacing_cm && <span>? {p.sow_spacing_cm} cm</span>}
-                                        {p.row_plant_count && <span>?? {p.row_plant_count} plants</span>}
-                                        {p.row_length_m && <span>?? {p.row_length_m} m</span>}
+                                        {p.row_count && <span>📏 {p.row_count} rows</span>}
+                                        {p.sow_spacing_cm && <span>↔ {p.sow_spacing_cm} cm</span>}
+                                        {p.row_plant_count && <span>🌱 {p.row_plant_count} plants</span>}
+                                        {p.row_length_m && <span>📐 {p.row_length_m} m</span>}
                                     </div>
                                 )}
                                 {(p.sow_date||p.plant_date||p.harvest_date) && (
                                     <div style={{ fontSize:11, color:T.textMuted, marginBottom:8, display:"flex", gap:8, flexWrap:"wrap" }}>
-                                        {p.sow_date && <span>?? {fmtDate(p.sow_date,lang)}</span>}
-                                        {p.plant_date && <span>?? {fmtDate(p.plant_date,lang)}</span>}
-                                        {p.harvest_date && <span>?? {fmtDate(p.harvest_date,lang)}</span>}
+                                        {p.sow_date && <span>🌱 {fmtDate(p.sow_date,lang)}</span>}
+                                        {p.plant_date && <span>🪴 {fmtDate(p.plant_date,lang)}</span>}
+                                        {p.harvest_date && <span>🧺 {fmtDate(p.harvest_date,lang)}</span>}
                                     </div>
                                 )}
                                 {p.notes && <div style={{ fontSize:12, color:T.textSub, marginBottom:10, lineHeight:1.5, borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>{p.notes}</div>}
                                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                                     <Btn size="sm" variant="secondary" onClick={()=>openEdit(p)}>{t("edit")}</Btn>
-                                    {(p.status==="growing"||p.status==="harvestable") && <Btn size="sm" variant="accent" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"harvested"}})}>? {t("harvest")}</Btn>}
+                                    {(p.status==="growing"||p.status==="harvestable") && <Btn size="sm" variant="accent" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"harvested"}})}>?>🧺 {t("harvest")}/Btn>}
                                     {p.status==="planned" && <Btn size="sm" variant="success" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"sown",sow_date:p.sow_date||new Date().toISOString().slice(0,10)}})}>{t("mark_sown")}</Btn>}
                                     <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_plant"))) dispatch({type:"DELETE_PLANT",payload:p.id}); }}>?</Btn>
                                 </div>
@@ -240,7 +240,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
             )}
             {/* Add / Edit modal */}
             {show && (
-                <Modal title={editing?`?? Edit Plant`:`?? ${t("add_plant")}`} onClose={close}>
+                <Modal title={editing?`✏️ Edit Plant`:`🌱 ${t("add_plant")}`} onClose={close}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <FormRow>
                             <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Tomato" required/>
@@ -287,7 +287,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                 <Modal title={t("library_title")} onClose={()=>setShowLib(false)} width={780}>
                     <p style={{ margin:"0 0 14px", fontSize:13, color:T.textMuted }}>{t("library_sub")}</p>
                     <div style={{ display:"flex", gap:8, marginBottom:14, alignItems:"center", flexWrap:"wrap" }}>
-                        <input value={libSearch} onChange={e=>setLibSearch(e.target.value)} placeholder={`?? ${t("search")}`} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"7px 12px", outline:"none", minWidth:180 }}/>
+                        <input value={libSearch} onChange={e=>setLibSearch(e.target.value)} placeholder={`🔍 ${t("search")}`} style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.surface, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"7px 12px", outline:"none", minWidth:180 }}/>
                         <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
                             <PillFilter value={t("all")} active={libCat==="all"} onClick={()=>setLibCat("all")}/>
                             {CATEGORIES.map(c => <PillFilter key={c} value={`${CAT_ICONS[c]}`} active={libCat===c} onClick={()=>setLibCat(c)} title={c}/>)}
@@ -327,7 +327,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                 />
             )}
             {bulkPrompt && (
-                <Modal title="?? Save as row plan?" onClose={()=>setBulkPrompt(null)} width={520}>
+                <Modal title="📋 Save as row plan?" onClose={()=>setBulkPrompt(null)} width={520}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <InfoBanner icon="🌱">
                             {bulkPrompt.quantity} plants in {bulkPrompt.slotName} can be stored as a row plan: {bulkPrompt.rowCount} rows × {bulkPrompt.rowPlantCount} plants.
