@@ -11,7 +11,8 @@ import { USER_COLORS, USER_AVATARS } from "../constants.js";
 import { gid } from "../helpers.js";
 import { setSession } from "../state/persistence.js";
 
-// LOGIN SCREENexport default function LoginScreen({ state, dispatch, onLogin }) {
+// LOGIN SCREEN
+export default function LoginScreen({ state, dispatch, onLogin }) {
     const [mode, setMode] = useState("login"); // "login" | "register"
     const [lang, setLang] = useState("nl");
     const t = useT(lang);
@@ -54,7 +55,7 @@ import { setSession } from "../state/persistence.js";
         onLogin(newUser.id);
     };
 
-    const LANGS = [["en","????"],["nl","????"],["fr","????"],["de","????"]];
+    const LANGS = [["en","🇬🇧"],["nl","🇳🇱"],["fr","🇫🇷"],["de","🇩🇪"]];
 
     return (
         <>

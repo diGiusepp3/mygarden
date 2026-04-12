@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { FIELD_COLORS, STRUCT_FILL, STRUCT_ICONS } from "../constants.js";
+import { FIELD_COLORS, STRUCT_FILL, WALL_COLORS } from "../constants.js";
 import { T } from "../theme.js";
 
 const clamp01 = (value) => Math.max(0, Math.min(1, value));
@@ -181,6 +181,18 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
             });
         });
         structures.forEach((st) => {
+            if (st.type === "wall") {
+                if (!Array.isArray(st.points) || st.points.length < 2) return;
+                items.push({
+                    kind: "wall",
+                    points: st.points,
+                    h: Math.max(0.3, st.height_m || 1.2),
+                    color: WALL_COLORS[st.material] || "#8D7060",
+                    label: st.name,
+                    material: st.material || "brick",
+                });
+                return;
+            }
             const metrics = structureMetrics(st);
             items.push({
                 kind: "struct",
@@ -232,7 +244,7 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
             });
         });
         return items;
-    }, [garden.height, garden.width, fields, structures, plants]);
+    }, [garden.height, garden.width, fields, structures, zones, plants]);
 
     useEffect(() => {
         const mount = mountRef.current;
@@ -296,8 +308,48 @@ export default function Garden3DScene({ garden, fields = [], structures = [], zo
         const root = new THREE.Group();
         scene.add(root);
 
-        const addBox = ({ x, y, w, d, h, color, label, kind, roof, type, surface, zoneType, points }) => {
+        const addBox = ({ x, y, w, d, h, color, label, kind, roof, type, surface, zoneType, points, material: wallMat }) => {
             const group = new THREE.Group();
+
+            if (kind === "wall" && Array.isArray(points) && points.length >= 2) {
+                const wallMaterial = new THREE.MeshStandardMaterial({
+                    color,
+                    roughness: wallMat === "stone" ? 0.95 : wallMat === "metal" ? 0.35 : 0.88,
+                    metalness: wallMat === "metal" ? 0.55 : 0.02,
+                });
+                const thickness = 0.22;
+                for (let i = 0; i < points.length - 1; i++) {
+                    const a = points[i];
+                    const b = points[i + 1];
+                    const dx = b.x - a.x;
+                    const dz = b.y - a.y;
+                    const len = Math.sqrt(dx * dx + dz * dz);
+                    if (len < 0.01) continue;
+                    const angle = Math.atan2(dz, dx);
+                    const seg = new THREE.Mesh(
+                        new THREE.BoxGeometry(len, h, thickness),
+                        wallMaterial
+                    );
+                    seg.position.set((a.x + b.x) / 2, h / 2, (a.y + b.y) / 2);
+                    seg.rotation.y = -angle;
+                    seg.castShadow = true;
+                    seg.receiveShadow = true;
+                    group.add(seg);
+                }
+                // Cap dots at each vertex
+                const capMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(color).offsetHSL(0, 0, -0.1), roughness: 0.9 });
+                points.forEach((p) => {
+                    const cap = new THREE.Mesh(new THREE.BoxGeometry(thickness + 0.04, h + 0.04, thickness + 0.04), capMat);
+                    cap.position.set(p.x, h / 2, p.y);
+                    cap.castShadow = true;
+                    cap.receiveShadow = true;
+                    group.add(cap);
+                });
+                group.userData = { label, kind };
+                root.add(group);
+                objects.push(group);
+                return;
+            }
 
             if (kind === "struct" && type === "greenhouse") {
                 const frameMat = makeFrameMaterial();

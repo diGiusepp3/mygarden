@@ -5,7 +5,7 @@ import { Textarea } from "../ui/Textarea.jsx";
 import { FormRow } from "../ui/FormRow.jsx";
 import { T } from "../theme.js";
 import { LANG } from "../translations.js";
-import { STRUCT_ICONS, ZONE_ICONS, ZONE_TYPES, ZONE_LABEL_K } from "../constants.js";
+import { STRUCT_ICONS, ZONE_ICONS, ZONE_TYPES, ZONE_LABEL_K, WALL_MATERIALS, WALL_MATERIAL_LABELS } from "../constants.js";
 import { polygonArea } from "../helpers.js";
 import { MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js";
 import { renderSlotSeedPlan } from "../slotSeedPlanView.jsx";
@@ -124,6 +124,32 @@ export function EditorEditBar({
                     </div>
                     {renderSlotSeedPlan(selItem, { compact:true })}
                 </div>
+            ) : selKind === "struct" && selItem.type === "wall" ? (
+                <>
+                    <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr", gap:8, alignItems:"end" }}>
+                        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                            <label style={{ fontSize:10, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>Name</label>
+                            {inlineInput(editForm.name, e => setEditForm(f => ({ ...f, name:e.target.value })))}
+                        </div>
+                        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                            <label style={{ fontSize:10, fontWeight:700, color:T.textSub, letterSpacing:0.5, textTransform:"uppercase" }}>Height (m)</label>
+                            <input type="number" value={editForm.height_m || 1.2} min={0.1} max={6} step={0.1}
+                                onChange={e => setEditForm(f => ({ ...f, height_m:e.target.value }))}
+                                style={{ fontFamily:"inherit", fontSize:13, color:T.text, background:T.bg, border:`1.5px solid ${T.border}`, borderRadius:T.rs, padding:"6px 8px", outline:"none", width:"100%" }} />
+                        </div>
+                        <Sel label="Material" value={editForm.material || "brick"} onChange={v => setEditForm(f => ({ ...f, material:v }))}
+                            options={WALL_MATERIALS.map(m => ({ value:m, label:WALL_MATERIAL_LABELS[m] || m }))} />
+                    </div>
+                    <div style={{ marginTop:10 }}>
+                        <Textarea label="Notes" value={editForm.notes || ""} onChange={v => setEditForm(f => ({ ...f, notes:v }))} rows={2} />
+                    </div>
+                    <div style={{ marginTop:10, display:"flex", gap:8, alignItems:"center" }}>
+                        <Btn size="sm" variant="primary" onClick={saveEdit}>?? Save Wall</Btn>
+                        <span style={{ fontSize:11, color:T.textMuted }}>· {selItem.points?.length || 0} punten · {(selItem.height_m || 1.2)}m hoog</span>
+                        <div style={{ flex:1 }} />
+                        <Btn size="sm" variant="danger" onClick={() => { if (window.confirm("Delete this wall?")) { dispatch({ type:"DELETE_STRUCT", payload:selItem.id }); setSelId(null); setSelKind(null); } }}>Delete Wall</Btn>
+                    </div>
+                </>
             ) : (
                 <>
                     <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:8, alignItems:"end" }}>
