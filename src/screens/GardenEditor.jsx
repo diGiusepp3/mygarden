@@ -1,22 +1,20 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Btn } from "../ui/Btn.jsx";
 import { Badge } from "../ui/Badge.jsx";
-import { Card } from "../ui/Card.jsx";
 import { Input } from "../ui/Input.jsx";
 import { Sel } from "../ui/Sel.jsx";
 import { Textarea } from "../ui/Textarea.jsx";
-import { Modal } from "../ui/Modal.jsx";
-import { EmptyState } from "../ui/EmptyState.jsx";
 import { FormRow } from "../ui/FormRow.jsx";
-import { InfoBanner } from "../ui/InfoBanner.jsx";
 import { BedShapePicker } from "../ui/BedShapePicker.jsx";
 import { T } from "../theme.js";
-import { LANG, useT } from "../translations.js";
-import { FIELD_TYPES, FIELD_LABEL_K, FIELD_COLORS, STRUCT_TYPES, STRUCT_LABEL_K, STRUCT_ICONS, ZONE_TYPES, ZONE_LABEL_K, ZONE_ICONS, ZONE_FILL, ZONE_STROKE, GH_TYPES } from "../constants.js";
-import { forUser, gid, fmtDate, slotDisplayLabel, childSlotsFor, findFieldAtPoint, polygonArea, polygonPointsString, pointInPolygon, polygonCentroid, isInsideGH, slotBaseLabel } from "../helpers.js";
+import { LANG } from "../translations.js";
+import { FIELD_COLORS, STRUCT_LABEL_K, STRUCT_ICONS, ZONE_TYPES, ZONE_LABEL_K, ZONE_ICONS, ZONE_FILL, ZONE_STROKE } from "../constants.js";
+import { gid, polygonArea, polygonPointsString, pointInPolygon, polygonCentroid, isInsideGH, slotBaseLabel } from "../helpers.js";
 import { renderSlotSeedPlan } from "../slotSeedPlanView.jsx";
-import { normalizeSearchText } from "../utils/text.js";
-import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js";
+import { MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js";
+import { EditorToolbar } from "../editor/EditorToolbar.jsx";
+import { EditorLegend } from "../editor/EditorLegend.jsx";
+import { EditorSidePanel } from "../editor/EditorSidePanel.jsx";
 
 const SCALE = 62;
 
@@ -39,7 +37,6 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
     const [editForm, setEditForm] = useState(null);
     const [zoneDraft, setZoneDraft] = useState(null);
     const [pickMenu, setPickMenu] = useState(null);
-    const [panelFilter, setPanelFilter] = useState("all");
     const selItem = selId ? (
         selKind === "field" ? fields.find(f => f.id === selId)
         : selKind === "struct" ? structures.find(s => s.id === selId)
@@ -289,9 +286,6 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
     const HCURSORS = { n:"ns-resize", ne:"nesw-resize", e:"ew-resize", se:"nwse-resize", s:"ns-resize", sw:"nesw-resize", w:"ew-resize", nw:"nwse-resize" };
     const menuLeft = pickMenu ? Math.max(12, Math.min(pickMenu.x + 8, (typeof window !== "undefined" ? window.innerWidth : 1200) - 260)) : 12;
     const menuTop = pickMenu ? Math.max(12, Math.min(pickMenu.y + 8, (typeof window !== "undefined" ? window.innerHeight : 900) - 240)) : 12;
-    const panelFields = panelFilter === "all" || panelFilter === "fields" ? fields : [];
-    const panelStructs = panelFilter === "all" || panelFilter === "structs" || panelFilter === "greenhouses" ? structures : [];
-    const panelZones = panelFilter === "all" || panelFilter === "zones" ? zones : [];
     const structSlotIndex = useMemo(() => {
         const index = {};
         const direct = slots.filter(s => s.parent_type === "struct");
@@ -581,22 +575,18 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
     };
     return (
         <div>
-            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:T.surfaceAlt, borderRadius:`${T.r} ${T.r} 0 0`, borderBottom:`1px solid ${T.border}`, flexWrap:"wrap" }}>
-                <span style={{ fontSize:12, color:T.textSub, flex:"1 1 320px", fontWeight:600 }}>
-                    ?? {garden.width}m × {garden.height}m · <span style={{ color:T.primary }}>Drag</span> to move · <span style={{ color:T.accent }}>Handles</span> to resize · Click to edit
-                </span>
-                <Btn size="sm" variant={zoneDraft ? "danger" : "accent"} onClick={zoneDraft ? cancelZoneDraft : beginZoneDraft}>
-                    {zoneDraft ? "Cancel Zone" : "Add Zone"}
-                </Btn>
-                {zoneDraft && <Btn size="sm" variant="primary" onClick={finishZoneDraft} disabled={zoneDraft.points.length < 3}>Finish Zone</Btn>}
-                <Btn size="sm" variant={viewMode === "3d" ? "primary" : "secondary"} onClick={() => setViewMode(v => v === "3d" ? "2d" : "3d")}>
-                    {viewMode === "3d" ? "2D" : "3D"}
-                </Btn>
-                <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.max(0.35, +(z-0.15).toFixed(2)))}>-</Btn>
-                <span style={{ fontSize:12, color:T.textSub, minWidth:38, textAlign:"center", fontWeight:700 }}>{Math.round(zoom * fitZoom * 100)}%</span>
-                <Btn size="sm" variant="secondary" onClick={() => setZoom(z => Math.min(2.5, +(z+0.15).toFixed(2)))}>+</Btn>
-                <Btn size="sm" variant="ghost" onClick={() => setZoom(1)}>Reset</Btn>
-            </div>
+            <EditorToolbar
+                garden={garden}
+                zoom={zoom}
+                fitZoom={fitZoom}
+                viewMode={viewMode}
+                zoneDraft={zoneDraft}
+                setZoom={setZoom}
+                setViewMode={setViewMode}
+                onBeginZone={beginZoneDraft}
+                onCancelZone={cancelZoneDraft}
+                onFinishZone={finishZoneDraft}
+            />
             <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) 280px", gap:12, alignItems:"start" }}>
                 <div ref={canvasWrapRef} style={{ overflow:"auto", background:"#F2EDE4", minHeight:320, border:`1px solid ${T.border}`, borderTop:"none" }}>
                     {viewMode === "3d" ? (
@@ -747,7 +737,16 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
                     </svg>
                     )}
                 </div>
-                <Card style={{ padding:14, position:"sticky", top:12, alignSelf:"start", maxHeight:"calc(100vh - 140px)", overflow:"auto" }}>
+                <EditorSidePanel
+                    fields={fields}
+                    structures={structures}
+                    zones={zones}
+                    selId={selId}
+                    selKind={selKind}
+                    setSelId={setSelId}
+                    setSelKind={setSelKind}
+                    lang={lang}
+                >
                     {selItem && editForm ? (
                         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                             <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8 }}>
@@ -756,7 +755,7 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
                                     <div style={{ fontSize:15, fontWeight:900, color:T.text, fontFamily:"Fraunces, serif" }}>{selItem.name}</div>
                                     <div style={{ fontSize:11, color:T.textMuted }}>{selKind==="zone" ? "Zone" : selKind==="struct" ? "Structure" : "Bed"}</div>
                                 </div>
-                                <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>?</Btn>
+                                <Btn size="sm" variant="ghost" onClick={() => { setSelId(null); setSelKind(null); }}>✕</Btn>
                             </div>
                             {selKind === "zone" ? (
                                 <div style={{ display:"grid", gap:10 }}>
@@ -855,69 +854,8 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
                                 </div>
                             )}
                         </div>
-                    ) : (
-                        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                            <div>
-                                <div style={{ fontSize:12, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>Context</div>
-                                <div style={{ fontSize:15, fontWeight:900, color:T.text, fontFamily:"Fraunces, serif" }}>Objects</div>
-                                <div style={{ fontSize:11, color:T.textMuted }}>{fields.length} beds · {structures.length} structures · {zones.length} zones</div>
-                            </div>
-                            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                                {["all","fields","structs","greenhouses","zones"].map(k => (
-                                    <Btn key={k} size="sm" variant={panelFilter===k ? "primary" : "secondary"} onClick={()=>setPanelFilter(k)} style={{ flex:"1 1 96px", justifyContent:"center" }}>
-                                        {k === "all" ? "All" : k === "fields" ? "Beds" : k === "structs" ? "Structs" : k === "greenhouses" ? "GH" : "Zones"}
-                                    </Btn>
-                                ))}
-                            </div>
-                            <div style={{ display:"grid", gap:10 }}>
-                                {panelFields.length>0 && (
-                                    <div>
-                                        <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Beds</div>
-                                        <div style={{ display:"grid", gap:6 }}>
-                                            {panelFields.map(f => (
-                                                <button key={f.id} onClick={()=>{ setSelId(f.id); setSelKind("field"); }} style={{ textAlign:"left", border:`1px solid ${selId===f.id&&selKind==="field"?T.primary:T.border}`, background:selId===f.id&&selKind==="field"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
-                                                    <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{f.name}</div>
-                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[FIELD_LABEL_K[f.type]] || f.type} · {f.width} × {f.height}m</div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {panelStructs.length>0 && (
-                                    <div>
-                                        <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Structures</div>
-                                        <div style={{ display:"grid", gap:6 }}>
-                                            {panelStructs.map(st => (
-                                                <button key={st.id} onClick={()=>{ setSelId(st.id); setSelKind("struct"); }} style={{ textAlign:"left", border:`1px solid ${selId===st.id&&selKind==="struct"?T.accent:T.border}`, background:selId===st.id&&selKind==="struct"?T.accentBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
-                                                    <div style={{ display:"flex", justifyContent:"space-between", gap:8, alignItems:"start" }}>
-                                                        <div>
-                                                            <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{STRUCT_ICONS[st.type] || "???"} {st.name}</div>
-                                                            <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[STRUCT_LABEL_K[st.type]] || st.type} · {st.width} × {st.height}m</div>
-                                                        </div>
-                                                        {st.linked_field_id && <Badge color={T.accent} bg={T.accentBg}>linked</Badge>}
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {panelZones.length>0 && (
-                                    <div>
-                                        <div style={{ fontSize:11, fontWeight:800, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Zones</div>
-                                        <div style={{ display:"grid", gap:6 }}>
-                                            {panelZones.map(z => (
-                                                <button key={z.id} onClick={()=>{ setSelId(z.id); setSelKind("zone"); }} style={{ textAlign:"left", border:`1px solid ${selId===z.id&&selKind==="zone"?T.primary:T.border}`, background:selId===z.id&&selKind==="zone"?T.primaryBg:T.surface, borderRadius:T.rs, padding:"8px 10px", cursor:"pointer", fontFamily:"inherit" }}>
-                                                    <div style={{ fontSize:12, fontWeight:800, color:T.text }}>{ZONE_ICONS[z.type] || "???"} {z.name}</div>
-                                                    <div style={{ fontSize:11, color:T.textMuted }}>{LANG[lang]?.[ZONE_LABEL_K[z.type]] || z.type} · {polygonArea(z.points||[]).toFixed(1)}m²</div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </Card>
+                    ) : null}
+                </EditorSidePanel>
             </div>
             {pickMenu && (
                 <div style={{ position:"fixed", inset:0, zIndex:1200 }} onClick={() => setPickMenu(null)}>
@@ -1103,23 +1041,8 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
                     )}
                 </div>
             )}
-            {(fields.length>0 || structures.length>0 || zones.length>0) && (
-                <div style={{ display:"flex", gap:10, flexWrap:"wrap", padding:"10px 4px 0" }}>
-                    {Object.entries(FIELD_LABEL_K).filter(([k]) => fields.some(f=>f.type===k)).map(([k,lk]) => (
-                        <div key={k} style={{ display:"flex", alignItems:"center", gap:5 }}><div style={{ width:10, height:10, borderRadius:2, background:FIELD_COLORS[k], flexShrink:0 }}/><span style={{ fontSize:10, color:T.textSub }}>{LANG.en[lk]}</span></div>
-                    ))}
-                    {Object.entries(STRUCT_LABEL_K).filter(([k]) => structures.some(s=>s.type===k)).map(([k,lk]) => (
-                        <div key={k} style={{ display:"flex", alignItems:"center", gap:5 }}><span style={{ fontSize:11 }}>{STRUCT_ICONS[k]}</span><span style={{ fontSize:10, color:T.textSub }}>{LANG.en[lk]}</span></div>
-                    ))}
-                    {Object.entries(ZONE_LABEL_K).filter(([k]) => zones.some(z=>z.type===k)).map(([k,lk]) => (
-                        <div key={k} style={{ display:"flex", alignItems:"center", gap:5 }}><span style={{ fontSize:11 }}>{ZONE_ICONS[k]}</span><span style={{ fontSize:10, color:T.textSub }}>{LANG[lang]?.[lk] || LANG.en[lk] || k}</span></div>
-                    ))}
-                </div>
-            )}
+            <EditorLegend fields={fields} structures={structures} zones={zones} lang={lang} />
         </div>
     );
 }
 
-// ----
-
-// ----
