@@ -8,7 +8,7 @@ import { FormRow } from "../ui/FormRow.jsx";
 import { BedShapePicker } from "../ui/BedShapePicker.jsx";
 import { T } from "../theme.js";
 import { LANG } from "../translations.js";
-import { FIELD_COLORS, STRUCT_ICONS, ZONE_ICONS, ZONE_FILL, ZONE_STROKE, ZONE_TYPES, ZONE_LABEL_K } from "../constants.js";
+import { FIELD_COLORS, STRUCT_ICONS, STRUCT_FILL, ZONE_ICONS, ZONE_FILL, ZONE_STROKE, ZONE_TYPES, ZONE_LABEL_K } from "../constants.js";
 import { gid, clamp, polygonArea, polygonPointsString, pointInPolygon, polygonCentroid, isInsideGH, slotBaseLabel } from "../helpers.js";
 import { renderSlotSeedPlan } from "../slotSeedPlanView.jsx";
 import { MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js";
