@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="8" fill="#2B5C10"/>
+  <!-- stem -->
+  <line x1="16" y1="26" x2="16" y2="14" stroke="#A8D878" stroke-width="2" stroke-linecap="round"/>
+  <!-- left leaf -->
+  <path d="M16 18 C16 18 8 16 8 9 C8 9 14 9 16 18Z" fill="#6DB33F"/>
+  <!-- right leaf -->
+  <path d="M16 14 C16 14 24 12 24 5 C24 5 18 5 16 14Z" fill="#8CC63F"/>
+  <!-- soil -->
+  <rect x="9" y="26" width="14" height="3" rx="1.5" fill="#A0522D" opacity="0.7"/>
+</svg>
