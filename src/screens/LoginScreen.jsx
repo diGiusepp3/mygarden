@@ -20,7 +20,7 @@ export default function LoginScreen({ state, dispatch, onLogin }) {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [confirmPw, setConfirmPw] = useState("");
-    const [avatar, setAvatar] = useState("??");
+    const [avatar, setAvatar] = useState("🧑‍🌾");
     const [color, setColor] = useState(USER_COLORS[0]);
     const [error, setError] = useState("");
     const [shake, setShake] = useState(false);
@@ -70,7 +70,7 @@ export default function LoginScreen({ state, dispatch, onLogin }) {
                 <div style={{ width:"100%", maxWidth:420 }}>
                     {/* Logo */}
                     <div style={{ textAlign:"center", marginBottom:32 }}>
-                        <div style={{ fontSize:56, marginBottom:8 }}>??</div>
+                        <div style={{ fontSize:56, marginBottom:8 }}>🌿</div>
                         <div style={{ fontSize:28, fontWeight:900, color:"#FFF", fontFamily:"Fraunces,serif", letterSpacing:-0.5 }}>MyGarden</div>
                         <div style={{ fontSize:13, color:"rgba(255,255,255,0.65)", marginTop:4 }}>{t("app_subtitle")}</div>
                         {/* Lang picker */}
@@ -102,7 +102,7 @@ export default function LoginScreen({ state, dispatch, onLogin }) {
                         </h2>
                         <p style={{ margin:"0 0 20px", fontSize:13, color:T.textMuted }}>{mode==="login" ? t("login_sub") : t("register_sub")}</p>
 
-                        {error && <div style={{ background:T.dangerBg, border:`1px solid ${T.danger}33`, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger, marginBottom:14 }}>?? {error}</div>}
+                        {error && <div style={{ background:T.dangerBg, border:`1px solid ${T.danger}33`, borderRadius:T.rs, padding:"9px 12px", fontSize:13, color:T.danger, marginBottom:14 }}>⚠️ {error}</div>}
 
                         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                             {mode==="register" && (
