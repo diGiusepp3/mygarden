@@ -1,0 +1,16 @@
+export const GARDEN_TYPE_LABEL_K = {
+    mixed:"garden_mixed",
+    vegetable:"garden_vegetable",
+    ornamental:"garden_ornamental",
+    balcony:"garden_balcony",
+    container:"garden_container",
+    herb:"garden_herb",
+    flower:"garden_flower",
+    fruit:"garden_fruit",
+    greenhouse:"garden_greenhouse",
+    allotment:"garden_allotment",
+    patio:"garden_patio",
+    roof_terrace:"garden_roof_terrace",
+    wildlife:"garden_wildlife",
+    all:"all",
+};
