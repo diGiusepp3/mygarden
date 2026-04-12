@@ -229,9 +229,9 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                                 {p.notes && <div style={{ fontSize:12, color:T.textSub, marginBottom:10, lineHeight:1.5, borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>{p.notes}</div>}
                                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                                     <Btn size="sm" variant="secondary" onClick={()=>openEdit(p)}>{t("edit")}</Btn>
-                                    {(p.status==="growing"||p.status==="harvestable") && <Btn size="sm" variant="accent" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"harvested"}})}>?>🧺 {t("harvest")}/Btn>}
+                                    {(p.status==="growing"||p.status==="harvestable") && <Btn size="sm" variant="accent" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"harvested"}})}>🧺 {t("harvest")}</Btn>}
                                     {p.status==="planned" && <Btn size="sm" variant="success" onClick={()=>dispatch({type:"UPDATE_PLANT",payload:{...p,status:"sown",sow_date:p.sow_date||new Date().toISOString().slice(0,10)}})}>{t("mark_sown")}</Btn>}
-                                    <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_plant"))) dispatch({type:"DELETE_PLANT",payload:p.id}); }}>?</Btn>
+                                    <Btn size="sm" variant="ghost" onClick={()=>{ if(window.confirm(t("delete_plant"))) dispatch({type:"DELETE_PLANT",payload:p.id}); }}>🗑️</Btn>
                                 </div>
                             </Card>
                         );
