@@ -185,7 +185,7 @@ function DevCodexPlantBuilder({ lang = "en" }) {
                         .map(item => (
                             <div key={item.id} style={{ padding:"10px 0", borderBottom:`1px solid ${T.borderLight}`, display:"flex", flexDirection:"column", gap:5 }}>
                                 <div style={{ display:"flex", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
-                                    <div style={{ fontWeight:800, color:T.text }}>{item.icon || "??"} {item.name}</div>
+                                    <div style={{ fontWeight:800, color:T.text }}>{item.icon || "🌱"} {item.name}</div>
                                     <Badge color={T.primary} bg={T.primaryBg}>{t(DEV_CATEGORY_LABEL_K[item.category] || item.category) || item.category}</Badge>
                                 </div>
                                 <div style={{ fontSize:12, color:T.textMuted, lineHeight:1.5 }}>{item.description || t("dev_library_none")}</div>
@@ -206,7 +206,7 @@ function DevCodexPlantBuilder({ lang = "en" }) {
                         <div key={i} style={{ padding:"8px 0", borderBottom: i < result.plants.length-1 ? `1px solid ${T.border}` : "none", fontSize:13 }}>
                             <span style={{ fontWeight:600 }}>{p.name}</span>
                             {p.description ? <span style={{ color:T.textMuted, marginLeft:8 }}>{p.description}</span> : null}
-                            {p.days_to_maturity ? <span style={{ color:T.textMuted, marginLeft:8 }}>?? {p.days_to_maturity}d</span> : null}
+                            {p.days_to_maturity ? <span style={{ color:T.textMuted, marginLeft:8 }}>⏱️ {p.days_to_maturity}d</span> : null}
                         </div>
                     ))}
                 </AiResult>
@@ -263,7 +263,7 @@ Antwoord in het Nederlands. Gebruik een genummerde lijst.`;
                     </div>
                 </div>
                 <Btn variant="primary" onClick={handleAdvise} disabled={loading || myPlants.length===0} style={{ minWidth:180 }}>
-                    {loading ? "? Analyseren..." : "?? Analyseer mijn tuin"}
+                    {loading ? "⏳ Analyseren..." : "🌿 Analyseer mijn tuin"}
                 </Btn>
                 {myPlants.length === 0 && <div style={{ fontSize:12, color:T.textMuted, marginTop:8 }}>Voeg eerst planten toe aan je tuin.</div>}
             </Card>
@@ -340,7 +340,7 @@ Antwoord in het Nederlands. Wees praktisch en bondig.`;
                     )}
                 </div>
                 <Btn variant="primary" onClick={handleCheck} disabled={loading || !plantName.trim()} style={{ minWidth:180 }}>
-                    {loading ? "? Opzoeken..." : "?? Check compagnons"}
+                    {loading ? "⏳ Opzoeken..." : "🌸 Check compagnons"}
                 </Btn>
             </Card>
             <DevError msg={error}/>
@@ -370,10 +370,10 @@ function DevSowCalendar() {
         const prompt = `Je bent een Belgische tuinkalender-expert (klimaatzone 8a). Maak een beknopte, praktische zaai- en tuinagenda voor de maand ${monthName}.${extraPart}
 
 Structureer je antwoord als:
-?? BINNENSHUIS ZAAIEN: [lijst]
-?? BUITEN ZAAIEN / PLANTEN: [lijst]
-?? VERPLANTEN / OOGSTEN: [lijst]
-?? TIPS VOOR ${monthName.toUpperCase()}: [2-3 praktische tips]
+🏠 BINNENSHUIS ZAAIEN: [lijst]
+🌤️ BUITEN ZAAIEN / PLANTEN: [lijst]
+🌿 VERPLANTEN / OOGSTEN: [lijst]
+💡 TIPS VOOR ${monthName.toUpperCase()}: [2-3 praktische tips]
 
 Antwoord in het Nederlands. Wees specifiek met plantnamen.`;
         try {
@@ -399,7 +399,7 @@ Antwoord in het Nederlands. Wees specifiek met plantnamen.`;
                 </div>
                 <div style={{ marginTop:16 }}>
                     <Btn variant="primary" onClick={handleGenerate} disabled={loading} style={{ minWidth:180 }}>
-                        {loading ? "? Genereren..." : "?? Genereer zaaiplan"}
+                        {loading ? "⏳ Genereren..." : "📅 Genereer zaaiplan"}
                     </Btn>
                 </div>
             </Card>
@@ -445,7 +445,7 @@ function DevFreeChat() {
                 />
                 <div style={{ marginTop:12 }}>
                     <Btn variant="primary" onClick={handleSend} disabled={loading || !prompt.trim()} style={{ minWidth:160 }}>
-                        {loading ? "? Nadenken..." : "?? Vraag stellen"}
+                        {loading ? "⏳ Nadenken..." : "💬 Vraag stellen"}
                     </Btn>
                 </div>
             </Card>
@@ -545,13 +545,13 @@ export default function DevScreen({ state, dispatch, lang }) {
     const t = useT(lang);
     const [tab, setTab] = useState("plants");
     const TABS = [
-        { id:"plants",   icon:"??", label:t("dev_tab_plants") },
-        { id:"codex",    icon:"??", label:t("dev_tab_codex") },
-        { id:"advisor",  icon:"??", label:t("dev_tab_advisor") },
-        { id:"companions", icon:"??", label:t("dev_tab_companions") },
-        { id:"calendar", icon:"??", label:t("dev_tab_calendar") },
-        { id:"knowledge", icon:"??", label:t("dev_tab_knowledge") },
-        { id:"chat",     icon:"??", label:t("dev_tab_chat") },
+        { id:"plants",   icon:"🌿", label:t("dev_tab_plants") },
+        { id:"codex",    icon:"🌿", label:t("dev_tab_codex") },
+        { id:"advisor",  icon:"🌿", label:t("dev_tab_advisor") },
+        { id:"companions", icon:"🌿", label:t("dev_tab_companions") },
+        { id:"calendar", icon:"🌿", label:t("dev_tab_calendar") },
+        { id:"knowledge", icon:"🌿", label:t("dev_tab_knowledge") },
+        { id:"chat",     icon:"🌿", label:t("dev_tab_chat") },
     ];
 
     return (

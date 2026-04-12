@@ -4,11 +4,16 @@ export const FIELD_TYPES   = ["open_field","raised_bed","greenhouse_bed","herb_b
 export const FIELD_LABEL_K = { open_field:"field_open", raised_bed:"field_raised", greenhouse_bed:"field_gh", herb_bed:"field_herb", flower_bed:"field_flower", fruit_area:"field_fruit", nursery:"field_nursery" };
 export const FIELD_COLORS  = { open_field:"#7CB342", raised_bed:"#558B2F", greenhouse_bed:"#00838F", herb_bed:"#43A047", flower_bed:"#BA68C8", fruit_area:"#FB8C00", nursery:"#8D6E63" };
 
-export const STRUCT_TYPES  = ["greenhouse","tunnel_greenhouse","compost_zone","water_point","shed","path","fence","animal_enclosure"];
-export const STRUCT_LABEL_K= { greenhouse:"struct_greenhouse", tunnel_greenhouse:"struct_tunnel", compost_zone:"struct_compost", water_point:"struct_water", shed:"struct_shed", path:"struct_path", fence:"struct_fence", animal_enclosure:"struct_animal" };
-export const STRUCT_ICONS  = { greenhouse:"🏡", tunnel_greenhouse:"⛺", compost_zone:"♻️", water_point:"💧", shed:"🏚️", path:"🛤️", fence:"🚧", animal_enclosure:"🐓" };
-export const STRUCT_FILL   = { greenhouse:"rgba(0,131,143,0.18)", tunnel_greenhouse:"rgba(0,150,136,0.18)", compost_zone:"rgba(121,85,72,0.22)", water_point:"rgba(66,165,245,0.55)", shed:"rgba(121,85,72,0.28)", path:"rgba(188,170,164,0.42)", fence:"rgba(78,52,46,0.4)", animal_enclosure:"rgba(255,183,77,0.3)" };
-export const STRUCT_STROKE = { greenhouse:"#00838F", tunnel_greenhouse:"#009688", compost_zone:"#795548", water_point:"#1976D2", shed:"#5D4037", path:"#8D6E63", fence:"#4E342E", animal_enclosure:"#F57C00" };
+export const STRUCT_TYPES  = ["greenhouse","tunnel_greenhouse","compost_zone","water_point","shed","path","fence","animal_enclosure","wall"];
+export const STRUCT_LABEL_K= { greenhouse:"struct_greenhouse", tunnel_greenhouse:"struct_tunnel", compost_zone:"struct_compost", water_point:"struct_water", shed:"struct_shed", path:"struct_path", fence:"struct_fence", animal_enclosure:"struct_animal", wall:"struct_wall" };
+export const STRUCT_ICONS  = { greenhouse:"🏡", tunnel_greenhouse:"⛺", compost_zone:"♻️", water_point:"💧", shed:"🏚️", path:"🛤️", fence:"🚧", animal_enclosure:"🐓", wall:"🧱" };
+export const STRUCT_FILL   = { greenhouse:"rgba(0,131,143,0.18)", tunnel_greenhouse:"rgba(0,150,136,0.18)", compost_zone:"rgba(121,85,72,0.22)", water_point:"rgba(66,165,245,0.55)", shed:"rgba(121,85,72,0.28)", path:"rgba(188,170,164,0.42)", fence:"rgba(78,52,46,0.4)", animal_enclosure:"rgba(255,183,77,0.3)", wall:"rgba(121,85,72,0.35)" };
+export const STRUCT_STROKE = { greenhouse:"#00838F", tunnel_greenhouse:"#009688", compost_zone:"#795548", water_point:"#1976D2", shed:"#5D4037", path:"#8D6E63", fence:"#4E342E", animal_enclosure:"#F57C00", wall:"#5D4037" };
+
+// Wall material options
+export const WALL_MATERIALS = ["brick","stone","concrete","wood","metal","mixed"];
+export const WALL_MATERIAL_LABELS = { brick:"Baksteen", stone:"Steen", concrete:"Beton", wood:"Hout", metal:"Metaal", mixed:"Gemengd" };
+export const WALL_COLORS = { brick:"#B5541B", stone:"#78716C", concrete:"#9CA3AF", wood:"#92400E", metal:"#6B7280", mixed:"#78716C" };
 
 export const ZONE_TYPES    = ["grass","path","gravel","border","mulch","shade","pond","animal","herb","flower","tree"];
 export const ZONE_LABEL_K  = { grass:"zone_grass", path:"zone_path", gravel:"zone_gravel", border:"zone_border", mulch:"zone_mulch", shade:"zone_shade", pond:"zone_pond", animal:"zone_animal", herb:"zone_herb", flower:"zone_flower", tree:"zone_tree" };

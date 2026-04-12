@@ -80,13 +80,13 @@ export default function SettingsScreen({ state, dispatch, lang }) {
             }
         });
     };
-    const LANGS = [["en","????","English"],["nl","????","Nederlands"],["fr","????","Français"],["de","????","Deutsch"]];
+    const LANGS = [["en","🇬🇧","English"],["nl","🇳🇱","Nederlands"],["fr","🇫🇷","Français"],["de","🇩🇪","Deutsch"]];
     return (
         <div style={{ padding:28, maxWidth:640, margin:"0 auto" }}>
-            <h1 style={{ margin:"0 0 24px", fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>?? {t("nav_settings")}</h1>
+            <h1 style={{ margin:"0 0 24px", fontSize:24, fontWeight:900, fontFamily:"Fraunces, serif", color:T.text }}>⚙️ {t("nav_settings")}</h1>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>?? {t("language")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>⚙️ {t("language")}</h2>
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:8 }}>
                     {LANGS.map(([code,flag,name]) => (
@@ -101,11 +101,11 @@ export default function SettingsScreen({ state, dispatch, lang }) {
             </Card>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>?? {t("your_profile")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>⚙️ {t("your_profile")}</h2>
                 </div>
                 <div style={{ padding:18 }}>
                     <div style={{ display:"flex", gap:14, alignItems:"center", marginBottom:16 }}>
-                        <div style={{ width:52, height:52, borderRadius:99, background:activeUser?.color||T.primary, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>{activeUser?.avatar||"??"}</div>
+                        <div style={{ width:52, height:52, borderRadius:99, background:activeUser?.color||T.primary, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>{activeUser?.avatar||"🧑‍🌾"}</div>
                         <div><div style={{ fontSize:16, fontWeight:800, color:T.text }}>{activeUser?.name||"User"}</div><div style={{ fontSize:12, color:T.textMuted }}>{forUser(state.gardens,uid).length} gardens · {forUser(state.plants,uid).length} plants · {forUser(state.tasks,uid).filter(t2=>t2.status==="pending").length} pending tasks</div></div>
                     </div>
                     <div style={{ fontSize:13, color:T.textSub }}>Manage profiles using the user switcher in the sidebar header.</div>
@@ -162,15 +162,15 @@ export default function SettingsScreen({ state, dispatch, lang }) {
             </Card>
             <Card style={{ marginBottom:16 }}>
                 <div style={{ padding:"14px 18px 12px", borderBottom:`1px solid ${T.border}` }}>
-                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>?? {t("data_mgmt")}</h2>
+                    <h2 style={{ margin:0, fontSize:14, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>⚙️ {t("data_mgmt")}</h2>
                 </div>
                 <div style={{ padding:18, display:"flex", flexDirection:"column", gap:12 }}>
                     <div style={{ fontSize:13, color:T.textSub, lineHeight:1.6, background:T.surfaceAlt, borderRadius:T.rs, padding:12 }}>
-                        ?? Your garden data is now stored securely on the server in MySQL so it stays available across devices and sessions.
+                        ℹ️ Your garden data is now stored securely on the server in MySQL so it stays available across devices and sessions.
                     </div>
                     <div style={{ display:"flex", gap:8 }}>
-                        <Btn variant="secondary" onClick={exportData} icon="??">{t("export_backup")}</Btn>
-                        <Btn variant="danger" onClick={resetData} icon="???">{t("reset_all")}</Btn>
+                        <Btn variant="secondary" onClick={exportData} icon="🌱">{t("export_backup")}</Btn>
+                        <Btn variant="danger" onClick={resetData} icon="🌱">{t("reset_all")}</Btn>
                     </div>
                     <div style={{ fontSize:11, color:T.textMuted }}>
                         {state.users.length} profiles · {state.gardens.length} gardens · {state.fields.length} beds · {state.plants.length} plants · {state.tasks.length} tasks
@@ -179,7 +179,7 @@ export default function SettingsScreen({ state, dispatch, lang }) {
             </Card>
             <Card>
                 <div style={{ padding:24, textAlign:"center" }}>
-                    <div style={{ fontSize:48, marginBottom:10 }}>??</div>
+                    <div style={{ fontSize:48, marginBottom:10 }}>🌿</div>
                     <div style={{ fontSize:20, fontWeight:900, color:T.text, fontFamily:"Fraunces, serif" }}>MyGarden</div>
                     <div style={{ fontSize:12, color:T.textMuted, marginTop:4, lineHeight:1.7 }}>
                         v2.0.0 · {t("app_subtitle")}<br/>

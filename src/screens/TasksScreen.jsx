@@ -127,7 +127,7 @@ export default function TasksScreen({ state, dispatch, lang }) {
                 </div>
             )}
             {show && (
-                <Modal title={`?? ${t("add_task")}`} onClose={()=>{ setShow(false); setForm(ef); }}>
+                <Modal title={`🌱 ${t("add_task")}`} onClose={()=>{ setShow(false); setForm(ef); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={form.title} onChange={set("title")} placeholder="e.g. Water the tomatoes" required/>
                         <FormRow>

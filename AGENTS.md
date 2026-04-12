@@ -1,5 +1,7 @@
 # MyGarden work rules
 
+codex resume 019d7693-918e-7f30-a187-d7ad472788e8
+
 Dit bestand is de vaste gids voor Codex in dit project.
 
 Lees dit eerst en volg het.
@@ -8,8 +10,8 @@ Lees dit eerst en volg het.
 
 - Spreek Nederlands.
 - Gebruik simpele taal.
-- Leg dingen uit alsof de lezer geen IT-er is.
 - Wees kort en duidelijk.
+- Mobile first uiteindelijk te compileren naar android app. 
 
 ## Hoofddoel
 
@@ -26,14 +28,19 @@ Lees dit eerst en volg het.
 ## Werkwijze
 
 - Volg eerst het masterplan in `MYGARDEN_MASTERPLAN.md`.
+- Doe alleen expliciet wat gevraagd word en verzin niets.
+- Hallucinaties zijn niet toegelaten. Strict planning volgen
 - Werk op basis van de actuele code in de repo.
 - Schrijf niets weg zonder dat het past in de bestaande structuur.
 - Werk stap voor stap.
 - Hou telkens de code schoon.
 - Maak liever kleine nette stukken dan grote rommel.
 - Zet nieuwe inzichten meteen in het plan als dat nodig is.
+- Upload elke wijziging naar Github 
+- npm run build na elke wijziging
 
-## Code regels
+
+## Code regels 
 
 - Houd UI, logica en data zo veel mogelijk gescheiden.
 - Maak kleine herbruikbare componenten.
@@ -80,3 +87,4 @@ Lees dit eerst en volg het.
 - Als iets groot is, hak het op.
 - Als iets onduidelijk is, maak het duidelijker.
 
+ 

@@ -37,6 +37,7 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
     const [livePos, setLivePos] = useState(null);
     const [editForm, setEditForm] = useState(null);
     const [zoneDraft, setZoneDraft] = useState(null);
+    const [wallDraft, setWallDraft] = useState(null);
     const [pickMenu, setPickMenu] = useState(null);
     const selItem = selId ? (
         selKind === "field" ? fields.find(f => f.id === selId)
@@ -132,7 +133,7 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
             // Ignore when typing in an input
             if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT")) return;
             if (e.key === "Escape") {
-                setSelId(null); setSelKind(null); setZoneDraft(null); setPickMenu(null);
+                setSelId(null); setSelKind(null); setZoneDraft(null); setWallDraft(null); setPickMenu(null);
             }
             if ((e.key === "Delete" || e.key === "Backspace") && selId && selKind) {
                 e.preventDefault();
@@ -264,6 +265,7 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
     }, [fields, structures, zones, livePos]);
     const handleItemPick = (kind, item, e) => {
         if (zoneDraft) return addZonePoint(e);
+        if (wallDraft) return addWallPoint(e);
         e.stopPropagation();
         const { x, y } = getSvgXY(e);
         const wx = (x - pad) / sc;
@@ -279,6 +281,7 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
     };
     const handleCanvasPick = (e) => {
         if (zoneDraft) return addZonePoint(e);
+        if (wallDraft) return addWallPoint(e);
         setPickMenu(null);
         setSelId(null);
         setSelKind(null);
@@ -433,6 +436,7 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
     };
     const beginZoneDraft = () => {
         setZoneDraft({ name:"New Zone", type:"grass", notes:"", points:[] });
+        setWallDraft(null);
         setSelId(null);
         setSelKind(null);
     };
@@ -451,6 +455,42 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
             }
         });
         setZoneDraft(null);
+    };
+    const addWallPoint = (e) => {
+        if (!wallDraft) return;
+        const { x, y } = getSvgXY(e);
+        const gx = clamp((x - pad) / sc, 0, garden.width);
+        const gy = clamp((y - pad) / sc, 0, garden.height);
+        setWallDraft(d => ({ ...d, points: [...d.points, { x:Math.round(gx*10)/10, y:Math.round(gy*10)/10 }] }));
+        setSelId(null);
+        setSelKind(null);
+        setEditForm(null);
+    };
+    const beginWallDraft = () => {
+        setWallDraft({ name:"New Wall", height_m:1.2, material:"brick", notes:"", points:[] });
+        setZoneDraft(null);
+        setSelId(null);
+        setSelKind(null);
+    };
+    const cancelWallDraft = () => setWallDraft(null);
+    const finishWallDraft = () => {
+        if (!wallDraft || wallDraft.points.length < 2) return;
+        dispatch({
+            type:"ADD_STRUCT",
+            payload:{
+                id: gid(),
+                garden_id: garden.id,
+                name: wallDraft.name.trim() || "Wall",
+                type: "wall",
+                points: wallDraft.points,
+                height_m: wallDraft.height_m,
+                material: wallDraft.material,
+                notes: wallDraft.notes || "",
+                // Wall heeft geen x/y/width/height — gebruik centroid als fallback
+                x: 0, y: 0, width: 0, height: 0,
+            }
+        });
+        setWallDraft(null);
     };
     const saveEdit = () => {
         if (!selItem || !editForm) return;
@@ -574,6 +614,58 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
             </g>
         );
     };
+    const WALL_COLORS_MAP = { brick:"#B5541B", stone:"#78716C", concrete:"#9CA3AF", wood:"#92400E", metal:"#6B7280", mixed:"#78716C" };
+    const getWallThickness = (height_m) => Math.max(3, Math.min(12, (height_m || 1.2) * sc * 0.12));
+    const renderWall = (struct) => {
+        const pts = struct.points || [];
+        if (pts.length < 2) return null;
+        const isSel = selId === struct.id;
+        const color = WALL_COLORS_MAP[struct.material] || "#5D4037";
+        const thickness = getWallThickness(struct.height_m);
+        const svgPts = pts.map(p => `${pad + p.x*sc},${pad + p.y*sc}`).join(" ");
+        return (
+            <g key={struct.id} style={{ cursor:"pointer" }}
+                onClick={e => handleItemPick("struct", struct, e)}
+                onMouseDown={e => { /* wall drag niet ondersteund */ }}
+            >
+                <polyline
+                    points={svgPts}
+                    fill="none"
+                    stroke={isSel ? T.accent : color}
+                    strokeWidth={isSel ? thickness + 2 : thickness}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+                {pts.map((pt, idx) => (
+                    <circle key={idx} cx={pad + pt.x*sc} cy={pad + pt.y*sc} r={isSel ? 4 : 3} fill={color} opacity={0.85} style={{ pointerEvents:"none" }} />
+                ))}
+                {pts.length >= 2 && (() => {
+                    const mid = pts[Math.floor(pts.length / 2)];
+                    return (
+                        <text x={pad + mid.x*sc} y={pad + mid.y*sc - thickness/2 - 4} textAnchor="middle" fontSize={9} fontFamily="DM Sans,sans-serif" fill={color} fontWeight={800} style={{ pointerEvents:"none" }}>
+                            🧱 {struct.name}
+                        </text>
+                    );
+                })()}
+            </g>
+        );
+    };
+    const renderWallDraft = () => {
+        if (!wallDraft) return null;
+        const pts = wallDraft.points || [];
+        if (!pts.length) return null;
+        const color = WALL_COLORS_MAP[wallDraft.material] || "#5D4037";
+        const thickness = getWallThickness(wallDraft.height_m);
+        const svgPts = pts.map(p => `${pad + p.x*sc},${pad + p.y*sc}`).join(" ");
+        return (
+            <g>
+                {pts.length >= 2 && <polyline points={svgPts} fill="none" stroke={color} strokeWidth={thickness} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="8,4" opacity={0.8} />}
+                {pts.map((pt, idx) => (
+                    <circle key={idx} cx={pad + pt.x*sc} cy={pad + pt.y*sc} r={5} fill={color} stroke="#fff" strokeWidth={1.5} />
+                ))}
+            </g>
+        );
+    };
     return (
         <div>
             <EditorToolbar
@@ -582,11 +674,15 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
                 fitZoom={fitZoom}
                 viewMode={viewMode}
                 zoneDraft={zoneDraft}
+                wallDraft={wallDraft}
                 setZoom={setZoom}
                 setViewMode={setViewMode}
                 onBeginZone={beginZoneDraft}
                 onCancelZone={cancelZoneDraft}
                 onFinishZone={finishZoneDraft}
+                onBeginWall={beginWallDraft}
+                onCancelWall={cancelWallDraft}
+                onFinishWall={finishWallDraft}
             />
             <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) 280px", gap:12, alignItems:"start" }}>
                 <div ref={canvasWrapRef} style={{ overflow:"auto", background:"#F2EDE4", minHeight:320, border:`1px solid ${T.border}`, borderTop:"none" }}>
@@ -615,7 +711,9 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
                     {labels}
                     {zones.map(renderZone)}
                     {renderDraft()}
-                    {structures.map(st => {
+                    {structures.filter(st => st.type === "wall").map(renderWall)}
+                    {renderWallDraft()}
+                    {structures.filter(st => st.type !== "wall").map(st => {
                         const e_ = eff(st);
                         const sx = pad + e_.x*sc, sy = pad + e_.y*sc, sw = e_.width*sc, sh = e_.height*sc;
                         const isGH = st.type === "greenhouse" || st.type === "tunnel_greenhouse";

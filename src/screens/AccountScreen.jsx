@@ -60,7 +60,7 @@ import { forUser } from "../helpers.js";
     const questBoard = buildUserQuestProgress({ user, gardens: myGardens, fields: myFields, structures: forUser(state.structures, uid), plants: myPlants, tasks: myTasks, lang });
     const joined    = user.created_at ? new Date(user.created_at).toLocaleDateString(LOCALE_MAP[lang]||"en-GB",{day:"numeric",month:"long",year:"numeric"}) : "—";
 
-    const TABS = [["profile","??",t("edit_profile")],["password","??",t("change_password")],["stats","??",t("your_stats")]];
+    const TABS = [["profile","👤",t("edit_profile")],["password","🔒",t("change_password")],["stats","📊",t("your_stats")]];
     const handleQuestStep = (step) => {
         if (step.actionKind === "confirm_email") {
             dispatch({ type:"SET_SETTING", payload:{ email_verified:true } });
@@ -102,7 +102,7 @@ import { forUser } from "../helpers.js";
                     <h1 style={{ margin:0, fontSize:22, fontWeight:900, fontFamily:"Fraunces,serif", color:T.text }}>{user.name}</h1>
                     <div style={{ fontSize:13, color:T.textMuted, marginTop:2 }}>{user.email} · {t("joined")} {joined}</div>
                 </div>
-                <Btn variant="ghost" onClick={onLogout} icon="??">{t("logout")}</Btn>
+                <Btn variant="ghost" onClick={onLogout} icon="🌱">{t("logout")}</Btn>
             </div>
 
             {/* Tab bar */}
@@ -141,7 +141,7 @@ import { forUser } from "../helpers.js";
                                 <div style={{ fontSize:11, color:T.textMuted }}>{pEmail||"no email"}</div>
                             </div>
                         </div>
-                        <Btn variant="primary" onClick={saveProfile} icon="??">{t("save")}</Btn>
+                        <Btn variant="primary" onClick={saveProfile} icon="🌱">{t("save")}</Btn>
                     </div>
                 </Card>
             )}
@@ -155,9 +155,9 @@ import { forUser } from "../helpers.js";
                         <Input label={t("new_password")} value={newPw} onChange={setNewPw} type="password" placeholder="••••••••" required/>
                         <Input label={t("confirm_new")} value={confPw} onChange={setConfPw} type="password" placeholder="••••••••" required/>
                         <div style={{ fontSize:12, color:T.textMuted, padding:"8px 12px", background:T.surfaceAlt, borderRadius:T.rs }}>
-                            ?? Wachtwoorden worden lokaal opgeslagen in je browser. MyGarden verstuurt geen gegevens naar een server.
+                            ℹ️ Wachtwoorden worden lokaal opgeslagen in je browser. MyGarden verstuurt geen gegevens naar een server.
                         </div>
-                        <Btn variant="primary" onClick={savePassword} icon="??">{t("change_password")}</Btn>
+                        <Btn variant="primary" onClick={savePassword} icon="🌱">{t("change_password")}</Btn>
                     </div>
                 </Card>
             )}
@@ -166,22 +166,22 @@ import { forUser } from "../helpers.js";
             {tab==="stats" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-                        <StatCard icon="??" label={t("gardens")} value={myGardens.length} color={T.primary}/>
-                        <StatCard icon="??" label={t("plant_varieties")} value={myPlants.length} color="#388E3C"/>
+                        <StatCard icon="🌱" label={t("gardens")} value={myGardens.length} color={T.primary}/>
+                        <StatCard icon="🌱" label={t("plant_varieties")} value={myPlants.length} color="#388E3C"/>
                         <StatCard icon="?" label={t("tasks_pending")} value={myTasks.filter(t2=>t2.status==="pending").length} color={T.warning}/>
-                        <StatCard icon="??" label={t("ready_to_harvest")} value={myPlants.filter(p=>p.status==="harvestable").length} color={T.accent}/>
+                        <StatCard icon="🌱" label={t("ready_to_harvest")} value={myPlants.filter(p=>p.status==="harvestable").length} color={T.accent}/>
                     </div>
                     <Card style={{ padding:16 }}>
                         <div style={{ fontSize:12, color:T.textMuted, display:"flex", flexDirection:"column", gap:6 }}>
-                            <div>?? {t("joined")}: <strong style={{color:T.text}}>{joined}</strong></div>
-                            <div>?? Total plants in garden: <strong style={{color:T.text}}>{myPlants.reduce((s,p)=>s+(+p.quantity||0),0)}</strong></div>
-                            <div>??? Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}m²</strong></div>
+                            <div>🗓️ {t("joined")}: <strong style={{color:T.text}}>{joined}</strong></div>
+                            <div>🌱 Total plants in garden: <strong style={{color:T.text}}>{myPlants.reduce((s,p)=>s+(+p.quantity||0),0)}</strong></div>
+                            <div>📐 Total bed area: <strong style={{color:T.text}}>{forUser(state.fields,uid).reduce((s,f)=>s+f.width*f.height,0).toFixed(1)}m²</strong></div>
                             <div>? Tasks completed: <strong style={{color:T.success}}>{myTasks.filter(t2=>t2.status==="done").length}</strong></div>
                         </div>
                     </Card>
                     {/* Danger zone */}
                     <Card style={{ padding:16, border:`1px solid ${T.danger}44` }}>
-                        <div style={{ fontSize:13, fontWeight:700, color:T.danger, marginBottom:8 }}>?? {t("danger_zone")}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:T.danger, marginBottom:8 }}>⚠️ {t("danger_zone")}</div>
                         <div style={{ fontSize:12, color:T.textSub, marginBottom:12 }}>{t("delete_account_confirm")}</div>
                         <Btn variant="danger" onClick={() => {
                             if (window.confirm(t("delete_account_confirm"))) {

@@ -82,7 +82,7 @@ export default function DashboardScreen({ state, dispatch, navigate, lang }) {
         return (
             <ListRow
                 key={task.id}
-                icon={TASK_ICONS[task.type] || "??"}
+                icon={TASK_ICONS[task.type] || "📋"}
                 title={task.title}
                 meta={metaParts.join(" · ")}
                 status={{ label: t(TASK_STATUS_K[task.status]) || task.status, color: statusCfg.color, bg: statusCfg.bg }}
@@ -99,7 +99,7 @@ export default function DashboardScreen({ state, dispatch, navigate, lang }) {
         return (
             <ListRow
                 key={plant.id}
-                icon={CAT_ICONS[plant.category] || "??"}
+                icon={CAT_ICONS[plant.category] || "🌿"}
                 title={`${plant.name}${plant.variety ? ` (${plant.variety})` : ""}`}
                 meta={`${fmtDate(plant.harvest_date, lang)} · ${bed?.name || struct?.name || t("unassigned")}`}
                 hint={plant.quantity ? `×${plant.quantity}` : undefined}
@@ -148,25 +148,25 @@ export default function DashboardScreen({ state, dispatch, navigate, lang }) {
     };
     const suggestionItems = [
         {
-            icon: "??",
+            icon: "🌿",
             label: nextHarvest ? `${t("harvest")} ${nextHarvest.name}` : t("dashboard_review_harvest"),
             helper: nextHarvest ? `${t("due_date")} ${fmtDate(nextHarvest.harvest_date, lang)}` : t("dashboard_no_harvest_soon"),
             onClick: () => navigate("plants"),
         },
         {
-            icon: "??",
+            icon: "🌿",
             label: emptyBeds.length ? `${emptyBeds.length} ${t("dashboard_empty_beds")}` : t("dashboard_all_beds_planted"),
             helper: emptyBeds.length ? t("dashboard_fill_beds") : t("dashboard_keep_beds_full"),
             onClick: () => navigate("fields"),
         },
         {
-            icon: "???",
+            icon: "🌱",
             label: greenhouseCount ? `${greenhouseCount} ${t("dashboard_greenhouse_spots")}` : t("dashboard_add_greenhouse"),
             helper: greenhouseCount ? t("dashboard_check_ventilation") : t("dashboard_create_protected"),
             onClick: () => navigate("greenhouses"),
         },
         {
-            icon: "??",
+            icon: "🌿",
             label: t("dashboard_seo_hub"),
             helper: t("dashboard_seo_hub_helper"),
             onClick: () => { window.location.href = "/seo/"; },
@@ -175,7 +175,7 @@ export default function DashboardScreen({ state, dispatch, navigate, lang }) {
     return (
         <PageShell width={1180}>
             <PageHeader
-                title={`${t("good_morning")} ???`}
+                title={`${t("good_morning")} 🌞`}
                 subtitle={todayLabel}
                 meta={instructionMeta}
                 actions={quickActions}
@@ -211,16 +211,16 @@ export default function DashboardScreen({ state, dispatch, navigate, lang }) {
             }
         />
             <PanelGroup>
-                <StatCard icon="??" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
-                <StatCard icon="???" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m² ${t("total_area")}`} onClick={() => navigate("fields")} />
-                <StatCard icon="??" label={t("plant_varieties")} value={plants.length} color="#388E3C" sub={`${plants.reduce((sum, p) => sum + (+p.quantity || 0), 0)} plants`} onClick={() => navigate("plants")} />
+                <StatCard icon="🌱" label={t("gardens")} value={gardens.length} color={T.primary} sub={`${fields.length} ${t("beds_total")}`} onClick={() => navigate("gardens")} />
+                <StatCard icon="🌱" label={t("beds_fields")} value={fields.length} color="#558B2F" sub={`${totalArea}m² ${t("total_area")}`} onClick={() => navigate("fields")} />
+                <StatCard icon="🌱" label={t("plant_varieties")} value={plants.length} color="#388E3C" sub={`${plants.reduce((sum, p) => sum + (+p.quantity || 0), 0)} plants`} onClick={() => navigate("plants")} />
                 <StatCard icon="?" label={t("tasks_pending")} value={pending.length} color={overdue.length > 0 ? T.danger : T.warning} sub={overdue.length > 0 ? `${overdue.length} ${t("overdue_badge")}` : t("all_on_track")} onClick={() => navigate("tasks")} />
                 {harvestable.length > 0 && (
-                    <StatCard icon="??" label={t("ready_to_harvest")} value={harvestable.length} color={T.accent} sub={t("harvestable_badge")} onClick={() => navigate("plants")} />
+                    <StatCard icon="🌱" label={t("ready_to_harvest")} value={harvestable.length} color={T.accent} sub={t("harvestable_badge")} onClick={() => navigate("plants")} />
                 )}
             </PanelGroup>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 16 }}>
-                <SectionPanel title={`?? ${t("today")}`} subtitle={`${todayTasks.length} ${t("tasks_pending").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
+                <SectionPanel title={`🌱 ${t("today")}`} subtitle={`${todayTasks.length} ${t("tasks_pending").toLowerCase()}`} action={<Btn size="sm" variant="ghost" onClick={() => navigate("tasks")}>{t("view_all")}</Btn>}>
                     {todayTasks.length ? todayTasks.map(renderTaskRow) : (
                         <div style={{ padding: "24px 0", fontSize: 13, color: T.textMuted, minHeight:120 }}>{t("dashboard_no_tasks_today")}</div>
                     )}
@@ -244,7 +244,7 @@ export default function DashboardScreen({ state, dispatch, navigate, lang }) {
                         </div>
                     ) : (
                         <div style={{ padding: "24px 0" }}>
-                            <EmptyState icon="??" title={t("no_gardens")} subtitle={t("dashboard_create_garden_hint")} action={<Btn variant="primary" onClick={() => navigate("gardens")} icon="+">{t("new_garden")}</Btn>} />
+                            <EmptyState icon="🌱" title={t("no_gardens")} subtitle={t("dashboard_create_garden_hint")} action={<Btn variant="primary" onClick={() => navigate("gardens")} icon="+">{t("new_garden")}</Btn>} />
                         </div>
                     )}
                 </SectionPanel>

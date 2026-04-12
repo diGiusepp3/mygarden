@@ -372,6 +372,7 @@ Wat nu al duidelijk is:
 - [ ] Maak dev panel beter voor een niet-tech gebruiker die even wil zien wat er gebeurt.
 - [ ] Maak dev panel minder schreeuwerig.
 - [ ] Maak dev panel aparte componenten.
+- [ ] Zo goed als de gehele website moett e beheren zijn vanaf het dev paneel.
 
 ## 15. Data en opslag
 
@@ -763,7 +764,10 @@ Wat nu al duidelijk is:
 - [ ] Maak tuinsoorten duidelijk voor moestuin, siertuin, balkon, serre en gemengde tuin.
 - [ ] Laat filters en suggesties per tuinsoort werken.
 - [ ] Laat de startflow van de app meteen zien dat er meer is dan alleen groenten.
-- [ ] Laat de app voorbeeldtuinen tonen voor moestuin, decoratietuin en balkon.
+- [ ] Laat de app geen voorbeeldtuinen tonen voor moestuin, decoratietuin en balkon maar gebruik echte data.
 - [ ] Maak import, generator en bibliotheek geschikt voor sier- en tuinplanten.
 - [ ] Voeg meer variëteiten toe per sierplant.
 - [ ] Laat de hele website voelen als een volledige tuinplanner.
+
+
+# N8N Integratie voor dev functies

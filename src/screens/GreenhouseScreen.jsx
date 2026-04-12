@@ -162,7 +162,7 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
     return (
         <PageShell width={1040}>
             <PageHeader
-                title={`?? ${t("greenhouses")}`}
+                title={`🌱 ${t("greenhouses")}`}
                 subtitle={`${structures.length} structures across ${gardens.length} gardens`}
                 meta={[
                     <MetaBadge key="gardens" value={gardens.length} label={t("gardens")} />,
@@ -171,14 +171,14 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 actions={[<Btn key="editor" variant="secondary" onClick={()=>navigate("editor")}>{t("nav_editor")}</Btn>]}
             />
             <PanelGroup>
-                <StatCard icon="??" label="Structures" value={structures.length} color={T.primary} sub={`${gardens.length} gardens`} />
-                <StatCard icon="??" label="Slots" value={totalSlots} color="#558B2F" sub="Trays / Rows / Pots" />
-                <StatCard icon="??" label="GH Plants" value={greenhousePlantsCount} color="#388E3C" sub="Inside structures" />
-                <StatCard icon="???" label="Ventilated" value={`${ventilatedCount}/${structures.length}`} color={ventilatedCount===structures.length?T.success:T.warning} sub="vents open" />
+                <StatCard icon="🌱" label="Structures" value={structures.length} color={T.primary} sub={`${gardens.length} gardens`} />
+                <StatCard icon="🌱" label="Slots" value={totalSlots} color="#558B2F" sub="Trays / Rows / Pots" />
+                <StatCard icon="🌱" label="GH Plants" value={greenhousePlantsCount} color="#388E3C" sub="Inside structures" />
+                <StatCard icon="🌱" label="Ventilated" value={`${ventilatedCount}/${structures.length}`} color={ventilatedCount===structures.length?T.success:T.warning} sub="vents open" />
             </PanelGroup>
             {structures.length===0 ? (
                 <SectionPanel title={t("greenhouses")} subtitle={t("no_greenhouses")} action={<Btn size="sm" variant="primary" onClick={()=>navigate("editor")}>{t("nav_editor")}</Btn>}>
-                    <EmptyState icon="??" title={t("no_greenhouses")} subtitle={t("no_gh_sub")} />
+                    <EmptyState icon="🌱" title={t("no_greenhouses")} subtitle={t("no_gh_sub")} />
                 </SectionPanel>
             ) : (
                 <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
@@ -207,14 +207,14 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                     <div style={{ padding:"16px 20px" }}>
                                         <div style={{ display:"flex", alignItems:"flex-start", gap:14, marginBottom:16 }}>
                                         <div style={{ width:52, height:52, borderRadius:T.r, background:STRUCT_FILL[st.type]||"rgba(0,131,143,0.15)", border:`2px solid ${stroke}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>
-                                            {isTunnel?"?":"??"}
+                                            {isTunnel?"⛺":"🏡"}
                                         </div>
                                         <div style={{ flex:1 }}>
                                             <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
                                                 <h2 style={{ margin:0, fontSize:18, fontWeight:800, color:T.text, fontFamily:"Fraunces, serif" }}>{st.name}</h2>
                                                 <Badge color={stroke} bg={stroke+"20"}>{t(STRUCT_LABEL_K[st.type])||st.type}</Badge>
                                                 {garden && <Badge color={T.textSub} bg={T.surfaceAlt}>{garden.name}</Badge>}
-                                                {linkedField && <Badge color={T.accent} bg={T.accentBg}>?? {linkedField.name}</Badge>}
+                                                {linkedField && <Badge color={T.accent} bg={T.accentBg}>{linkedField.name}</Badge>}
                                             </div>
                                             <div style={{ fontSize:12, color:T.textMuted, marginTop:4 }}>{st.width}m × {st.height}m = {(st.width*st.height).toFixed(1)}m² · Position ({st.x}m, {st.y}m)</div>
                                             {st.notes && <div style={{ fontSize:12, color:T.textSub, marginTop:4, lineHeight:1.5 }}>{st.notes}</div>}
@@ -232,7 +232,7 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                         {/* Climate row */}
                                         <div style={{ display:"flex", gap:10, marginBottom:16, flexWrap:"wrap" }}>
                                             <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs, flex:1, minWidth:180 }}>
-                                            <span style={{ fontSize:18 }}>???</span>
+                                            <span style={{ fontSize:18 }}>🌡️</span>
                                             <div style={{ flex:1 }}>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>{t("temp")}</div>
                                                 <div style={{ fontSize:14, fontWeight:700, color:T.text }}>{st.temperature||"—"}</div>
@@ -240,21 +240,21 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                             <Btn size="sm" variant="ghost" onClick={()=>setEditGh(st)}>Edit</Btn>
                                         </div>
                                         <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs, flex:1, minWidth:180 }}>
-                                            <span style={{ fontSize:18 }}>??</span>
+                                            <span style={{ fontSize:18 }}>💧</span>
                                             <div style={{ flex:1 }}>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>{t("humidity")}</div>
                                                 <div style={{ fontSize:14, fontWeight:700, color:T.text }}>{st.humidity ? `${st.humidity}%` : "—"}</div>
                                             </div>
                                         </div>
                                         <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs }}>
-                                            <span style={{ fontSize:18 }}>???</span>
+                                            <span style={{ fontSize:18 }}>🌡️</span>
                                             <div>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>{t("inside_beds")}</div>
                                                 <div style={{ fontSize:14, fontWeight:700, color:T.primary }}>{insideBeds.length}</div>
                                             </div>
                                         </div>
                                         <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", background:T.surfaceAlt, borderRadius:T.rs }}>
-                                            <span style={{ fontSize:18 }}>??</span>
+                                            <span style={{ fontSize:18 }}>💧</span>
                                             <div>
                                                 <div style={{ fontSize:10, fontWeight:700, color:T.textMuted, textTransform:"uppercase", letterSpacing:0.5 }}>Pots / Trays / Rows</div>
                                             <div style={{ fontSize:14, fontWeight:700, color:T.primary }}>{structDirectSlots.length}</div>
@@ -307,7 +307,7 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             {(slot.type==="tunnel_row"||slot.type==="bed_row") && renderSlotSeedPlan(slot)}
                                                             {slotPlants.length>0 && (
                                                                 <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:5 }}>
-                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"??"} {p.name} · ×{Math.max(1, +p.quantity || 1)}</Badge>)}
+                                                                    {slotPlants.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name} · ×{Math.max(1, +p.quantity || 1)}</Badge>)}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -330,7 +330,7 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                             <div style={{ fontSize:11, color:T.textMuted }}>{bed.width}m × {bed.height}m · {LANG[lang]?.[FIELD_LABEL_K[bed.type]]||bed.type}</div>
                                                             {bp.length>0 && (
                                                                 <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:5 }}>
-                                                                    {bp.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"??"} {p.name}</Badge>)}
+                                                                    {bp.map(p => <Badge key={p.id} color={STATUS_CFG[p.status]?.color||T.textSub} bg={STATUS_CFG[p.status]?.bg||T.surfaceAlt}>{CAT_ICONS[p.category]||"🌿"} {p.name}</Badge>)}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -350,7 +350,7 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                                     const slot=allSlots.find(s => s.id===p.slot_id);
                                                     return (
                                                         <div key={p.id} style={{ padding:"6px 10px", background:T.surface, border:`1px solid ${T.border}`, borderRadius:T.rs, display:"flex", alignItems:"center", gap:6 }}>
-                                                            <span style={{ fontSize:16 }}>{CAT_ICONS[p.category]||"??"}</span>
+                                                            <span style={{ fontSize:16 }}>{CAT_ICONS[p.category]||"🌿"}</span>
                                                             <div>
                                                                 <div style={{ fontSize:12, fontWeight:700, color:T.text }}>{p.name}</div>
                                                                 <div style={{ fontSize:10, color:T.textMuted }}>{p.variety} · ×{Math.max(1, +p.quantity || 1)}{slot ? ` · ${slot.name}` : ""}{p.row_count ? ` · ${p.row_count} rows` : ""}{p.row_plant_count ? ` · ${p.row_plant_count}/row` : ""}</div>
@@ -369,12 +369,12 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                                     )}
                                     {/* Actions */}
                                     <div style={{ display:"flex", gap:8, marginTop:14, flexWrap:"wrap" }}>
-                                        <Btn size="sm" variant="secondary" onClick={()=>openSlotModal(st)}>?? Add {isTunnel ? "Row" : "Pot / Tray / Row"}</Btn>
+                                        <Btn size="sm" variant="secondary" onClick={()=>openSlotModal(st)}>➕ Add {isTunnel ? "Row" : "Pot / Tray / Row"}</Btn>
                                         <Btn size="sm" variant="primary" onClick={()=>{ dispatch({type:"SET_ACTIVE_GARDEN",payload:st.garden_id}); navigate("editor"); }}>?? {t("nav_editor")}</Btn>
                                         <Btn size="sm" variant={st.ventilated?"ghost":"success"} onClick={()=>toggleVent(st)}>
                                             {st.ventilated ? `?? ${t("close_vents")}` : `??? ${t("ventilate")}`}
                                         </Btn>
-                                        <Btn size="sm" variant="secondary" onClick={()=>setEditGh(st)}>??? Log Climate</Btn>
+                                        <Btn size="sm" variant="secondary" onClick={()=>setEditGh(st)}>📊 Log Climate</Btn>
                                         <Btn size="sm" variant="danger" onClick={()=>{ if(window.confirm(t("delete_struct"))) dispatch({type:"DELETE_STRUCT",payload:st.id}); }}>? {t("delete")}</Btn>
                                     </div>
                                 </div>
@@ -384,9 +384,9 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 </div>
             )}
             {showSlot && slotStruct && (
-            <Modal title={`?? Add ${slotStruct.type==="tunnel_greenhouse" ? "Row" : "Pot"} In ${slotStruct.name}`} onClose={()=>{ setShowSlot(false); setSlotStruct(null); setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" }); }}>
+            <Modal title={`🌱 Add ${slotStruct.type==="tunnel_greenhouse" ? "Row" : "Pot"} In ${slotStruct.name}`} onClose={()=>{ setShowSlot(false); setSlotStruct(null); setSlotForm({ name:"", label:"", type:"greenhouse_pot", rows:"4", cols:"6", row_count:"", spacing_cm:"", plant_count:"", row_length_m:"", orientation:"horizontal", notes:"" }); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="??">
+                        <InfoBanner icon="🌱">
                             {slotStruct.type==="tunnel_greenhouse"
                                 ? "Tunnel layouts work best as rows. Add row counts, spacing and plants per row."
                                 : "Pots, trays, tables and rows are optional internal locations inside a greenhouse."}
@@ -427,9 +427,9 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {editSlot && editSlotForm && (
-                <Modal title={`?? Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
+                <Modal title={`🌱 Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="??">This edits an existing slot. Row count and spacing control the scale preview only for row-based slots.</InfoBanner>
+                        <InfoBanner icon="🌱">This edits an existing slot. Row count and spacing control the scale preview only for row-based slots.</InfoBanner>
                         <FormRow cols={2}>
                             <Input label="Name" value={editSlotForm.name} onChange={v=>setEditSlotForm(f=>({...f,name:v}))} required/>
                             <Input label="Label" value={editSlotForm.label} onChange={v=>setEditSlotForm(f=>({...f,label:v}))} required/>
@@ -459,7 +459,7 @@ export default function GreenhouseScreen({ state, dispatch, navigate, lang }) {
                 </Modal>
             )}
             {editGh && (
-                <Modal title={`??? Climate Log — ${editGh.name}`} onClose={()=>setEditGh(null)} width={400}>
+                <Modal title={`🌱? Climate Log — ${editGh.name}`} onClose={()=>setEditGh(null)} width={400}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={`??? ${t("temp")} (e.g. 22°C)`} value={tempVal} onChange={setTempVal} placeholder="22°C"/>
                         <Input label={`?? ${t("humidity")} (0-100%)`} value={humVal} onChange={setHumVal} type="number" min="0" max="100" placeholder="65"/>

@@ -34,7 +34,7 @@ export default function EditorScreen({ state, dispatch, navigate, lang, GardenEd
         return (
             <PageShell width={980}>
                 <EmptyState
-                    icon="???"
+                    icon="🌱"
                     title={t("editor_no_garden_title")}
                     subtitle={t("editor_no_garden_subtitle")}
                     action={<Btn onClick={()=>navigate("gardens")} variant="primary">{t("editor_no_garden_action")}</Btn>}
@@ -92,10 +92,10 @@ export default function EditorScreen({ state, dispatch, navigate, lang, GardenEd
         });
     };
     const quickActions = [
-        { icon:"???", label:t("add_bed"), helper:t("editor_add_bed_hint"), onClick:()=>setShowField(true) },
-        { icon:"??", label:t("add_structure"), helper:t("editor_add_structure_hint"), onClick:()=>setShowStruct(true) },
-        { icon:"??", label:t("editor_open_beds"), helper:t("editor_bed_overview_sub"), onClick:()=>navigate("fields") },
-        { icon:"??", label:t("editor_open_plants"), helper:t("editor_position_hint"), onClick:()=>navigate("plants") },
+        { icon:"🛏️", label:t("add_bed"), helper:t("editor_add_bed_hint"), onClick:()=>setShowField(true) },
+        { icon:"🌿", label:t("add_structure"), helper:t("editor_add_structure_hint"), onClick:()=>setShowStruct(true) },
+        { icon:"🌿", label:t("editor_open_beds"), helper:t("editor_bed_overview_sub"), onClick:()=>navigate("fields") },
+        { icon:"🌿", label:t("editor_open_plants"), helper:t("editor_position_hint"), onClick:()=>navigate("plants") },
     ];
     const addField  = () => { if (!ff.name||!ff.x||!ff.y||!ff.width||!ff.height) return; dispatch({type:"ADD_FIELD",payload:{id:gid(),garden_id:garden.id,...ff,x:+ff.x,y:+ff.y,width:+ff.width,height:+ff.height}}); setShowField(false); setFf(ef); };
     const addStruct = () => {
@@ -136,9 +136,9 @@ export default function EditorScreen({ state, dispatch, navigate, lang, GardenEd
                     <MetaBadge key="plants" value={gPlants.length} label={t("editor_stats_plants")} />,
                 ]}
                 actions={[
-                    <Btn key="gardens" size="sm" variant="ghost" onClick={()=>navigate("gardens")} icon="??">{t("editor_open_gardens")}</Btn>,
-                    <Btn key="struct" size="sm" variant="secondary" onClick={()=>setShowStruct(true)} icon="??">{t("add_structure")}</Btn>,
-                    <Btn key="bed" size="sm" variant="primary" onClick={()=>setShowField(true)} icon="???">{t("add_bed")}</Btn>
+                    <Btn key="gardens" size="sm" variant="ghost" onClick={()=>navigate("gardens")} icon="🌱">{t("editor_open_gardens")}</Btn>,
+                    <Btn key="struct" size="sm" variant="secondary" onClick={()=>setShowStruct(true)} icon="🌱">{t("add_structure")}</Btn>,
+                    <Btn key="bed" size="sm" variant="primary" onClick={()=>setShowField(true)} icon="🌱">{t("add_bed")}</Btn>
                 ]}
             />
             <PanelGroup cols="repeat(auto-fit,minmax(250px,1fr))">
@@ -213,12 +213,12 @@ export default function EditorScreen({ state, dispatch, navigate, lang, GardenEd
                 <GardenEditor garden={garden} fields={gFields} structures={gStructs} zones={gZones} plants={gPlants} slots={gSlots} dispatch={dispatch} lang={lang} navigate={navigate}/>
             </SectionPanel>
             {showField && (
-                <Modal title={`??? ${t("add_bed")}`} onClose={()=>setShowField(false)}>
+                <Modal title={`🌱? ${t("add_bed")}`} onClose={()=>setShowField(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={ff.name} onChange={setF("name")} placeholder="e.g. Tomato Raised Bed" required/>
                         <Sel label={t("type")} value={ff.type} onChange={setF("type")} options={FIELD_TYPES.map(ft=>({value:ft,label:LANG[lang]?.[FIELD_LABEL_K[ft]]||ft}))}/>
                         <BedShapePicker value={ff.shape||"rect"} onChange={setF("shape")}/>
-                        <InfoBanner icon="??">{posHint}</InfoBanner>
+                        <InfoBanner icon="🌱">{posHint}</InfoBanner>
                         <FormRow><Input label="X (m)" value={ff.x} onChange={setF("x")} type="number" step="0.1" min="0" required/><Input label="Y (m)" value={ff.y} onChange={setF("y")} type="number" step="0.1" min="0" required/><Input label={`${t("width")} (m)`} value={ff.width} onChange={setF("width")} type="number" step="0.1" min="0.1" required/><Input label={`${t("height")} (m)`} value={ff.height} onChange={setF("height")} type="number" step="0.1" min="0.1" required/></FormRow>
                         <Textarea label={t("notes")} value={ff.notes} onChange={setF("notes")} rows={2}/>
                         <FormActions onCancel={()=>{ setShowField(false); setFf(ef); }} onSave={addField} saveLabel={t("add_bed")} t={t}/>
@@ -226,7 +226,7 @@ export default function EditorScreen({ state, dispatch, navigate, lang, GardenEd
                 </Modal>
             )}
             {showStruct && (
-                <Modal title={`?? ${t("add_structure")}`} onClose={()=>setShowStruct(false)}>
+                <Modal title={`🌱 ${t("add_structure")}`} onClose={()=>setShowStruct(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={sf.name} onChange={setS("name")} placeholder="e.g. Main Greenhouse" required/>
                         <Sel label={t("type")} value={sf.type} onChange={setS("type")} options={STRUCT_TYPES.map(st=>({value:st,label:`${STRUCT_ICONS[st]} ${LANG[lang]?.[STRUCT_LABEL_K[st]]||st}`}))}/>
@@ -242,7 +242,7 @@ export default function EditorScreen({ state, dispatch, navigate, lang, GardenEd
                                 <Textarea label="Maintenance notes" value={sf.maintenance_notes} onChange={setS("maintenance_notes")} rows={2} placeholder="Cut in late spring and after summer growth" />
                             </>
                         )}
-                        <InfoBanner icon="??">{posHint}</InfoBanner>
+                        <InfoBanner icon="🌱">{posHint}</InfoBanner>
                         <FormRow><Input label="X (m)" value={sf.x} onChange={setS("x")} type="number" step="0.1" min="0" required/><Input label="Y (m)" value={sf.y} onChange={setS("y")} type="number" step="0.1" min="0" required/><Input label={`${t("width")} (m)`} value={sf.width} onChange={setS("width")} type="number" step="0.1" min="0.1" required/><Input label={`${t("height")} (m)`} value={sf.height} onChange={setS("height")} type="number" step="0.1" min="0.1" required/></FormRow>
                         <Textarea label={t("notes")} value={sf.notes} onChange={setS("notes")} rows={2}/>
                         <FormActions onCancel={()=>{ setShowStruct(false); setSf(es); }} onSave={addStruct} saveLabel={t("add_structure")} t={t}/>

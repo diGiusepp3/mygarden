@@ -135,7 +135,7 @@ import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js"
     return (
         <PageShell width={1120}>
             <PageHeader
-                title={`??? ${t("nav_fields")}`}
+                title={`🌱? ${t("nav_fields")}`}
                 subtitle={`${display.length} ${t("beds_total")} · ${displayArea}m² planned`}
                 meta={[
                     <MetaBadge key="beds" value={display.length} label={t("beds_fields")} />,
@@ -149,14 +149,14 @@ import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js"
                     <Badge color={T.textSub} bg={T.surfaceAlt}>{display.length} beds</Badge>
                 </div>
                 <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                    <Btn size="sm" variant="secondary" icon="???" onClick={()=>navigate("editor")} title="Open editor">Editor</Btn>
+                    <Btn size="sm" variant="secondary" icon="🌱" onClick={()=>navigate("editor")} title="Open editor">Editor</Btn>
                     <Btn size="sm" variant="secondary" onClick={()=>navigate("gardens")} title="Go to gardens">Gardens</Btn>
                 </div>
             </div>
 
             {display.length===0 ? (
-                <SectionPanel title={`??? ${t("nav_fields")}`} subtitle={t("no_beds")} action={<Btn size="sm" variant="primary" onClick={()=>setShow(true)}>{t("add_bed")}</Btn>}>
-                    <EmptyState icon="???" title={t("no_beds")} subtitle="Add beds or fields to start planning." />
+                <SectionPanel title={`🌱? ${t("nav_fields")}`} subtitle={t("no_beds")} action={<Btn size="sm" variant="primary" onClick={()=>setShow(true)}>{t("add_bed")}</Btn>}>
+                    <EmptyState icon="🌱" title={t("no_beds")} subtitle="Add beds or fields to start planning." />
                 </SectionPanel>
             ) : (
                 <SectionPanel title="Bed overzicht" subtitle="Compacte status per bed" style={{ padding:0 }}>
@@ -174,7 +174,7 @@ import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js"
                             return (
                                 <ListRow
                                     key={f.id}
-                                    icon="???"
+                                    icon="🌱"
                                     title={f.name}
                                     meta={`${f.width}m × ${f.height}m · ${typeLabel}`}
                                     hint={`Area ${(f.width*f.height).toFixed(1)}m² · Pos (${f.x}m, ${f.y}m) · ${nextLabel}`}
@@ -196,13 +196,13 @@ import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js"
             )}
 
             {show && (
-                <Modal title={`??? ${t("add_bed")}`} onClose={()=>setShow(false)}>
+                <Modal title={`🌱? ${t("add_bed")}`} onClose={()=>setShow(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         {gardens.length>1 && <Sel label={t("gardens")} value={gardenSel} onChange={setGardenSel} options={gardens.map(g=>({value:g.id,label:g.name}))} required/>}
                         <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Tomato Raised Bed" required/>
                         <Sel label={t("type")} value={form.type} onChange={set("type")} options={FIELD_TYPES.map(ft=>({value:ft,label:LANG[lang]?.[FIELD_LABEL_K[ft]]||ft}))}/>
                         <BedShapePicker value={form.shape||"rect"} onChange={set("shape")}/>
-                        {garden && <InfoBanner icon="??">Garden is {garden.width}m × {garden.height}m. Position from top-left (0, 0).</InfoBanner>}
+                        {garden && <InfoBanner icon="🌱">Garden is {garden.width}m × {garden.height}m. Position from top-left (0, 0).</InfoBanner>}
                         <FormRow><Input label="X (m)" value={form.x} onChange={set("x")} type="number" step="0.1" min="0" required/><Input label="Y (m)" value={form.y} onChange={set("y")} type="number" step="0.1" min="0" required/><Input label={`${t("width")} (m)`} value={form.width} onChange={set("width")} type="number" step="0.1" min="0.1" required/><Input label={`${t("height")} (m)`} value={form.height} onChange={set("height")} type="number" step="0.1" min="0.1" required/></FormRow>
                         <Textarea label={t("notes")} value={form.notes} onChange={set("notes")} rows={2}/>
                         <FormActions onCancel={()=>{ setShow(false); setForm(ef); }} onSave={create} saveLabel={t("add_bed")} t={t}/>
@@ -210,9 +210,9 @@ import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js"
                 </Modal>
             )}
             {showSlot && slotField && (
-                <Modal title={`?? Add Row In ${slotField.name}`} onClose={()=>{ setShowSlot(false); setSlotField(null); setSlotForm(esl); }}>
+                <Modal title={`🌱 Add Row In ${slotField.name}`} onClose={()=>{ setShowSlot(false); setSlotField(null); setSlotForm(esl); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="??">Rows are internal locations inside a bed. Existing plants without a row stay valid.</InfoBanner>
+                        <InfoBanner icon="🌱">Rows are internal locations inside a bed. Existing plants without a row stay valid.</InfoBanner>
                         <FormRow cols={2}>
                             <Input label="Name" value={slotForm.name} onChange={setSlot("name")} placeholder="e.g. North Row" required/>
                             <Input label="Label" value={slotForm.label} onChange={setSlot("label")} placeholder="R1" required/>
@@ -238,9 +238,9 @@ import { GARDEN_TYPE_LABEL_K, MAINTENANCE_STRUCT_TYPES } from "../gardenMeta.js"
                 </Modal>
             )}
             {editSlot && editSlotForm && (
-                <Modal title={`?? Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
+                <Modal title={`🌱 Edit ${editSlot.name}`} onClose={()=>{ setEditSlot(null); setEditSlotForm(null); }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="??">Existing rows can be adjusted here. The preview updates from row count, spacing and plant count.</InfoBanner>
+                        <InfoBanner icon="🌱">Existing rows can be adjusted here. The preview updates from row count, spacing and plant count.</InfoBanner>
                         <FormRow cols={2}>
                             <Input label="Name" value={editSlotForm.name} onChange={v=>setEditSlotForm(f=>({...f,name:v}))} required/>
                             <Input label="Label" value={editSlotForm.label} onChange={v=>setEditSlotForm(f=>({...f,label:v}))} required/>
@@ -357,13 +357,13 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
     const targetOptions = placementType === "struct" ? structOptions : bedOptions;
 
     const stages = [
-        { id:"zaailing",    label:"?? Zaailing",     hint:"Net gezaaid" },
-        { id:"jonge_plant", label:"?? Jonge plant",  hint:"Al een beetje gegroeid" },
-        { id:"volwassen",   label:"?? Volwassen",    hint:"Bijna oogstbaar" },
+        { id:"zaailing",    label:"🌱 Zaailing",     hint:"Net gezaaid" },
+        { id:"jonge_plant", label:"🪴 Jonge plant",  hint:"Al een beetje gegroeid" },
+        { id:"volwassen",   label:"🌿 Volwassen",    hint:"Bijna oogstbaar" },
     ];
 
     return (
-        <Modal title="?? Plant toevoegen" onClose={onClose} width={480}>
+        <Modal title="🌱 Plant toevoegen" onClose={onClose} width={480}>
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
                 {/* Search */}
                 <div style={{ position:"relative" }}>
@@ -383,7 +383,7 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
                                 <button key={h.name} onClick={() => selectEntry(h)} style={{ display:"flex", alignItems:"center", gap:10, width:"100%", padding:"10px 14px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, color:T.text, textAlign:"left", borderBottom:`1px solid ${T.borderLight}` }}
                                     onMouseEnter={e => e.currentTarget.style.background = T.surfaceSoft}
                                     onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                                    <span style={{ fontSize:18 }}>{CAT_ICONS[h.category] || "??"}</span>
+                                    <span style={{ fontSize:18 }}>{CAT_ICONS[plant.category] || "🌿"}</span>
                                     <div>
                                         <div style={{ fontWeight:700 }}>{h.name}</div>
                                         <div style={{ fontSize:11, color:T.textMuted }}>{h.category}{h.varieties.length ? ` · ${h.varieties[0]}` : ""}</div>
@@ -409,7 +409,7 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
 
                 {/* Harvest preview */}
                 {harvestDate && (
-                    <InfoBanner icon="???">
+                    <InfoBanner icon="🌱">
                         Geschatte oogst: <strong>{new Date(harvestDate + "T00:00:00").toLocaleDateString(lang === "nl" ? "nl-BE" : "en-GB", { day:"numeric", month:"long", year:"numeric" })}</strong>
                     </InfoBanner>
                 )}
@@ -442,7 +442,7 @@ function QuickAddPlantModal({ onClose, gardens, fields, structures, lang, dispat
                             options={[{ value:"", label:`- Kies een ${targetLabel.toLowerCase()} -` }, ...targetOptions]}
                         />
                     ) : (
-                        <InfoBanner icon="??">
+                        <InfoBanner icon="🌱">
                             Er is geen {targetLabel.toLowerCase()} gevonden in deze tuin.
                         </InfoBanner>
                     )}

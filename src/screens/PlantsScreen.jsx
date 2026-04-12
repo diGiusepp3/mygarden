@@ -1,5 +1,5 @@
 ﻿import { useMemo, useRef, useState } from "react";
-import { PageShell, PageHeader } from "../layout/PageChrome.jsx";
+import { PageShell, PageHeader, MetaBadge } from "../layout/PageChrome.jsx";
 import { Btn } from "../ui/Btn.jsx";
 import { Badge } from "../ui/Badge.jsx";
 import { ListRow } from "../ui/ListRow.jsx";
@@ -148,7 +148,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
     return (
         <PageShell width={1100}>
             <PageHeader
-                title={`?? ${t("nav_plants")}`}
+                title={`🌱 ${t("nav_plants")}`}
                 subtitle={slotFilter ? `${filtered.length}/${plants.length} plants · ${slotDisplayLabel(slotFilter, slots)}` : `${filtered.length}/${plants.length} plants`}
                 meta={[
                     <MetaBadge key="gardens" value={gardens.length} label={t("gardens")} />,
@@ -161,7 +161,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
             />
             <Card variant="muted" style={{ padding:18, display:"flex", flexDirection:"column", gap:14, marginBottom:20, boxShadow:"0 1px 6px rgba(0,0,0,0.05)" }}>
                 {slotFilter && (
-                    <InfoBanner icon="??">
+                    <InfoBanner icon="🌱">
                         Filtering plants in {slotDisplayLabel(slotFilter, slots)}.
                         <Btn size="xs" variant="ghost" onClick={() => navigate && navigate("plants")}>Clear filter</Btn>
                     </InfoBanner>
@@ -186,7 +186,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                 </div>
             </Card>
             {filtered.length===0 ? (
-                <EmptyState icon="??" title={plants.length===0?t("no_plants"):"No plants match filters"} action={plants.length===0?<Btn onClick={()=>setShow(true)} icon="+" variant="primary">{t("add_plant")}</Btn>:<Btn onClick={()=>{ setFStatus("all"); setFCat("all"); setSearch(""); }}>Clear Filters</Btn>}/>
+                <EmptyState icon="🌱" title={plants.length===0?t("no_plants"):"No plants match filters"} action={plants.length===0?<Btn onClick={()=>setShow(true)} icon="+" variant="primary">{t("add_plant")}</Btn>:<Btn onClick={()=>{ setFStatus("all"); setFCat("all"); setSearch(""); }}>Clear Filters</Btn>}/>
             ) : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))", gap:14 }}>
                     {filtered.map(p => {
@@ -199,7 +199,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                             <Card key={p.id} style={{ padding:16 }}>
                                 <div style={{ display:"flex", alignItems:"start", justifyContent:"space-between", marginBottom:10 }}>
                                     <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-                                        <div style={{ fontSize:28, lineHeight:1 }}>{CAT_ICONS[p.category]||"??"}</div>
+                                        <div style={{ fontSize:28, lineHeight:1 }}>{CAT_ICONS[p.category]||"🌿"}</div>
                                         <div><div style={{ fontSize:15, fontWeight:800, color:T.text, lineHeight:1.2 }}>{p.name}</div><div style={{ fontSize:11, color:T.textMuted, marginTop:2 }}>{p.variety||"—"}</div></div>
                                     </div>
                                     <Badge color={sc_.color} bg={sc_.bg}>{sc_l}</Badge>
@@ -268,7 +268,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                             <Input label="Row length (m)" value={form.row_length_m} onChange={set("row_length_m")} type="number" min="0.1" max="100" placeholder="8.4" />
                         )}
                         {selectedSlotIsRow && quantityValue > 1 && rowCountValue > 1 && (
-                            <InfoBanner icon="??">
+                            <InfoBanner icon="🌱">
                                 This can be saved as a row plan: {rowCountValue} rows × {rowPlantValue} plants in {slotDisplayLabel(selectedSlot, slots)}.
                             </InfoBanner>
                         )}
@@ -300,7 +300,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                                  onMouseEnter={e=>{ e.currentTarget.style.borderColor=T.primary; e.currentTarget.style.background=T.primaryBg; }}
                                  onMouseLeave={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.background=T.surface; }}>
                                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
-                                    <span style={{ fontSize:22 }}>{CAT_ICONS[p.category]||"??"}</span>
+                                    <span style={{ fontSize:22 }}>{CAT_ICONS[p.category]||"🌿"}</span>
                                     <div>
                                         <div style={{ fontSize:13, fontWeight:700, color:T.text }}>{p.name}</div>
                                         <div style={{ fontSize:10, color:T.textMuted }}>{p.category}</div>
@@ -329,7 +329,7 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
             {bulkPrompt && (
                 <Modal title="?? Save as row plan?" onClose={()=>setBulkPrompt(null)} width={520}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                        <InfoBanner icon="??">
+                        <InfoBanner icon="🌱">
                             {bulkPrompt.quantity} plants in {bulkPrompt.slotName} can be stored as a row plan: {bulkPrompt.rowCount} rows × {bulkPrompt.rowPlantCount} plants.
                         </InfoBanner>
                         <div style={{ fontSize:13, color:T.textSub, lineHeight:1.5 }}>

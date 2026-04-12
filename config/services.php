@@ -15,6 +15,6 @@ return [
         'sms_gate_password' => getenv('MYGARDEN_SMSGATE_PASSWORD') ?: '',
         'twilio_account_sid' => getenv('MYGARDEN_TWILIO_ACCOUNT_SID') ?: '',
         'twilio_auth_token' => getenv('MYGARDEN_TWILIO_AUTH_TOKEN') ?: '',
-        'twilio_from_number' => getenv('MYGARDEN_TWILIO_FROM_NUMBER') ?: '+32478118430',
+        'twilio_from_number' => getenv('MYGARDEN_TWILIO_FROM_NUMBER') ?: '',
     ],
 ];

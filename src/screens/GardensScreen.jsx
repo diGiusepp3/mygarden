@@ -45,7 +45,7 @@ export default function GardensScreen({ state, dispatch, navigate, lang }) {
     return (
         <PageShell width={1040}>
             <PageHeader
-                title={`?? ${t("nav_gardens")}`}
+                title={`🌱 ${t("nav_gardens")}`}
                 subtitle={`${gardens.length} ${t("gardens").toLowerCase()}`}
                 meta={metaBadges}
                 actions={[<Btn key="new" icon="+" variant="primary" onClick={()=>setShow(true)}>{t("new_garden")}</Btn>]}
@@ -64,7 +64,7 @@ export default function GardensScreen({ state, dispatch, navigate, lang }) {
             />
             {gardens.length===0 ? (
                 <SectionPanel title={t("nav_gardens")} subtitle="Start by creating your first garden" action={<Btn size="sm" icon="+" variant="primary" onClick={()=>setShow(true)}>{t("create_garden")}</Btn>}>
-                    <EmptyState icon="??" title={t("no_gardens")} subtitle="Create your first kitchen garden and start planning." />
+                    <EmptyState icon="🌱" title={t("no_gardens")} subtitle="Create your first kitchen garden and start planning." />
                 </SectionPanel>
             ) : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
@@ -106,7 +106,7 @@ export default function GardensScreen({ state, dispatch, navigate, lang }) {
                 </div>
             )}
             {show && (
-                <Modal title={`?? ${t("create_garden")}`} onClose={()=>setShow(false)}>
+                <Modal title={`🌱 ${t("create_garden")}`} onClose={()=>setShow(false)}>
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                         <Input label={t("name")} value={form.name} onChange={set("name")} placeholder="e.g. Backyard Kitchen Garden" required/>
                         <FormRow cols={3}>
