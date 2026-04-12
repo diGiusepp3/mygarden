@@ -255,8 +255,8 @@ export default function PlantsScreen({ state, dispatch, lang, routeParams = {}, 
                         </FormRow>
                         <FormRow cols={4}>
                             <Sel label={t("nav_gardens")} value={form.garden_id} onChange={v=>setForm(f=>({...f,garden_id:v,field_id:"",struct_id:"",slot_id:""}))} options={[{value:"",label:t("select_garden")},...gardens.map(g=>({value:g.id,label:g.name}))]} required/>
-                            <Sel label="Placement" value={form.placement_type} onChange={v=>setForm(f=>({...f,placement_type:v,field_id:"",struct_id:"",slot_id:""}))} options={[{value:"field",label:"Bed / Field"},{value:"struct",label:"Greenhouse"}]}/>
-                            <Sel label={form.placement_type==="struct"?"Greenhouse":"Bed / Field"} value={form.placement_type==="struct"?form.struct_id:form.field_id} onChange={v=>setForm(f=>({...f,[f.placement_type==="struct"?"struct_id":"field_id"]:v,slot_id:""}))} options={[{value:"",label:t("unassigned")},...placeOptions]}/>
+                            <Sel label="Placement" value={form.placement_type} onChange={v=>setForm(f=>({...f,placement_type:v,field_id:"",struct_id:"",slot_id:""}))} options={[{value:"field",label:"Bed / Field"},{value:"struct",label:"Structure"}]}/>
+                            <Sel label={form.placement_type==="struct"?"Structure":"Bed / Field"} value={form.placement_type==="struct"?form.struct_id:form.field_id} onChange={v=>setForm(f=>({...f,[f.placement_type==="struct"?"struct_id":"field_id"]:v,slot_id:""}))} options={[{value:"",label:t("unassigned")},...placeOptions]}/>
                             <Sel label="Row / Pot" value={form.slot_id} onChange={set("slot_id")} options={slotOptions}/>
                         </FormRow>
                         {selectedSlotIsRow && (

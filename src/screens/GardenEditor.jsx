@@ -725,76 +725,17 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
                         const roofRise = Math.max(10, depth * 0.75);
                         const faceFill = STRUCT_FILL[st.type] || "rgba(128,128,128,0.2)";
                         const faceStroke = STRUCT_STROKE[st.type] || "#888";
-                        if (viewMode === "3d" && isGH) {
-                            const topY = sy - roofRise;
-                            const rightX = sx + depth;
-                            const rightY = sy + depth * 0.45;
-                            return (
-                                <g key={st.id}>
-                                    <polygon
-                                        points={`${sx},${sy} ${sx + sw},${sy} ${sx + sw},${sy + sh} ${sx},${sy + sh}`}
-                                        fill={faceFill}
-                                        stroke={isSel ? T.accent : faceStroke}
-                                        strokeWidth={isSel ? 2.5 : 1.4}
-                                        style={{ cursor:"move" }}
-                                        onMouseDown={e => startDrag(e, "struct", st)}
-                                        onClick={e => handleItemPick("struct", st, e)}
-                                    />
-                                    <polygon
-                                        points={`${sx},${sy} ${sx + depth},${sy - roofRise} ${sx + sw + depth},${sy - roofRise} ${sx + sw},${sy}`}
-                                        fill={faceFill}
-                                        opacity={0.96}
-                                        stroke={isSel ? T.accent : faceStroke}
-                                        strokeWidth={isSel ? 2.2 : 1.2}
-                                        onMouseDown={e => startDrag(e, "struct", st)}
-                                        onClick={e => handleItemPick("struct", st, e)}
-                                    />
-                                    <polygon
-                                        points={`${sx + sw},${sy} ${sx + sw + depth},${sy - roofRise} ${sx + sw + depth},${sy + sh - roofRise * 0.15} ${sx + sw},${sy + sh}`}
-                                        fill={faceFill}
-                                        opacity={0.72}
-                                        stroke={isSel ? T.accent : faceStroke}
-                                        strokeWidth={isSel ? 2 : 1}
-                                        onMouseDown={e => startDrag(e, "struct", st)}
-                                        onClick={e => handleItemPick("struct", st, e)}
-                                    />
-                                    <polygon
-                                        points={`${sx},${sy} ${sx + depth},${sy - roofRise} ${sx + depth},${sy + sh - roofRise * 0.15} ${sx},${sy + sh}`}
-                                        fill="#ffffff"
-                                        opacity={0.08}
-                                        stroke="none"
-                                    />
-                                    <rect
-                                        x={sx + depth * 0.15}
-                                        y={topY + roofRise * 0.2}
-                                        width={sw}
-                                        height={sh}
-                                        fill="none"
-                                        stroke={isSel ? T.accent : faceStroke}
-                                        strokeWidth={isSel ? 2.5 : 1.3}
-                                        strokeDasharray="8,4"
-                                        rx={isGH ? 6 : 3}
-                                        style={{ cursor:"move" }}
-                                        onMouseDown={e => startDrag(e, "struct", st)}
-                                        onClick={e => handleItemPick("struct", st, e)}
-                                    />
-                                    <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 - fs*0.3 - roofRise * 0.18} textAnchor="middle" fontSize={Math.min(fs+1,15)} fontFamily="DM Sans,sans-serif" fill={faceStroke} fontWeight={800} style={{ pointerEvents:"none" }}>{STRUCT_ICONS[st.type]}</text>
-                                    {sh > sc*0.55 && <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 + fs*0.85 - roofRise * 0.18} textAnchor="middle" fontSize={clamp(fs,7,11)} fontFamily="DM Sans,sans-serif" fill={faceStroke} fontWeight={700} style={{ pointerEvents:"none" }}>{st.name}</text>}
-                                    {sh > sc*0.95 && plantCount > 0 && <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 + fs*2.35 - roofRise * 0.18} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={T.primary} fontWeight={700} style={{ pointerEvents:"none" }}>{plantCount} plants</text>}
-                                    {sh > sc*1.1 && <text x={sx + sw/2 + depth * 0.5} y={sy + sh/2 + fs*1.65 - roofRise * 0.18} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={faceStroke} style={{ pointerEvents:"none" }}>{e_.width} × {e_.height}m</text>}
-                                    {rowSlots.length > 0 && <g transform={`translate(${depth * 0.5}, ${-roofRise * 0.15})`}>{renderRowSlotOverlay(rowSlots, sx, sy, sw, sh)}</g>}
-                                    {isSel && renderHandles("struct", st)}
-                                </g>
-                            );
-                        }
+                        const isKeyhole = st.type === "keyhole_garden";
+                        const r = Math.min(sw * 0.4, sh * 0.4);
+                        const d = isKeyhole ? `M ${sx} ${sy} L ${sx + sw} ${sy} L ${sx + sw} ${sy + sh} A ${sw/2} ${sh/2} 0 0 1 ${sx} ${sy + sh} Z` : null;
                         return (
                             <g key={st.id}>
-                                <rect x={sx} y={sy} width={sw} height={sh} fill={STRUCT_FILL[st.type] || "rgba(128,128,128,0.2)"} stroke={isSel ? T.accent : (STRUCT_STROKE[st.type] || "#888")} strokeWidth={isSel ? 2.5 : (isGH ? 2 : 1.2)} strokeDasharray={isGH ? "8,4" : "none"} rx={isGH ? 5 : 3} style={{ cursor:"move" }} onMouseDown={e => startDrag(e, "struct", st)} onClick={e => handleItemPick("struct", st, e)} />
-                                {rowSlots.length > 0 && renderRowSlotOverlay(rowSlots, sx, sy, sw, sh)}
-                                <text x={sx+sw/2} y={sy+sh/2-fs*0.3} textAnchor="middle" fontSize={Math.min(fs+1,15)} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#555"} fontWeight={700} style={{ pointerEvents:"none" }}>{STRUCT_ICONS[st.type]}</text>
-                                {sh > sc*0.6 && <text x={sx+sw/2} y={sy+sh/2+fs*0.9} textAnchor="middle" fontSize={clamp(fs,7,11)} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#555"} fontWeight={600} style={{ pointerEvents:"none" }}>{st.name}</text>}
-                                {sh > sc*1.0 && plantCount > 0 && <text x={sx+sw/2} y={sy+sh/2+fs*2.55} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={T.primary} fontWeight={700} style={{ pointerEvents:"none" }}>{plantCount} plants</text>}
-                                {sh > sc*1.2 && <text x={sx+sw/2} y={sy+sh/2+fs*1.9} textAnchor="middle" fontSize={8} fontFamily="DM Sans,sans-serif" fill={STRUCT_STROKE[st.type] || "#888"} style={{ pointerEvents:"none" }}>{e_.width} × {e_.height}m</text>}
+                                {isKeyhole ? (
+                                    <path d={d} fill={STRUCT_FILL[st.type] || "rgba(128,128,128,0.2)"} stroke={isSel ? T.accent : (STRUCT_STROKE[st.type] || "#888")} strokeWidth={isSel ? 2.5 : (isGH ? 2 : 1.2)} strokeDasharray={isGH ? "8,4" : "none"} style={{ cursor:"move" }} onMouseDown={e => startDrag(e, "struct", st)} onClick={e => handleItemPick("struct", st, e)} />
+                                ) : (
+                                    <rect x={sx} y={sy} width={sw} height={sh} fill={STRUCT_FILL[st.type] || "rgba(128,128,128,0.2)"} stroke={isSel ? T.accent : (STRUCT_STROKE[st.type] || "#888")} strokeWidth={isSel ? 2.5 : (isGH ? 2 : 1.2)} strokeDasharray={isGH ? "8,4" : "none"} rx={isGH ? 5 : 3} style={{ cursor:"move" }} onMouseDown={e => startDrag(e, "struct", st)} onClick={e => handleItemPick("struct", st, e)} />
+                                )}
+                                {rowSlots.length > 0 && <g transform={`translate(${depth * 0.5}, ${-roofRise * 0.15})`}>{renderRowSlotOverlay(rowSlots, sx, sy, sw, sh)}</g>}
                                 {isSel && renderHandles("struct", st)}
                             </g>
                         );
@@ -1023,4 +964,10 @@ export default function GardenEditor({ garden, fields, structures, zones, plants
         </div>
     );
 }
+
+
+
+
+
+
 

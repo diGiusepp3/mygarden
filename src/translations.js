@@ -203,7 +203,7 @@ export const LANG = {
         struct_fence:"Fence", struct_animal:"Animal Enclosure", struct_chicken_coop:"Chicken Coop", struct_chicken_run:"Chicken Run", struct_wall:"Wall",
         struct_cold_frame:"Cold Frame", struct_raised_tunnel:"Raised Tunnel", struct_rain_barrel:"Rain Barrel",
         struct_potting_bench:"Potting Bench", struct_tool_rack:"Tool Rack", struct_insect_hotel:"Insect Hotel", struct_hedge:"Hedge",
-        struct_trellis:"Trellis", struct_windbreak:"Windbreak", struct_orchard_row:"Orchard Row",
+        struct_trellis:"Trellis", struct_windbreak:"Windbreak", struct_orchard_row:"Orchard Row", struct_keyhole_garden:"Keyhole Garden",
         delete_garden:"Delete garden?", delete_bed:"Delete this bed?",
         delete_plant:"Delete plant?", delete_struct:"Delete this structure?",
         select_garden:"— Select garden —", unassigned:"— Unassigned —",
@@ -427,7 +427,7 @@ export const LANG = {
         struct_fence:"Hek", struct_animal:"Dierenweide", struct_chicken_coop:"Kippenhok", struct_chicken_run:"Kippenren", struct_wall:"Muur",
         struct_cold_frame:"Koude bak", struct_raised_tunnel:"Verhoogde tunnel", struct_rain_barrel:"Regenton",
         struct_potting_bench:"Pottafel", struct_tool_rack:"Gereedschapsrek", struct_insect_hotel:"Insectenhotel", struct_hedge:"Haag",
-        struct_trellis:"Trellis", struct_windbreak:"Windscherm", struct_orchard_row:"Fruitrij",
+        struct_trellis:"Trellis", struct_windbreak:"Windscherm", struct_orchard_row:"Fruitrij", struct_keyhole_garden:"Sleutelgat Tuin",
         delete_garden:"Tuin verwijderen?", delete_bed:"Dit bed verwijderen?",
         delete_plant:"Plant verwijderen?", delete_struct:"Deze structuur verwijderen?",
         select_garden:"— Selecteer tuin —", unassigned:"— Niet toegewezen —",
@@ -561,7 +561,7 @@ export const LANG = {
         dev_tab_plants:"Générer des plantes",
         dev_tab_codex:"Types de plantes Codex",
         dev_tab_advisor:"Conseiller jardin",
-        dev_tab_companions:"Compagnonnage",
+        dev_tab_companions:"Compagnons",
         dev_tab_calendar:"Plan de semis",
         dev_tab_knowledge:"Base de connaissances",
         dev_tab_chat:"Question libre",
@@ -651,7 +651,7 @@ export const LANG = {
         struct_fence:"Clôture", struct_animal:"Enclos animal", struct_chicken_coop:"Poulailler", struct_chicken_run:"Parc à poules", struct_wall:"Mur",
         struct_cold_frame:"Châssis froid", struct_raised_tunnel:"Tunnel surélevé", struct_rain_barrel:"Tonneau de pluie",
         struct_potting_bench:"Table de rempotage", struct_tool_rack:"Râtelier à outils", struct_insect_hotel:"Hôtel à insectes", struct_hedge:"Haie",
-        struct_trellis:"Trellis", struct_windbreak:"Brise-vent", struct_orchard_row:"Rangée fruitière",
+        struct_trellis:"Trellis", struct_windbreak:"Brise-vent", struct_orchard_row:"Rangée fruitière", struct_keyhole_garden:"Jardin en trou de serrure",
         delete_garden:"Supprimer ce jardin ?", delete_bed:"Supprimer ce parterre ?",
         delete_plant:"Supprimer cette plante ?", delete_struct:"Supprimer cette structure ?",
         select_garden:"— Sélectionner un jardin —", unassigned:"— Non assigné —",
@@ -767,12 +767,12 @@ export const LANG = {
         sow_date:"Aussaatdatum", plant_date:"Pflanzdatum", harvest_date:"Erntedatum (geplant)",
         add_plant:"Pflanze hinzufügen", add_from_library:"📚 Pflanzenbibliothek",
         new_garden:"Neuer Garten", open_editor:"Editor öffnen", create_garden:"Garten erstellen",
-        add_bed:"Beet hinzufügen", add_structure:"Struktur hinzufügen", add_task:"Aufgabe hinzufügen",
-        due_date:"Fälligkeitsdatum", linked_to:"Verknüpft mit",
-        language:"Sprache", data_mgmt:"Datenverwaltung",
-        export_backup:"JSON-Backup exportieren", reset_all:"Alle Daten zurücksetzen",
-        reset_confirm:"ALLE Gartendaten zurücksetzen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
-        greenhouses:"Gewächshäuser & Tunnel", no_greenhouses:"Noch keine Gewächshäuser",
+        add_bed:"Beet toevoegen", add_structure:"Structuur toevoegen", add_task:"Taak toevoegen",
+        due_date:"Vervaldatum", linked_to:"Gekoppeld aan",
+        language:"Taal", data_mgmt:"Gegevensbeheer",
+        export_backup:"JSON-Backup exporteren", reset_all:"Alle gegevens terugzetten",
+        reset_confirm:"ALLE tuingegevens terugzetten? Deze actie kan niet ongedaan gemaakt worden.",
+        greenhouses:"Gewächshäuser & Tunnel", no_greenhouses:"Nog geen gewächshäuser",
         no_gh_sub:"Füge zuerst ein Gewächshaus oder einen Tunnel im Garteneditor hinzu.",
         ventilated:"Belüftet ✅", closed:"Geschlossen 🔒", ventilate:"Lüftung öffnen",
         close_vents:"Lüftung schließen", inside_beds:"Beete drinnen", inside_plants:"Pflanzen drinnen",
@@ -875,7 +875,7 @@ export const LANG = {
         struct_fence:"Zaun", struct_animal:"Tiergehege", struct_chicken_coop:"Hühnerstall", struct_chicken_run:"Hühnerauslauf", struct_wall:"Mauer",
         struct_cold_frame:"Frühbeet", struct_raised_tunnel:"Hochtunnel", struct_rain_barrel:"Regentonne",
         struct_potting_bench:"Topftisch", struct_tool_rack:"Werkzeughalter", struct_insect_hotel:"Insektenhotel", struct_hedge:"Hecke",
-        struct_trellis:"Rankhilfe", struct_windbreak:"Windschutz", struct_orchard_row:"Obstreihe",
+        struct_trellis:"Rankhilfe", struct_windbreak:"Windschutz", struct_orchard_row:"Obstreihe", struct_keyhole_garden:"Schlüssellochgarten",
         delete_garden:"Garten löschen?", delete_bed:"Dieses Beet löschen?",
         delete_plant:"Pflanze löschen?", delete_struct:"Diese Struktur löschen?",
         select_garden:"— Garten auswählen —", unassigned:"— Nicht zugewiesen —",
@@ -903,3 +903,7 @@ export const LANG = {
 };
 export const useT = (lang) => useCallback((k) => LANG[lang]?.[k] ?? LANG.en[k] ?? k, [lang]);
 export const LOCALE_MAP = { en:"en-GB", nl:"nl-BE", fr:"fr-BE", de:"de-DE" };
+export const STRUCT_LABEL_K = {greenhouse:"struct_greenhouse", tunnel_greenhouse:"struct_tunnel", compost_zone:"struct_compost", water_point:"struct_water", shed:"struct_shed", path:"struct_path", fence:"struct_fence", animal_enclosure:"struct_animal", wall:"struct_wall", chicken_coop:"struct_chicken_coop", chicken_run:"struct_chicken_run", cold_frame:"struct_cold_frame", raised_tunnel:"struct_raised_tunnel", rain_barrel:"struct_rain_barrel", potting_bench:"struct_potting_bench", tool_rack:"struct_tool_rack", insect_hotel:"struct_insect_hotel", hedge:"struct_hedge", trellis:"struct_trellis", windbreak:"struct_windbreak", orchard_row:"struct_orchard_row", keyhole_garden:"struct_keyhole_garden"}
+export const STRUCT_ICONS = {greenhouse:"🏠", tunnel_greenhouse:"⛺", compost_zone:"♻️", water_point:"💧", shed:"🏚️", path:"🚶‍♂️", fence:"🚧", animal_enclosure:"🐃", wall:"🧱", chicken_coop:"🐔", chicken_run:"🐔", cold_frame:"🧊", raised_tunnel:"🌿", rain_barrel:"🚰", potting_bench:"🪑", tool_rack:"🛠️", insect_hotel:"🐝", hedge:"🌳", trellis:"🪜", windbreak:"🌬️", orchard_row:"🍎", keyhole_garden:"🔑"}
+export const STRUCT_FILL = {greenhouse:"rgba(0,131,143,0.18)", tunnel_greenhouse:"rgba(0,150,136,0.18)", compost_zone:"rgba(121,85,72,0.22)", water_point:"rgba(66,165,245,0.55)", shed:"rgba(121,85,72,0.28)", path:"rgba(188,170,164,0.42)", fence:"rgba(78,52,46,0.4)", animal_enclosure:"rgba(255,183,77,0.3)", wall:"rgba(121,85,72,0.35)", chicken_coop:"rgba(255,213,79,0.26)", chicken_run:"rgba(245,124,0,0.18)", cold_frame:"rgba(96,125,139,0.18)", raised_tunnel:"rgba(76,175,80,0.16)", rain_barrel:"rgba(33,150,243,0.22)", potting_bench:"rgba(139,195,74,0.18)", tool_rack:"rgba(158,158,158,0.22)", insect_hotel:"rgba(255,193,7,0.20)", hedge:"rgba(76,175,80,0.20)", trellis:"rgba(121,85,72,0.18)", windbreak:"rgba(96,125,139,0.22)", orchard_row:"rgba(255,152,0,0.18)", keyhole_garden:"rgba(121,85,72,0.4)"}
+export const STRUCT_STROKE = {greenhouse:"#00838F", tunnel_greenhouse:"#009688", compost_zone:"#795548", water_point:"#1976D2", shed:"#5D4037", path:"#8D6E63", fence:"#4E342E", animal_enclosure:"#F57C00", wall:"#5D4037", chicken_coop:"#C9A227", chicken_run:"#E65100", cold_frame:"#607D8B", raised_tunnel:"#2E7D32", rain_barrel:"#1565C0", potting_bench:"#558B2F", tool_rack:"#616161", insect_hotel:"#F9A825", hedge:"#2E7D32", trellis:"#795548", windbreak:"#607D8B", orchard_row:"#FB8C00", keyhole_garden:"#5D4037"}
