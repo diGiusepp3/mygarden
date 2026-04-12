@@ -148,3 +148,27 @@ export const polygonCentroid = (points = []) => {
     const sum = points.reduce((acc, p) => ({ x:acc.x + p.x, y:acc.y + p.y }), { x:0, y:0 });
     return { x:sum.x / points.length, y:sum.y / points.length };
 };
+
+// ── Structure maintenance task sync ───────────────────────────
+export const getStructureMaintenanceTask = (struct, uid) => {
+    if (!struct) return null;
+    const maintenanceMap = {
+        hedge:      { type:"pruning", label:"Prune hedge",        dueKey:"next_prune_date" },
+        trellis:    { type:"repair",  label:"Inspect trellis",    dueKey:"next_prune_date" },
+        windbreak:  { type:"pruning", label:"Trim windbreak",     dueKey:"next_prune_date" },
+        orchard_row:{ type:"pruning", label:"Prune orchard row",  dueKey:"next_prune_date" },
+    };
+    const cfg = maintenanceMap[struct.type];
+    if (!cfg) return null;
+    return {
+        id: `maint_${struct.id}`,
+        user_id: uid,
+        title: `${cfg.label}: ${struct.name}`,
+        type: cfg.type,
+        status: "pending",
+        due_date: struct[cfg.dueKey] || struct.next_prune_date || "",
+        linked_type: "struct",
+        linked_id: struct.id,
+        notes: struct.maintenance_notes || struct.info || struct.notes || "",
+    };
+};

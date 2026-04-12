@@ -1,5 +1,5 @@
 import { normalizeState } from "./persistence.js";
-import { syncHarvestTask, removeHarvestTask, getHarvestTaskForPlant } from "../helpers.js";
+import { syncHarvestTask, removeHarvestTask, getHarvestTaskForPlant, getStructureMaintenanceTask } from "../helpers.js";
 
 export function reducer(state, { type, payload }) {
     const uid = state.activeUserId;
@@ -45,6 +45,15 @@ export function reducer(state, { type, payload }) {
             const untouchedTasks = state.tasks.filter(t => !String(t.id).startsWith("harvest_"));
             const harvestTasks = syncedPlants.map(p => getHarvestTaskForPlant(p, uid)).filter(Boolean);
             return { ...state, tasks: [...untouchedTasks, ...harvestTasks] };
+        }
+        case "SYNC_STRUCTURE_TASKS": {
+            const syncedStructs = state.structures.filter(s => !s.user_id || s.user_id === uid);
+            let nextTasks = state.tasks.filter(t => !String(t.id).startsWith("maint_"));
+            syncedStructs.forEach(struct => {
+                const task = getStructureMaintenanceTask(struct, uid);
+                if (task) nextTasks.push(task);
+            });
+            return { ...state, tasks: nextTasks };
         }
         case "HYDRATE_STATE":     return normalizeState(payload) || state;
         case "SET_SETTING":       return { ...state, users: state.users.map(u => u.id===uid ? {...u, settings:{...u.settings,...payload}} : u) };
