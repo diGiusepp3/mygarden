@@ -4,7 +4,16 @@ import { SLOT_TYPE_LABELS, SLOT_TYPE_ICONS, SLOT_SEED_COLORS } from "./constants
 // ── Date helpers ──────────────────────────────────────────────
 export const fmtDate = (d, lang = "en") => {
     if (!d) return "—";
-    try { return new Date(d + "T00:00:00").toLocaleDateString(LOCALE_MAP[lang] || "en-GB", { day:"numeric", month:"short", year:"numeric" }); }
+    try {
+        let iso = d;
+        // DD/MM/YYYY → YYYY-MM-DD
+        const dmyFull = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (dmyFull) iso = `${dmyFull[3]}-${dmyFull[2].padStart(2,"0")}-${dmyFull[1].padStart(2,"0")}`;
+        // DD/MM → YYYY-MM-DD (current year)
+        const dmy = d.match(/^(\d{1,2})\/(\d{1,2})$/);
+        if (dmy) iso = `${new Date().getFullYear()}-${dmy[2].padStart(2,"0")}-${dmy[1].padStart(2,"0")}`;
+        return new Date(iso + "T00:00:00").toLocaleDateString(LOCALE_MAP[lang] || "en-GB", { day:"numeric", month:"short", year:"numeric" });
+    }
     catch { return d; }
 };
 export const isSameDay = (d, ref = new Date()) => {
